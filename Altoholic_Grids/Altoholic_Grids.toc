@@ -1,0 +1,12 @@
+## Interface: 30403
+## Title: Altoholic_Grids
+## Notes: Altoholic's Grids Tab
+## Author: Thaoky (EU-Marécages de Zangar)
+## Version: 3.4.010
+## Dependencies: Altoholic, DataStore, DataStore_Characters
+## LoadOnDemand: 1
+## X-Category: Interface Enhancements
+
+Templates\UITemplates.xml
+TabGrids.xml
+Grids.xml
