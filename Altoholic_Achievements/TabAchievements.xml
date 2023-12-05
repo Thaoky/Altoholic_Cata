@@ -1,0 +1,91 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="TabAchievements.lua"></Script>
+	
+	<Button name="AltoTabAchievementsClassIconTemplate" inherits="AltoClassIconTemplate" virtual="true">
+		<KeyValues>
+			<KeyValue key="optionFormat" value="Tabs.Achievements.%s.%s.Column%d" />
+		</KeyValues>
+		<Scripts>
+			<OnEnter>
+				self:Icon_OnEnter()
+			</OnEnter>
+			<OnClick>
+				-- make that configurable
+				--self:Icon_OnEnter()
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<Frame name="AltoholicTabAchievements" parent="AltoholicFrame" hidden="true">
+		<Size x="758" y="447" />
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Label1" inherits="GameFontNormalSmall" justifyH="LEFT" text="GUILD_ROSTER_VIEW">
+					<Size x="60" y="18" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="AltoholicFrameSearchLabel" relativePoint="RIGHT" x="60" y="-5" />
+					</Anchors>
+					<Color r="255" g="255" b="255" />
+				</FontString>
+				<FontString parentKey="Status" inherits="GameFontNormal" justifyH="LEFT">
+					<Size x="320" y="24" />
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-250" y="13" />
+					</Anchors>
+					<Color r="255" g="255" b="255" />
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="SelectRealm" inherits="AltoRealmPickerTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.Label1" relativePoint="BOTTOMLEFT" x="-30" y="-2" />
+				</Anchors>
+				<KeyValues>
+					<KeyValue key="menuWidth" value="100" type="number" />
+				</KeyValues>
+			</Frame>
+		
+			<!-- Menu Icons -->
+			<Frame parentKey="ClassIcons" inherits="AltoClassIconsContainerTemplate">
+				<KeyValues>
+					<KeyValue key="numIcons" value="12" type="number" />
+					<KeyValue key="iconTemplate" value="AltoTabAchievementsClassIconTemplate" />
+					<KeyValue key="tabName" value="Achievements" />
+				</KeyValues>
+			</Frame>
+		
+			<Frame parentKey="ContextualMenu" inherits="AltoContextualMenuTemplate" />
+
+			<ScrollFrame parentKey="ScrollFrame" inherits="AltoMenuScrollFrameTemplate">
+				<Scripts>
+					<OnVerticalScroll>
+						local parent = self:GetParent()
+						self:OnVerticalScroll(offset, 20, parent.Update, parent)
+					</OnVerticalScroll>
+					<OnShow>
+						self:GetParent().Achievements:Update()
+					</OnShow>
+				</Scripts>
+				<KeyValues>
+					<KeyValue key="numRows" value="15" type="number" />
+					<KeyValue key="rowHeight" value="20" type="number" />
+					<KeyValue key="rowTemplate" value="AltoMenuItemTemplate" />
+					<KeyValue key="xOffset" value="23" type="number" />
+					<KeyValue key="yOffset" value="-105" type="number" />
+				</KeyValues>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				Altoholic:BindViewToController(self, "AltoholicUI.TabAchievements")
+			</OnLoad>
+			<OnShow>
+				self:Update()
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

@@ -1,0 +1,13 @@
+## Interface: 30403
+## Title: Altoholic_Achievements
+## Notes: Altoholic's Achievements UI
+## Author: Thaoky (EU-Marécages de Zangar)
+## Version: 3.4.010
+## Dependencies: Altoholic, DataStore, DataStore_Achievements, DataStore_Characters
+## LoadOnDemand: 1
+## X-Category: Interface Enhancements
+
+Templates\UITemplates.xml
+TabAchievements.xml
+
+Frames\Achievements.xml
