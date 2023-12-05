@@ -1,0 +1,135 @@
+Altoholic BC & WotLK Classic Changelog (dates in dd/mm/yyyy)
+=======================================
+
+3.4.010 (26/11/2023)
+
+- DataStore_Crafts: The module is now shared between all versions of the game.
+- This concludes the conversion of all DataStore modules to make them compatible with all versions.
+
+3.4.009 (20/11/2023)
+
+- DataStore_Quests: The module is now shared between all versions of the game.
+- DataStore_Talents: The module is now shared between all versions of the game.
+- DataStore_Reputations: The module is now shared between all versions of the game.
+- The Quest Log icon now has the proper size.
+- DataStore_Containers: Fixed COMMON_NUM_BAG_SLOTS to be NUM_BAG_SLOTS + 1 for retail, and NUM_BAG_SLOTS for non-retail, instead of the opposite.
+
+3.4.008 (17/11/2023)
+
+- DataStore ToC Updates.
+- Events : fixed a Lua error when deleting an expired event.
+
+3.4.007 (14/11/2023)
+
+- DataStore_Containers: The module is now shared between all versions of the game.
+
+3.4.006 (06/11/2023)
+
+- DataStore_Quests : updated ScanChoices and ScanRewardSpells to use the questID. (Thanks Technohunter)
+- Accout Summary : fixed the tests that were using MAX_PLAYER_LEVEL, now using MAX_PLAYER_LEVEL_TABLE instead. (Thanks Technohunter)
+- DataStore_Auctions is now generic and works will all versions of the game.
+- DataStore_Inventory is now generic and works will all versions of the game.
+
+3.4.005 (18/05/2023)
+
+- DataStore_Agenda is now generic and works will all versions of the game.
+- DataStore_Currencies is now generic and works will all versions of the game.
+- Agenda tab : fixed the calendar not showing calendar events.
+
+3.4.004 (04/05/2023)
+
+- Updated Ace Libraries
+- DataStore_Mails : fixed the events triggered when opening the mailbox AGAIN !
+- DataStore_Spells : fixed toc files to use the same version as retail (wrong push in previous version).
+
+3.4.003 (03/05/2023)
+
+Most changes in this release are from TechnoHunter, many thanks for his support !
+
+- DataStore_Reputations : updated a few reputations
+- DataStore_Mails : fixed the events triggered when opening the mailbox.
+- DataStore_Crafts : fixed scanning of the Enchanting profession.
+- DataStore_Containers : fixed scanning of containers to use the new API.
+- DataStore_Containers : Fixed guild bank update (Thanks GovtGeek !)
+- DataStore_Auctions : fixed scanning functions.
+- DataStore_Auctions : added a warning when auctions have not been checked for a long time.
+- Fixed calendar issues.
+- Fixed the recipes panel.
+- Grids Tab : added the shift-click links on the reputation icons.
+- and a few more minor fixes !
+
+
+3.4.002 (20/12/2022)
+
+- Added DataStore_Currencies.
+- Grids Tab : Added support for currencies.
+- Toolip : Added support for currencies.
+- Added support for Jewelcrafting & Inscription.
+
+Thanks to Yamilife & Takka for their help !
+
+3.4.001 (25/10/2022)
+
+First of all, huge thanks to Takka, Klyup, Spudicus, Himeki, Mewse and maybe a few others I have missed for helping since the LK release!
+Your help is greatly appreciated :)
+
+- Imported the unofficial fixes into the main branch.
+- Added the Achievements tab.
+- Added WotLK factions.
+
+2.5.008 (05/06/2022)
+
+- Fixed item count not being visible in the tooltip for enchanting reagents.
+- Fixed the tooltip backdrop issue.
+(for reference: changed 2x BackdropTemplate to TooltipBackdropTemplate in Altoholic\Templates\DropDownMenu.xml)
+
+2.5.007 (03/10/2021)
+
+- Fixed an issue that made any recipe tooltip with "Requires [reagents](X)" show as learnable (Thanks Solastus75 !)
+
+2.5.006 (05/09/2021)
+
+- Grids Tab : fixed the tradeskills not being properly listed.
+- Grids Tab : Added Burning Crusade attunements.
+- Guild Tab : guild banks are back, Huuuuge thanks to Kranna for her assistance ! :)
+- Added a tooltip option to display the counter for heartstones or not.
+
+2.5.005 (29/08/2021)
+
+- Fixed characters above 60 not being visible in the account summary.
+
+Reminder : I've seen several reports of errors in DataStore_Crafts, that manifest while making a search, or when a tooltip gets stuck at a vendor.
+You might also get a Lua error that looks like this :
+
+=> bad argument #2 to 'strsplit' (string expected, got table)
+
+Related Curse Issues : 1182, 1253, 1256
+
+This is caused by Saved Variables that have not been cleared after upgrading from Classic to TBC.
+This is a MANDATORY step, and it must happen WHEN THE GAME IS NOT RUNNING !!
+This means cleaning the following files in \WTF\Account\<your_account>\SavedVariables : Altoholic.lua & All DataStore*.lua
+
+
+2.5.004 (20/06/2021)
+
+- Fixed the enchanting profession in the character's tab. Filtering by enchant name now also working.
+
+2.5.003 (07/06/2021)
+
+- Account Summary : Fixed improper level filtering causing alts not to be displayed.
+- Fixed a tooltip issue caused by RAID_CLASS_COLORS not yet being loaded, made it local.
+- Fixed a Lua error in the Skills panel when having to display a skill level higher than the maximum.
+
+2.5.002 (24/05/2021)
+
+- Fixed invisible backdrop in the message box object.
+- Fixed missing Jewelcrafting icon in the Skill panel.
+- Fixed account sharing.
+- DataStore_Talents : fixed and issue when reporting a character's main specialization
+- DataStore_Crafts : fixed the color of enchanting recipes in the skill panel, which were all displayed as orange.
+You must reload the profession once to fix the database entries.
+
+
+2.5.001 (24/05/2021)
+
+- Initial release on Burning Crusade Classic.
