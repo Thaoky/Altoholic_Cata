@@ -1,6 +1,11 @@
 Altoholic BC & WotLK Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
+3.4.011 (07/12/2023)
+
+- First release via Github.
+- ToC Update.
+
 3.4.010 (26/11/2023)
 
 - DataStore_Crafts: The module is now shared between all versions of the game.
