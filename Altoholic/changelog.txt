@@ -1,6 +1,11 @@
 Altoholic BC & WotLK Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
+
+3.4.012 (10/12/2023)
+
+- DataStore_Containers: Fixed Bag5 being treated as the reagent bag in non-retail, causing the proper count not to be displayed for the first bank bag.
+
 3.4.011 (07/12/2023)
 
 - First release via Github.
