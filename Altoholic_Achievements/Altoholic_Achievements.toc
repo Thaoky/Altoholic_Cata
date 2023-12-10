@@ -2,7 +2,7 @@
 ## Title: Altoholic_Achievements
 ## Notes: Altoholic's Achievements UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 3.4.011
+## Version: 3.4.012
 ## Dependencies: Altoholic, DataStore, DataStore_Achievements, DataStore_Characters
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
