@@ -2,6 +2,10 @@ Altoholic BC & WotLK Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
 
+3.4.014 (29/12/2023)
+
+- Align with DataStore updates.
+
 3.4.013 (17/12/2023)
 
 - DataStore_Quests: Reworked the tracking of campaign progress. 
