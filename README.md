@@ -1,2 +1,2 @@
-# Altoholic_WotLK
-WoW Altoholic Addon (WoW WotLK version)
+# Altoholic_Cata
+WoW Altoholic Addon (WoW Cataclysm version)
