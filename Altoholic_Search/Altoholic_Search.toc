@@ -1,9 +1,10 @@
-## Interface: 30403
+## Interface: 40400
 ## Title: Altoholic_Search
 ## Notes: Altoholic's Search UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 3.4.012
+## Version: 4.4.001
 ## Dependencies: Altoholic, DataStore, DataStore_Characters
+## SavedVariables: Altoholic_SearchTab_Options
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
 

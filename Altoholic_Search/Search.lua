@@ -2,7 +2,8 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
+local enum = DataStore.Enum.ContainerIDs
 
 local THIS_ACCOUNT = "Default"
 
@@ -603,7 +604,7 @@ function ns:SortResults(frame, field)
 	if ns:GetNumResults() == 0 then return end
 
 	local id = frame:GetID()
-	local ascending = addon:GetOption("UI.Tabs.Search.SortAscending")
+	local ascending = Altoholic_SearchTab_Options.SortAscending
 		
 	if field == "name" then
 		table.sort(results, function(a, b) return SortByName(a, b, ascending) end)
@@ -640,7 +641,7 @@ local currentResultLocation	-- what is actually being searched (bags, bank, equi
 
 local MYTHIC_KEYSTONE = 138019
 
-local function VerifyItem(item, itemCount, itemLink)
+local function VerifyItem(location, item, itemLink, itemCount)
 	if type(item) == "string" then		-- convert a link to its item id, only data saved
 	
 		if item:match("|Hkeystone:") then
@@ -655,17 +656,16 @@ local function VerifyItem(item, itemCount, itemLink)
 	end
 	
 	filters:SetSearchedItem(item, (item ~= MYTHIC_KEYSTONE) and itemLink or nil)
-	-- local isOK = filters:ItemPassesFilters((item == 138019))	-- debug item 
-	local isOK = filters:ItemPassesFilters()
 	
-	if isOK then			-- All conditions ok ? save it
+	-- All conditions ok ? save it
+	if filters:ItemPassesFilters() then
 		ns:AddResult( {
 			linetype = currentResultType,			-- PLAYER_ITEM_LINE or GUILD_ITEM_LINE 
 			id = item,
 			link = itemLink,
 			source = currentResultKey,				-- character or guild key in DataStore
 			count = itemCount,
-			location = currentResultLocation,
+			location = location,
 		} )
 	end
 end
@@ -691,86 +691,69 @@ local function BrowseCharacter(character)
 	currentResultType = PLAYER_ITEM_LINE	
 	currentResultKey = character
 	
-	local itemID, itemLink, itemCount
-	local containers = DataStore:GetContainers(character)
-	if containers then
-		for containerName, container in pairs(containers) do
-			if string.sub(containerName, 1, string.len("VoidStorage")) == "VoidStorage" then
-				currentResultLocation = VOID_STORAGE
-			elseif (containerName == "Bag100") then
-				currentResultLocation = L["Bank"]
-			elseif (containerName == "Bag-2") then
-				currentResultLocation = KEYRING
-			else
-				local bagNum = tonumber(string.sub(containerName, 4))
-				if (bagNum >= 0) and (bagNum <= 4) then
-					currentResultLocation = L["Bags"]
-				else
-					currentResultLocation = L["Bank"]
-				end			
-			end
-		
-			for slotID = 1, container.size do
-				itemID, itemLink, itemCount = DataStore:GetSlotInfo(container, slotID)
-				
-				-- use the link before the id if there's one
-				if itemID then
-					-- VerifyItem(itemLink or itemID, itemCount, itemLink)
-					VerifyItem(itemID, itemCount, itemLink)
-				end
-			end
-		end
-	end
-	
-	currentResultLocation = L["Equipped"]
+	-- Bags / Bank
+	DataStore:IterateContainerSlots(character, function(containerID, itemID, itemLink, itemCount, isBattlePet) 
+		local location
 
-	local inventory = DataStore:GetInventory(character)
-	if inventory then
-		for _, v in pairs(inventory) do
-			VerifyItem(v, 1, v)
+		if containerID == enum.Keyring then
+			location = KEYRING
+		elseif containerID <= 4 then
+			location = L["Bags"]
+		else
+			location = L["Bank"]
 		end
-	end
 	
-	if addon:GetOption("UI.Tabs.Search.IncludeMailboxItems") then			-- check mail ?
-		currentResultLocation = L["Mail"]
-		local num = DataStore:GetNumMails(character) or 0
-		for i = 1, num do
-			local _, count, link = DataStore:GetMailInfo(character, i)
-			if link then
-				VerifyItem(link, count, link)
-			end
-		end
-	end
+		VerifyItem(location, itemID, itemLink, itemCount, character, isBattlePet)
+	end)
 	
-	if addon:GetOption("UI.Tabs.Search.IncludeKnownRecipes")			-- check known recipes ?
-		and (filters:GetFilterValue("itemType") == nil) 
-		-- and (filters:GetFilterValue("itemSlot") == 0)				-- is now nil .. not zero anymore, keep commented for reference
-		and (filters:GetFilterValue("itemRarity") == 0) then
+	-- Player Bank (main slots)
+	DataStore:IteratePlayerBankSlots(character, function(itemID, itemLink, itemCount, isBattlePet) 
+		VerifyItem(L["Bank"], itemID, itemLink, itemCount, character, isBattlePet)
+	end)
+	
+	-- Equipment
+	DataStore:IterateInventory(character, function(item) 
+		VerifyItem(L["Equipped"], item, item, 1, character)
+	end)
+	
+	-- Mails
+	if Altoholic_SearchTab_Options["IncludeMailboxItems"] then			
 		
-		local professions = DataStore:GetProfessions(character)
-		if professions then
-			for professionName, profession in pairs(professions) do
-			
-				local isEnchanting = (professionName == GetSpellInfo(7411))
-			
-				DataStore:IterateRecipes(profession, 0, function(color, spellID)
-					if CraftMatchFound(spellID, currentValue, isEnchanting) then
-						ns:AddResult(	{
-							linetype = PLAYER_CRAFT_LINE,
-							char = currentResultKey,
-							professionName = professionName,
-							profession = profession,
-							spellID = spellID
-						} )
-					end
-				end)
+		DataStore:IterateMails(character, function(icon, count, itemLink) 
+			if itemLink then
+				VerifyItem(L["Mail"], itemLink, itemLink, count, character)
 			end
+		end)
+	end
+	
+	-- Check known recipes ?
+	if not Altoholic_SearchTab_Options["IncludeKnownRecipes"] then return end	
+		
+	local professions = DataStore:GetProfessions(character)
+	if professions then
+		for professionName, profession in pairs(professions) do
+		
+			local isEnchanting = (professionName == GetSpellInfo(7411))
+		
+			DataStore:IterateRecipes(profession, 0, 0, function(recipeData)
+				local _, spellID, isLearned = DataStore:GetRecipeInfo(recipeData)
+				
+				if isLearned and CraftMatchFound(spellID, currentValue, isEnchanting) then
+					ns:AddResult(	{
+						linetype = PLAYER_CRAFT_LINE,
+						char = currentResultKey,
+						professionName = professionName,
+						profession = profession,
+						spellID = spellID
+					} )
+				end
+			end)
 		end
 	end
+	-- end
 	
 	currentResultType = nil
 	currentResultKey = nil
-	currentResultLocation = nil
 end
 
 local function BrowseRealm(realm, account, bothFactions)
@@ -782,7 +765,7 @@ local function BrowseRealm(realm, account, bothFactions)
 		end
 	end
 	
-	if addon:GetOption("UI.Tabs.Search.IncludeGuildBankItems") then	-- Check guild bank(s) ?
+	if Altoholic_SearchTab_Options.IncludeGuildBankItems then	-- Check guild bank(s) ?
 		currentResultType = GUILD_ITEM_LINE
 
 		for guildName, guild in pairs(DataStore:GetGuilds(realm, account)) do
@@ -911,7 +894,7 @@ function ns:FindItem(searchType, searchSubType)
 	
 	if SearchLoots then
 		addon.Tabs.Search:SetMode("loots")
-		-- if addon:GetOption("UI.Tabs.Search.SortDescending") then 		-- descending sort ?
+		-- if Altoholic_SearchTab_Options.SortDescending then 		-- descending sort ?
 			-- AltoholicTabSearch.SortButtons.Sort3.ascendingSort = true		-- say it's ascending now, it will be toggled
 			-- ns:SortResults(AltoholicTabSearch.SortButtons.Sort3, "iLvl")
 		-- else
@@ -975,8 +958,8 @@ function ns:FindEquipmentUpgrade()
 
 	else	-- simple search, point to simple VerifyUpgrade method
 		addon.Loots:FindUpgrade()
-		AltoholicSearchOptionsLootInfo:SetText( colors.green .. addon:GetOption("TotalLoots") .. "|r " .. L["Loots"] .. " / "
-				.. colors.green .. addon:GetOption("UnknownLoots") .. "|r " .. L["Unknown"])
+		AltoholicSearchOptionsLootInfo:SetText( colors.green .. Altoholic_UI_Options.TotalLoots .. "|r " .. L["Loots"] .. " / "
+				.. colors.green .. Altoholic_UI_Options.UnknownLoots .. "|r " .. L["Unknown"])
 	end
 	
 	filters:ClearFilters()
@@ -994,7 +977,7 @@ function ns:FindEquipmentUpgrade()
 		addon.Tabs.Search:SetMode("loots")
 	end
 	
-	-- if addon:GetOption("UI.Tabs.Search.SortDescending") then 		-- descending sort ?
+	-- if Altoholic_SearchTab_Options.SortDescending then 		-- descending sort ?
 		-- AltoholicTabSearch.SortButtons.Sort8.ascendingSort = true		-- say it's ascending now, it will be toggled
 		-- ns:SortResults(AltoholicTabSearch.SortButtons.Sort8, "iLvl")
 	-- else

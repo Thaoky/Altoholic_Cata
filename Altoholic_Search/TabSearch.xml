@@ -106,7 +106,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						local L = LibStub("AceLocale-3.0"):GetLocale("Altoholic")
+						local L = DataStore:GetLocale("Altoholic")
 						
 						UIDropDownMenu_SetWidth(self, 80) 
 						UIDropDownMenu_SetButtonWidth(self, 20)
@@ -122,7 +122,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						local L = LibStub("AceLocale-3.0"):GetLocale("Altoholic")
+						local L = DataStore:GetLocale("Altoholic")
 						
 						UIDropDownMenu_SetWidth(self, 150) 
 						UIDropDownMenu_SetButtonWidth(self, 20)
@@ -136,7 +136,8 @@
 			<Frame parentKey="SortButtons" inherits="AltoSortButtonsContainerTemplate">
 				<KeyValues>
 					<KeyValue key="numButtons" value="8" type="number" />
-					<KeyValue key="option" value="UI.Tabs.Search.SortAscending" />
+					<KeyValue key="optionTable" value="Altoholic_SearchTab_Options" />
+					<KeyValue key="optionKey" value="SortAscending" />
 				</KeyValues>
 			</Frame>
 		</Frames>

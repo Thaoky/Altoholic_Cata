@@ -1,8 +1,9 @@
+local addonTabName = ...
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local parentName = "AltoholicTabSearch"
 local parent
@@ -373,3 +374,19 @@ function ns:TooltipStats(frame)
 	end
 	AltoTooltip:Show()
 end
+
+DataStore:OnAddonLoaded(addonTabName, function() 
+	Altoholic_SearchTab_Options = Altoholic_SearchTab_Options or {
+		["ItemInfoAutoQuery"] = false,
+		["IncludeNoMinLevel"] = true,				-- include items with no minimum level
+		["IncludeMailboxItems"] = true,
+		-- ["IncludeGuildBankItems"] = true,
+		["IncludeKnownRecipes"] = true,
+		-- ["CurrentLocation"] = 1,
+		-- ["UseColorsForAlts"] = true,
+		-- ["UseColorsForRealms"] = true,
+		["SortAscending"] = true,					-- ascending or descending sort order
+				
+	}
+
+end)
