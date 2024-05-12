@@ -257,12 +257,13 @@ local function GetItemCount(searchedID)
 	if options.ShowGuildBankCount then
 		for _, realm in pairs(GetRealmsList()) do
 			for guildName, guildKey in pairs(DataStore:GetGuilds(realm)) do
-				local altoGuild = addon:GetGuild(guildName)
+				local hideInTooltip = options.HiddenGuilds[guildKey] or false
 				local bankFaction = DataStore:GetGuildBankFaction(guildKey)
 								
 				-- do not show cross faction counters for guild banks if they were not requested
 				if (showCrossFaction or (not showCrossFaction and (DataStore:GetGuildBankFaction(guildKey) == UnitFactionGroup("player")))) 
-					and (not altoGuild or (altoGuild and not altoGuild.hideInTooltip)) then
+					and not hideInTooltip
+				then
 					local guildCount = 0
 					local guildLabel = format("%s%s|r", colors.green, guildName)
 					

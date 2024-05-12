@@ -83,17 +83,6 @@ function addon:GetCharacterTableByLine(line)
 	return addon:GetCharacterTable( addon.Characters:GetInfo(line) )
 end
 
-function addon:GetGuild(name, realm, account)
-	name = name or GetGuildInfo("player")
-	if not name then return end
-	
-	realm = realm or GetRealmName()
-	account = account or THIS_ACCOUNT
-	
-	local key = format("%s.%s.%s", account, realm, name)
-	return addon.db.global.Guilds[key]
-end
-
 function Altoholic:SetLastAccountSharingInfo(name, realm, account)
 	local sharing = Altoholic.db.global.Sharing.Domains[format("%s.%s", account, realm)]
 	sharing.lastSharingTimestamp = time()

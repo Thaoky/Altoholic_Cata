@@ -14,59 +14,6 @@ local commPrefix = addonName
 BINDING_HEADER_ALTOHOLIC = addonName
 BINDING_NAME_ALTOHOLIC_TOGGLE = "Altoholic - Toggle UI"
  
-local AddonDB_Defaults = {
-	global = {
-		Guilds = {
-			['*'] = {			-- ["Account.Realm.Name"] 
-				hideInTooltip = nil,		-- true if this guild should not be shown in the tooltip counters
-			},
-		},
-		Characters = {
-			['*'] = {					-- ["Account.Realm.Name"] 
-			},
-		},
-		Sharing = {
-			Clients = {},
-			SharedContent = {			-- lists the shared content
-				--	["Account.Realm.Name"]  = true means the char is shared,
-				--	["Account.Realm.Name.Module"]  = true means the module is shared for that char
-			},
-			Domains = {
-				['*'] = {			-- ["Account.Realm"] 
-					lastSharingTimestamp = nil,	-- a date, the last time information from this realm/account was queried and successfully saved.
-					lastUpdatedWith = nil,		-- last player with whom the account sharing took place
-				},
-			},
-		},
-		unsafeItems = {},
-		moreRecentVersion = nil,
-		options = {
-			
-			-- ** Character tab options **
-			["UI.Tabs.Characters.ViewBags"] = true,
-			["UI.Tabs.Characters.ViewBank"] = true,
-			["UI.Tabs.Characters.ViewBagsAllInOne"] = false,
-			["UI.Tabs.Characters.ViewBagsRarity"] = 0,						-- rarity level of items (not a boolean !)
-			["UI.Tabs.Characters.SortAscending"] = true,						-- ascending or descending sort order
-						
-			
-			-- ** Grids tab options **
-			["UI.Tabs.Grids.Reputations.CurrentXPack"] = 1,					-- Current expansion pack 
-			["UI.Tabs.Grids.Reputations.CurrentFactionGroup"] = 1,		-- Current faction group in that xpack
-			["UI.Tabs.Grids.Currencies.CurrentTokenType"] = nil,			-- Current token type (default to nil = all-in-one)
-			["UI.Tabs.Grids.Tradeskills.CurrentXPack"] = 1,					-- Current expansion pack 
-			["UI.Tabs.Grids.Tradeskills.CurrentTradeSkill"] = 1,			-- Current tradeskill index
-			["UI.Tabs.Grids.Dungeons.CurrentXPack"] = 1,						-- Current expansion pack 
-			["UI.Tabs.Grids.Dungeons.CurrentRaids"] = 1,						-- Current raid index
-			
-			-- ** Global options **
-			["UI.AHColorCoding"] = true,					-- color coded recipes at the AH
-			["UI.VendorColorCoding"] = true,				-- color coded recipes at vendors
-
-		},
-	}
-}
-
 addon.Colors = {
 	white	= "|cFFFFFFFF",
 	red = "|cFFFF0000",
@@ -175,7 +122,7 @@ end
 local commandLineCommands = {
 	["show"] = function() AltoholicFrame:Show() end,
 	["hide"] = function() AltoholicFrame:Hide() end,
-	["toggle"] = function() AltoholicFrame:ToggleUI() end,
+	["toggle"] = function() addon:ToggleUI() end,
 	["search"] = SearchBags,
 }
 
@@ -534,3 +481,7 @@ end
 -- Allow ESC to close the main frame
 tinsert(UISpecialFrames, "AltoholicFrame")
 tinsert(UISpecialFrames, "AltoMessageBox")
+
+function addon:Print(text)	
+	DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", addonName, text))
+end
