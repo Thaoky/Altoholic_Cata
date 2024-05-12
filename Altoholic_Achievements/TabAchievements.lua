@@ -1,8 +1,9 @@
+local addonTabName = ...
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local ICON_NOT_STARTED = "Interface\\RaidFrame\\ReadyCheck-NotReady" 
 local ICON_PARTIAL = "Interface\\RaidFrame\\ReadyCheck-Waiting"
@@ -54,12 +55,6 @@ local function Item_OnClick(frame)
 	ShowCategory(frame, view[highlightIndex])
 end
 
-local function OnAchievementEarned(event, id)
-	if id then
-		AltoholicTabAchievements.Achievements:Update()
-	end
-end
-
 addon:Controller("AltoholicUI.TabAchievements", {
 	OnBind = function(frame)
 		frame.SelectRealm:RegisterClassEvent("RealmChanged", function(self, account, realm) 
@@ -80,8 +75,11 @@ addon:Controller("AltoholicUI.TabAchievements", {
 				self:Update(account, realm)
 				frame.Achievements:Update()
 			end
-			
-		addon:RegisterEvent("ACHIEVEMENT_EARNED", OnAchievementEarned)
+		
+		addon:ListenTo("ACHIEVEMENT_EARNED", function(event, id)
+			-- AltoholicTabAchievements.Achievements:Update()
+			if id then frame:Update() end
+		end)
 		
 		-- test new menu view
 		
@@ -194,3 +192,7 @@ addon:Controller("AltoholicUI.TabAchievements", {
 		return realm, account
 	end,
 })
+
+DataStore:OnAddonLoaded(addonTabName, function() 
+	Altoholic_AchievementsTab_Columns = Altoholic_AchievementsTab_Columns or {}
+end)

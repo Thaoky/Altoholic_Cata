@@ -3,7 +3,7 @@ local addon = _G[addonName]
 local colors = addon.Colors
 local icons = addon.Icons
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local CRITERIA_COMPLETE_ICON = "\124TInterface\\AchievementFrame\\UI-Achievement-Criteria-Check:14\124t"
 

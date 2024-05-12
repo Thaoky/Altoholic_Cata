@@ -3,7 +3,7 @@
 	
 	<Button name="AltoTabAchievementsClassIconTemplate" inherits="AltoClassIconTemplate" virtual="true">
 		<KeyValues>
-			<KeyValue key="optionFormat" value="Tabs.Achievements.%s.%s.Column%d" />
+			<KeyValue key="storage" value="Altoholic_AchievementsTab_Columns" />
 		</KeyValues>
 		<Scripts>
 			<OnEnter>
@@ -55,6 +55,7 @@
 					<KeyValue key="numIcons" value="12" type="number" />
 					<KeyValue key="iconTemplate" value="AltoTabAchievementsClassIconTemplate" />
 					<KeyValue key="tabName" value="Achievements" />
+					<KeyValue key="storage" value="Altoholic_AchievementsTab_Columns" />
 				</KeyValues>
 			</Frame>
 		
