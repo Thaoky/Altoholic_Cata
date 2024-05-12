@@ -163,7 +163,8 @@
 			<Frame parentKey="SortButtons" inherits="AltoSortButtonsContainerTemplate">
 				<KeyValues>
 					<KeyValue key="numButtons" value="9" type="number" />
-					<KeyValue key="option" value="UI.Tabs.Summary.SortAscending" />
+					<KeyValue key="optionTable" value="Altoholic_SummaryTab_Options" />
+					<KeyValue key="optionKey" value="SortAscending" />
 				</KeyValues>
 			</Frame>
 			
@@ -195,7 +196,7 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				local L = LibStub("AceLocale-3.0"):GetLocale("Altoholic")
+				local L = DataStore:GetLocale("Altoholic")
 				
 				self.MenuItem1:SetText(L["Account Summary"])
 				self.MenuItem2:SetText(L["Bag Usage"])

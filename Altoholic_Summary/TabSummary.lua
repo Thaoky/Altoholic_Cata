@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 addon.Tabs.Summary = {}
 
@@ -17,7 +17,7 @@ function ns:AccountSharingButton_OnEnter(self)
 end
 
 function ns:AccountSharingButton_OnClick()
-	if addon:GetOption("UI.AccountSharing.IsEnabled") == 0 then
+	if Altoholic_Sharing_Options.IsEnabled then
 		addon:Print(L["Both parties must enable account sharing\nbefore using this feature (see options)"])
 		return
 	end
@@ -30,3 +30,4 @@ function ns:AccountSharingButton_OnClick()
 	end
 	AltoAccountSharing:Show()
 end
+

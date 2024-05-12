@@ -3,7 +3,9 @@ local addon = _G[addonName]
 local colors = addon.Colors
 local icons = addon.Icons
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
+local MVC = LibStub("LibMVC-1.0")
+local Formatter = MVC:GetService("AltoholicUI.Formatter")
 
 local MODE_SUMMARY = 1
 local MODE_BAGS = 2
@@ -11,7 +13,7 @@ local MODE_SKILLS = 3
 local MODE_ACTIVITY = 4
 local MODE_MISCELLANEOUS = 5
 
-local SKILL_CAP = 300
+local SKILL_CAP = 525
 
 local INFO_REALM_LINE = 0
 local INFO_CHARACTER_LINE = 1
@@ -29,8 +31,8 @@ local VIEW_COMPANIONS = 7
 local VIEW_SPELLS = 8
 local VIEW_PROFESSION = 9
 
-local TEXTURE_FONT = "|T%s:%s:%s|t"
 local tocVersion = select(4, GetBuildInfo())
+local professionIndices = DataStore:GetProfessionIndices()
 
 addon.Summary = {}
 
@@ -42,7 +44,7 @@ local function GetRestedXP(character)
 
 	-- display in 100% or 150% mode ?
 	local coeff = 1
-	if addon:GetOption("UI.Tabs.Summary.ShowRestXP150pc") then
+	if Altoholic_SummaryTab_Options.ShowRestXP150pc then
 		coeff = 1.5
 	end
 	
@@ -129,17 +131,27 @@ local function TradeskillHeader_OnEnter(frame, tooltip)
 	tooltip:AddLine(format("%s%s|r %s %s %s", colors.green, L["COLOR_GREEN"], L["at"], SKILL_CAP, L["and above"]),1,1,1)
 end
 
-local function Tradeskill_OnEnter(frame, skillName, showRecipeStats)
+local function Tradeskill_OnEnter(frame, professionIndex, showRecipeStats)
 	local character = frame:GetParent().character
 	if not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
 	
-	local curRank, maxRank = DataStore:GetProfessionInfo(DataStore:GetProfession(character, skillName))
-	local profession = DataStore:GetProfession(character, skillName)
-
+	-- Prepare the tooltip
 	local tt = AltoTooltip
-	
 	tt:ClearLines()
 	tt:SetOwner(frame, "ANCHOR_RIGHT")
+	
+	-- Get the profession, if it has been learned
+	local profession = DataStore:GetProfessionByIndex(character, professionIndex)
+	if not profession then
+		tt:AddLine(L["No data"])
+		tt:Show()
+		return
+	end
+	
+	-- Get the ranks
+	local curRank, maxRank = DataStore:GetProfessionRankByIndex(character, professionIndex)
+	local skillName = profession.Name
+	
 	tt:AddLine(skillName,1,1,1)
 	tt:AddLine(format("%s%s/%s", GetSkillRankColor(curRank), curRank, maxRank),1,1,1)
 	
@@ -147,11 +159,7 @@ local function Tradeskill_OnEnter(frame, skillName, showRecipeStats)
 		-- if DataStore:GetProfessionSpellID(skillName) ~= 2366 and skillName ~= GetSpellInfo(8613) then		-- no display for herbalism & skinning
 			tt:AddLine(" ")
 			
-			if not profession then
-				tt:AddLine(L["No data"])
-				tt:Show()
-				return
-			end
+
 
 			local numCategories = DataStore:GetNumRecipeCategories(profession)
 			
@@ -197,21 +205,22 @@ local function Tradeskill_OnEnter(frame, skillName, showRecipeStats)
 	tt:Show()
 end
 
-local function Tradeskill_OnClick(frame, skillName)
+local function Tradeskill_OnClick(frame, professionIndex)
 	local character = frame:GetParent().character
-	if not skillName or not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
+	if not professionIndex or not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
 
-	local profession = DataStore:GetProfession(character, skillName)
+	local profession = DataStore:GetProfessionByIndex(character, professionIndex)
 	if not profession or DataStore:GetNumRecipeCategories(profession) == 0 then		-- if profession hasn't been scanned (or scan failed), exit
 		return
 	end
 	
+	local skillName = profession.Name
 	local charName, realm, account = strsplit(".", character)
 	local chat = ChatEdit_GetLastActiveWindow()
 	
 	if chat:IsShown() and IsShiftKeyDown() and realm == DataStore.ThisRealm then
 		-- if shift-click, then display the profession link and exit
-		local link = profession.FullLink	
+		local link = DataStore:GetProfessionLink(character, professionIndex)
 		if link and link:match("trade:") then
 			chat:Insert(link)
 		end
@@ -237,7 +246,7 @@ end
 local Characters = addon.Characters
 
 local function SortView(columnName)
-	addon:SetOption("UI.Tabs.Summary.CurrentColumn", columnName)
+	Altoholic_SummaryTab_Options.CurrentColumn = columnName
 	addon.Summary:Update()
 end
 
@@ -424,7 +433,7 @@ columns["Name"] = {
 			local class = DataStore:GetCharacterClass(character)
 			local icon = icons[DataStore:GetCharacterFaction(character)] or "Interface/Icons/INV_BannerPVP_03"
 
-			return format("%s %s (%s)", format(TEXTURE_FONT, icon, 18, 18), name, class)
+			return format("%s %s (%s)", Formatter.Texture18(icon), name, class)
 		end,
 	OnEnter = function(frame)
 			local character = frame:GetParent().character
@@ -498,7 +507,7 @@ columns["Level"] = {
 	JustifyH = "CENTER",
 	GetText = function(character) 
 		local level = DataStore:GetCharacterLevel(character)
-		if level ~= MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel] and addon:GetOption("UI.Tabs.Summary.ShowLevelDecimals") then
+		if level ~= MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel] and Altoholic_SummaryTab_Options.ShowLevelDecimals then
 			local rate = DataStore:GetXPRate(character)
 			level = format("%.1f", level + (rate/100))		-- show level as 98.4 if not level cap
 		end
@@ -526,7 +535,7 @@ columns["Level"] = {
 			tt:Show()
 		end,
 	OnClick = function(frame, button)
-			addon:ToggleOption(nil, "UI.Tabs.Summary.ShowLevelDecimals")
+			Altoholic_SummaryTab_Options.ShowLevelDecimals = not Altoholic_SummaryTab_Options.ShowLevelDecimals
 			addon.Summary:Update()
 		end,
 	GetTotal = function(line) return Characters:GetField(line, "level") end,
@@ -591,7 +600,7 @@ columns["RestXP"] = {
 			tt:Show()
 		end,
 	OnClick = function(frame, button)
-			addon:ToggleOption(nil, "UI.Tabs.Summary.ShowRestXP150pc")
+			Altoholic_SummaryTab_Options.ShowRestXP150pc = not Altoholic_SummaryTab_Options.ShowRestXP150pc
 			addon.Summary:Update()
 		end,	
 }
@@ -630,7 +639,8 @@ columns["Played"] = {
 		return addon:GetTimeString(DataStore:GetPlayTime(character))
 	end,
 	OnClick = function(frame, button)
-			DataStore:ToggleOption(nil, "DataStore_Characters", "HideRealPlayTime")
+			DataStore_Characters_Options.HideRealPlayTime = not DataStore_Characters_Options.HideRealPlayTime
+
 			addon.Summary:Update()
 		end,
 	GetTotal = function(line) return Characters:GetField(line, "played") end,
@@ -650,7 +660,7 @@ columns["AiL"] = {
 	JustifyH = "CENTER",
 	GetText = function(character) 
 		local AiL = DataStore:GetAverageItemLevel(character) or 0
-		if addon:GetOption("UI.Tabs.Summary.ShowILevelDecimals") then
+		if Altoholic_SummaryTab_Options.ShowILevelDecimals then
 			return format("%s%.1f", colors.yellow, AiL)
 		else
 			return format("%s%d", colors.yellow, AiL)
@@ -675,7 +685,7 @@ columns["AiL"] = {
 			tt:Show()
 		end,
 	OnClick = function(frame, button)
-			addon:ToggleOption(nil, "UI.Tabs.Summary.ShowILevelDecimals")
+			Altoholic_SummaryTab_Options.ShowILevelDecimals = not Altoholic_SummaryTab_Options.ShowILevelDecimals
 			addon.Summary:Update()
 		end,
 	GetTotal = function(line) return colors.white..format("%.1f", Characters:GetField(line, "realmAiL")) end,
@@ -956,28 +966,21 @@ columns["Prof1"] = {
 	tooltipSubTitle = nil,
 	headerOnEnter = TradeskillHeader_OnEnter,
 	headerOnClick = function() SortView("Prof1") end,
-	headerSort = DataStore.GetProfession1,
+	headerSort = DataStore.GetProfession1Rank,
 	
 	-- Content
 	Width = 70,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank, _, _, name = DataStore:GetProfession1(character)
+			local rank = DataStore:GetProfession1Rank(character)
+			local name = DataStore:GetProfession1Name(character)
 			local spellID = DataStore:GetProfessionSpellID(name)
-			local icon = spellID and format(TEXTURE_FONT, addon:GetSpellIcon(spellID), 18, 18) .. " " or ""
+			local icon = spellID and Formatter.Texture18(addon:GetSpellIcon(spellID)) .. " " or ""
 			
 			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
 		end,
-	OnEnter = function(frame)
-			local character = frame:GetParent().character
-			local _, _, _, skillName = DataStore:GetProfession1(character)
-			Tradeskill_OnEnter(frame, skillName, true)
-		end,
-	OnClick = function(frame, button)
-			local character = frame:GetParent().character
-			local _, _, _, skillName = DataStore:GetProfession1(character)
-			Tradeskill_OnClick(frame, skillName)
-		end,
+	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Profession1, true) end,
+	OnClick = function(frame, button) Tradeskill_OnClick(frame, professionIndices.Profession1) end,
 }
 
 columns["Prof2"] = {
@@ -988,34 +991,27 @@ columns["Prof2"] = {
 	tooltipSubTitle = nil,
 	headerOnEnter = TradeskillHeader_OnEnter,
 	headerOnClick = function() SortView("Prof2") end,
-	headerSort = DataStore.GetProfession2,
+	headerSort = DataStore.GetProfession2Rank,
 	
 	-- Content
 	Width = 70,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank, _, _, name = DataStore:GetProfession2(character)
+			local rank = DataStore:GetProfession2Rank(character)
+			local name = DataStore:GetProfession2Name(character)
 			local spellID = DataStore:GetProfessionSpellID(name)
-			local icon = spellID and format(TEXTURE_FONT, addon:GetSpellIcon(spellID), 18, 18) .. " " or ""
+			local icon = spellID and Formatter.Texture18(addon:GetSpellIcon(spellID)) .. " " or ""
 			
 			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
 		end,
-	OnEnter = function(frame)
-			local character = frame:GetParent().character
-			local _, _, _, skillName = DataStore:GetProfession2(character)
-			Tradeskill_OnEnter(frame, skillName, true)
-		end,
-	OnClick = function(frame, button)
-			local character = frame:GetParent().character
-			local _, _, _, skillName = DataStore:GetProfession2(character)
-			Tradeskill_OnClick(frame, skillName)
-		end,
+	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Profession2, true) end,
+	OnClick = function(frame, button) Tradeskill_OnClick(frame, professionIndices.Profession2) end,
 }
 
 columns["ProfCooking"] = {
 	-- Header
 	headerWidth = 60,
-	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(2550), 18, 18),
+	headerLabel = format("   %s", Formatter.Texture18(addon:GetSpellIcon(2550))),
 	tooltipTitle = GetSpellInfo(2550),
 	tooltipSubTitle = nil,
 	headerOnEnter = TradeskillHeader_OnEnter,
@@ -1029,18 +1025,14 @@ columns["ProfCooking"] = {
 			local rank = DataStore:GetCookingRank(character)
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
-	OnEnter = function(frame)
-			Tradeskill_OnEnter(frame, GetSpellInfo(2550), true)
-		end,
-	OnClick = function(frame, button)
-			Tradeskill_OnClick(frame, GetSpellInfo(2550))
-		end,
+	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Cooking, true) end,
+	OnClick = function(frame, button) Tradeskill_OnClick(frame, professionIndices.Cooking) end,
 }
 
 columns["ProfFirstAid"] = {
 	-- Header
 	headerWidth = 60,
-	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(3273), 18, 18),
+	headerLabel = format("   %s", Formatter.Texture18(addon:GetSpellIcon(3273))),
 	tooltipTitle = GetSpellInfo(3273),
 	tooltipSubTitle = nil,
 	headerOnEnter = TradeskillHeader_OnEnter,
@@ -1054,18 +1046,14 @@ columns["ProfFirstAid"] = {
 			local rank = DataStore:GetFirstAidRank(character)
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
-	OnEnter = function(frame)
-			Tradeskill_OnEnter(frame, GetSpellInfo(3273), true)
-		end,
-	OnClick = function(frame, button)
-			Tradeskill_OnClick(frame, GetSpellInfo(3273))
-		end,
+	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.FirstAid, true) end,
+	OnClick = function(frame, button) Tradeskill_OnClick(frame, professionIndices.FirstAid) end,
 }
 
 columns["ProfFishing"] = {
 	-- Header
 	headerWidth = 60,
-	headerLabel = "   " .. format(TEXTURE_FONT, addon:GetSpellIcon(7732), 18, 18),
+	headerLabel = format("   %s", Formatter.Texture18(addon:GetSpellIcon(7732))),
 	tooltipTitle = GetSpellInfo(7732),
 	tooltipSubTitle = nil,
 	headerOnEnter = TradeskillHeader_OnEnter,
@@ -1079,9 +1067,7 @@ columns["ProfFishing"] = {
 			local rank = DataStore:GetFishingRank(character)
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
-	OnEnter = function(frame)
-			Tradeskill_OnEnter(frame, GetSpellInfo(7732), true)
-		end,
+	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Fishing, true) end,
 }
 
 -- ** Activity **
@@ -1109,7 +1095,8 @@ columns["Mails"] = {
 			if num ~= 0 then
 				color = colors.green		-- green by default, red if at least one mail is about to expire
 							
-				local threshold = DataStore:GetOption("DataStore_Mails", "MailWarningThreshold")
+				local threshold = DataStore_Mails_Options.MailWarningThreshold
+				
 				if DataStore:GetNumExpiredMails(character, threshold) > 0 then
 					color = colors.red
 				end
@@ -1347,7 +1334,7 @@ columns["GuildName"] = {
 	GetText = function(character) 
 		local guildName, guildRank = DataStore:GetGuildInfo(character)
 		
-		if addon:GetOption("UI.Tabs.Summary.ShowGuildRank") then
+		if Altoholic_SummaryTab_Options.ShowGuildRank then
 			return FormatGreyIfEmpty(guildRank)
 		else
 			return FormatGreyIfEmpty(guildName, colors.green)
@@ -1355,7 +1342,7 @@ columns["GuildName"] = {
 	end,
 	
 	OnClick = function(frame, button)
-			addon:ToggleOption(nil, "UI.Tabs.Summary.ShowGuildRank")
+			Altoholic_SummaryTab_Options.ShowGuildRank = not Altoholic_SummaryTab_Options.ShowGuildRank
 			addon.Summary:Update()
 		end,	
 }
@@ -1449,7 +1436,7 @@ local modes = {
 }
 
 function ns:SetMode(mode)
-	addon:SetOption("UI.Tabs.Summary.CurrentMode", mode)
+	Altoholic_SummaryTab_Options.CurrentMode = mode
 	
 	local parent = AltoholicTabSummary
 	
@@ -1475,9 +1462,10 @@ function ns:Update()
 	local numVisibleRows = 0
 	local numDisplayedRows = 0
 
-	local sortOrder = addon:GetOption("UI.Tabs.Summary.SortAscending")
-	local currentColumn = addon:GetOption("UI.Tabs.Summary.CurrentColumn")
-	local currentModeIndex = addon:GetOption("UI.Tabs.Summary.CurrentMode")
+	local options = Altoholic_SummaryTab_Options
+	local sortOrder = options["SortAscending"]
+	local currentColumn = options["CurrentColumn"]
+	local currentModeIndex = options["CurrentMode"]
 	local currentMode = modes[currentModeIndex]
 	
 	-- rebuild and get the view, then sort it

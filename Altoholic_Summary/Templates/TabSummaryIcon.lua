@@ -1,35 +1,36 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
+local L = DataStore:GetLocale(addonName)
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local OPTION_REALMS = "CurrentRealms"
+local OPTION_FACTIONS = "CurrentFactions"
+local OPTION_LEVELS = "CurrentLevels"
+local OPTION_LEVELS_MIN = "CurrentLevelsMin"
+local OPTION_LEVELS_MAX = "CurrentLevelsMax"
+local OPTION_CLASSES = "CurrentClasses"
+local OPTION_TRADESKILL = "CurrentTradeSkill"
 
-local OPTION_REALMS = "UI.Tabs.Summary.CurrentRealms"
-local OPTION_FACTIONS = "UI.Tabs.Summary.CurrentFactions"
-local OPTION_LEVELS = "UI.Tabs.Summary.CurrentLevels"
-local OPTION_LEVELS_MIN = "UI.Tabs.Summary.CurrentLevelsMin"
-local OPTION_LEVELS_MAX = "UI.Tabs.Summary.CurrentLevelsMax"
-local OPTION_CLASSES = "UI.Tabs.Summary.CurrentClasses"
-local OPTION_TRADESKILL = "UI.Tabs.Summary.CurrentTradeSkill"
+local options
 
 -- ** Icon events **
 
 local function OnRealmFilterChange(frame)
-	addon:SetOption(OPTION_REALMS, frame.value)
+	options[OPTION_REALMS] = frame.value
 	addon.Characters:InvalidateView()
 	addon.Summary:Update()
 end
 
 local function OnFactionFilterChange(frame)
-	addon:SetOption(OPTION_FACTIONS, frame.value)
+	options[OPTION_FACTIONS] = frame.value
 	addon.Characters:InvalidateView()
 	addon.Summary:Update()
 end
 
 local function OnLevelFilterChange(frame, minLevel, maxLevel)
-	addon:SetOption(OPTION_LEVELS, frame.value)
-	addon:SetOption(OPTION_LEVELS_MIN, minLevel)
-	addon:SetOption(OPTION_LEVELS_MAX, maxLevel)
+	options[OPTION_LEVELS] = frame.value
+	options[OPTION_LEVELS_MIN] = minLevel
+	options[OPTION_LEVELS_MAX] = maxLevel
 	addon.Characters:InvalidateView()
 	addon.Summary:Update()
 end
@@ -37,13 +38,13 @@ end
 local function OnTradeSkillFilterChange(frame)
 	frame:GetParent():Close()
 	
-	addon:SetOption(OPTION_TRADESKILL, frame.value)
+	options[OPTION_TRADESKILL] = frame.value
 	addon.Characters:InvalidateView()
 	addon.Summary:Update()
 end
 
 local function OnClassFilterChange(frame)
-	addon:SetOption(OPTION_CLASSES, frame.value)
+	options[OPTION_CLASSES] = frame.value
 	addon.Characters:InvalidateView()
 	addon.Summary:Update()
 end
@@ -82,7 +83,7 @@ local locationLabels = {
 
 local function RealmsIcon_Initialize(frame, level)
 	frame:AddTitle(L["FILTER_REALMS"])
-	local option = addon:GetOption(OPTION_REALMS)
+	local option = options[OPTION_REALMS]
 
 	-- add specific account/realm filters
 	for key, text in ipairs(locationLabels) do
@@ -92,7 +93,7 @@ local function RealmsIcon_Initialize(frame, level)
 end
 
 local function FactionIcon_Initialize(frame, level)
-	local option = addon:GetOption(OPTION_FACTIONS)
+	local option = options[OPTION_FACTIONS]
 
 	frame:AddTitle(L["FILTER_FACTIONS"])
 	frame:AddButton(FACTION_ALLIANCE, 1, OnFactionFilterChange, nil, (option == 1))
@@ -103,7 +104,7 @@ local function FactionIcon_Initialize(frame, level)
 end
 
 local function LevelIcon_Initialize(frame, level)
-	local option = addon:GetOption(OPTION_LEVELS)
+	local option = options[OPTION_LEVELS]
 	
 	frame:AddTitle(L["FILTER_LEVELS"])
 	frame:AddButtonWithArgs(ALL, 1, OnLevelFilterChange, 1, 80, (option == 1))
@@ -121,7 +122,7 @@ local function ProfessionsIcon_Initialize(frame, level)
 	if not level then return end
 
 	local tradeskills = addon.TradeSkills.AccountSummaryFiltersSpellIDs
-	local option = addon:GetOption(OPTION_TRADESKILL)
+	local option = options[OPTION_TRADESKILL]
 	
 	if level == 1 then
 		frame:AddTitle(L["FILTER_PROFESSIONS"])
@@ -152,7 +153,7 @@ local function ProfessionsIcon_Initialize(frame, level)
 end
 
 local function ClassIcon_Initialize(frame, level)
-	local option = addon:GetOption(OPTION_CLASSES)
+	local option = options[OPTION_CLASSES]
 	
 	frame:AddTitle(L["FILTER_CLASSES"])
 	frame:AddButton(ALL, 0, OnClassFilterChange, nil, (option == 0))
@@ -231,3 +232,29 @@ addon:Controller("AltoholicUI.TabSummaryIcon", {
 		menu:Toggle(frame, 0, 0)
 	end,
 })
+
+-- This should be in TabSummary, not here, move later
+DataStore:OnAddonLoaded("Altoholic_Summary", function() 
+	Altoholic_SummaryTab_Options = Altoholic_SummaryTab_Options or {
+		["ShowRestXP150pc"] = false,					-- display max rest xp in normal 100% mode or in level equivalent 150% mode ?
+		["CurrentMode"] = 1,								-- current mode (1 = account summary, 2 = bags, ...)
+		["CurrentColumn"] = "Name",					-- current column (default = "Name")
+		["CurrentRealms"] = 2,							-- selected realms (current/all in current/all accounts)
+		["CurrentAltGroup"] = 0,						-- selected alt group
+		["CurrentFactions"] = 3,						-- 1 = Alliance, 2 = Horde, 3 = Both
+		["CurrentLevels"] = 1,							-- 1 = All
+		["CurrentLevelsMin"] = 1,							
+		["CurrentLevelsMax"] = 70,					
+		["CurrentBankType"] = 0,						-- 0 = All
+		["CurrentClasses"] = 0,							-- 0 = All
+		["CurrentTradeSkill"] = 0,						-- 0 = All
+		["CurrentMisc"] = 0,								-- 
+		["UseColorForTradeSkills"] = true,			-- Use color coding for tradeskills, or neutral
+		["SortAscending"] = true,						-- ascending or descending sort order
+		["ShowLevelDecimals"] = true,					-- display character level with decimals or not
+		["ShowILevelDecimals"] = true,				-- display character level with decimals or not
+		["ShowGuildRank"] = false,						-- display the guild rank or the guild name
+	}
+	options = Altoholic_SummaryTab_Options
+
+end)

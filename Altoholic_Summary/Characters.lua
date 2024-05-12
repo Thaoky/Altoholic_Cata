@@ -1,9 +1,8 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 local colors = addon.Colors
 
-local THIS_ACCOUNT = "Default"
 local INFO_REALM_LINE = 0
 local INFO_CHARACTER_LINE = 1
 local INFO_TOTAL_LINE = 2
@@ -21,30 +20,23 @@ local characterList
 local view
 local isViewValid
 
-local OPTION_FACTIONS = "UI.Tabs.Summary.CurrentFactions"
-local OPTION_LEVELS_MIN = "UI.Tabs.Summary.CurrentLevelsMin"
-local OPTION_LEVELS_MAX = "UI.Tabs.Summary.CurrentLevelsMax"
-local OPTION_TRADESKILL = "UI.Tabs.Summary.CurrentTradeSkill"
-local OPTION_CLASSES = "UI.Tabs.Summary.CurrentClasses"
-
 local function ProcessRealms(func)
-	local mode = addon:GetOption("UI.Tabs.Summary.CurrentRealms")
-	local thisRealm = GetRealmName()
+	local mode = Altoholic_SummaryTab_Options["CurrentRealms"]
 	
 	-- this account only
 	if mode == THISREALM_THISACCOUNT then
-		func(THIS_ACCOUNT, thisRealm)
+		func(DataStore.ThisAccount, DataStore.ThisRealm)
 		
 	elseif mode == ALLREALMS_THISACCOUNT then	
 		for realm in pairs(DataStore:GetRealms()) do
-			func(THIS_ACCOUNT, realm)
+			func(DataStore.ThisAccount, realm)
 		end
 
 	-- all accounts
 	elseif mode == THISREALM_ALLACCOUNTS then
 		for account in pairs(DataStore:GetAccounts()) do
 			for realm in pairs(DataStore:GetRealms(account)) do
-				if realm == thisRealm then
+				if realm == DataStore.ThisRealm then
 					func(account, realm)
 				end
 			end
@@ -88,14 +80,13 @@ local function AddRealm(AccountName, RealmName)
 	local numCharacters = 0
 
 	-- let's get our filter values
-	local factions = addon:GetOption(OPTION_FACTIONS)
-	local minLevel = addon:GetOption(OPTION_LEVELS_MIN)
-	local maxLevel = addon:GetOption(OPTION_LEVELS_MAX)
-	local class = addon:GetOption(OPTION_CLASSES)
-	local tradeskill = addon:GetOption(OPTION_TRADESKILL)
+	local options = Altoholic_SummaryTab_Options
+	local factions = options["CurrentFactions"]
+	local minLevel = options["CurrentLevelsMin"]
+	local maxLevel = options["CurrentLevelsMax"]
+	local class = options["CurrentClasses"]
+	local tradeskill = options["CurrentTradeSkill"]	
 	local firstSecondary = addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex
-	
-	local shouldAddCharacter = true
 	
 	if factions == 4 then
 		factions = (UnitFactionGroup("player") == "Alliance") and 1 or 2
@@ -109,7 +100,7 @@ local function AddRealm(AccountName, RealmName)
 	
 	-- 2) Add the characters (if they pass filters)
 	for characterName, character in pairs(DataStore:GetCharacters(RealmName, AccountName)) do
-		shouldAddCharacter = true
+		local shouldAddCharacter = true
 	
 		local characterLevel = DataStore:GetCharacterLevel(character)
 		local characterFaction = DataStore:GetCharacterFaction(character)
