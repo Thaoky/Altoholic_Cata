@@ -6,7 +6,7 @@ local addonName = ...
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 local LCI = LibStub("LibCraftInfo-1.0")
 
 local THIS_ACCOUNT = "Default"
@@ -48,7 +48,7 @@ local function BuildUnsafeItemList()
 	-- In the previous game session, the list has been populated with items id's that were originally unsafe and for which a query was sent to the server.
 	-- In this session, a getiteminfo on these id's will keep returning a nil if the item is really unsafe, so this method will get rid of the id's that are now valid.
 	local TmpUnsafe = {}		-- create a temporary table with confirmed unsafe id's
-	local unsafeItems = Altoholic.db.global.unsafeItems
+	local unsafeItems = Altoholic_UI_Options.unsafeItems
 	
 	for _, itemID in pairs(unsafeItems) do
 		local itemName = GetItemInfo(itemID)
@@ -125,7 +125,7 @@ end
 local Orig_SendMailNameEditBox_OnChar = SendMailNameEditBox:GetScript("OnChar")
 
 SendMailNameEditBox:SetScript("OnChar", function(self, ...)
-	if addon:GetOption("UI.Mail.AutoCompleteRecipient") then
+	if Altoholic_UI_Options.Mail.AutoCompleteRecipient then
 		local text = self:GetText()
 		local textlen = strlen(text)
 		local currentFaction = UnitFactionGroup("player")
@@ -155,7 +155,7 @@ function AuctionFrameBrowse_UpdateHook()
 
 	Orig_AuctionFrameBrowse_Update()		-- Let default stuff happen first ..
 	
-	if addon:GetOption("UI.AHColorCoding") == false then return end
+	if Altoholic_UI_Options.AHColorCoding == false then return end
 	
 	if IsAddOnLoaded("Auctioneer") and Auctioneer.ScanManager.IsScanning() then return end
 
@@ -250,7 +250,7 @@ local function MerchantFrame_UpdateMerchantInfoHook()
 	
 	Orig_MerchantFrame_UpdateMerchantInfo()		-- Let default stuff happen first ..
 	
-	if addon:GetOption("UI.VendorColorCoding") == false then return end
+	if Altoholic_UI_Options.VendorColorCoding == false then return end
 	
    local numItems = GetMerchantNumItems()
 	local index, link
@@ -315,7 +315,7 @@ local function OnChatMsgLoot(event, arg)
 	addon:RefreshTooltip()		-- any loot message should cause a refresh
 end
 
-function addon:OnEnable()
+DataStore:OnPlayerLogin(function() 
 	InitLocalization()
 	addon:SetupOptions()
 	-- Only needed in debug
@@ -324,29 +324,30 @@ function addon:OnEnable()
 	addon.Events:Init()
 	addon:InitTooltip()
 
-	addon:RegisterEvent("AUCTION_HOUSE_SHOW", OnAuctionHouseShow)	-- must stay here for the AH hook (to manage recipe coloring)
+	addon:ListenTo("AUCTION_HOUSE_SHOW", OnAuctionHouseShow)	-- must stay here for the AH hook (to manage recipe coloring)
 
 	-- hook the Merchant update function
 	Orig_MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfo
 	MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfoHook
 	
-	AltoholicFrameName:SetText(format("Altoholic |cFF84B9E8Wrath of the Lich King|r Classic %s%s by %sThaoky", colors.white, addon.Version, colors.classMage))
+	AltoholicFrameName:SetText(format("Altoholic |cFFFFD700Cataclysm|r Classic %s%s by %sThaoky", colors.white, addon.Version, colors.classMage))
 
-	local realm = GetRealmName()
-	local player = UnitName("player")
-	local key = format("%s.%s.%s", THIS_ACCOUNT, realm, player)
-	addon.ThisCharacter = addon.db.global.Characters[key]
+	-- local realm = GetRealmName()
+	-- local player = UnitName("player")
+	-- local key = format("%s.%s.%s", THIS_ACCOUNT, realm, player)
+	-- addon.ThisCharacter = addon.db.global.Characters[key]
 
 	-- Do not move this line, minimap initialization must happen AFTER OnEnable, otherwise options are not yet ready
-	if addon:GetOption("UI.Minimap.ShowIcon") then
+	if Altoholic_UI_Options.Minimap.ShowIcon then
 		Minimap.AltoholicButton:Move()
 		Minimap.AltoholicButton:Show()
 	else
 		Minimap.AltoholicButton:Hide()
 	end
 	
-	addon:RestoreOptionsToUI()
-	addon:RegisterEvent("CHAT_MSG_LOOT", OnChatMsgLoot)
+	-- to be moved to their respective tabs
+	-- addon:RestoreOptionsToUI()
+	addon:ListenTo("CHAT_MSG_LOOT", OnChatMsgLoot)
 	
 	BuildUnsafeItemList()
 	
@@ -359,10 +360,7 @@ function addon:OnEnable()
 	f:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 1, 1)
 	f:SetScript("OnUpdate", function(addon, elapsed) Altoholic.Tasks:OnUpdate(elapsed) end)
 	f:Show()
-end
-
-function addon:OnDisable()
-end
+end)
 
 function addon:ToggleUI()
 	if (AltoholicFrame:IsVisible()) then
@@ -377,7 +375,7 @@ function addon:OnShow()
 	
 	if not addon.Tabs.current then
 		addon.Tabs:OnClick("Summary")
-		local mode = addon:GetOption("UI.Tabs.Summary.CurrentMode")
+		local mode = Altoholic_SummaryTab_Options.CurrentMode
 		AltoholicTabSummary["MenuItem"..mode]:Item_OnClick()
 	end
 end
@@ -669,15 +667,10 @@ function addon:ListCharsOnQuest(questName, player, tooltip)
 	end
 end
 
-function addon:UpdateSlider(frame, text, field)
+function addon:UpdateSlider(frame, text, value)
 	local name = frame:GetName()
-	local value = frame:GetValue()
-
 	_G[name .. "Text"]:SetText(format("%s (%d)", text, value))
-	if addon.db and addon.db.global then 
-		addon:SetOption(field, value)
-		Minimap.AltoholicButton:Move()
-	end
+	Minimap.AltoholicButton:Move()
 end
 
 function addon:ShowWidgetTooltip(frame)
@@ -690,11 +683,15 @@ function addon:ShowWidgetTooltip(frame)
 end
 
 function addon:OnTimeToNextWarningChanged(frame)
+
 	local name = frame:GetName()
 	local timeToNext = frame:GetValue()
 
 	_G[name .. "Text"]:SetText(format("%s (%s)", L["TIME_TO_NEXT_WARNING_TEXT"], format(D_HOURS, timeToNext)))
-	addon:SetOption("UI.Mail.TimeToNextWarning", timeToNext)
+	
+	if Altoholic_UI_Options then
+		Altoholic_UI_Options.Mail.TimeToNextWarning = timeToNext
+	end
 end
 
 function addon:DDM_Initialize(frame, func)
@@ -748,12 +745,12 @@ end
 -- ** Unsafe Items **
 function addon:SaveUnsafeItem(itemID)
 	if not addon:IsItemUnsafe(itemID) then			-- if the item is not a known unsafe item, save it in the db
-		table.insert(Altoholic.db.global.unsafeItems, itemID)
+		table.insert(Altoholic_UI_Options.unsafeItems, itemID)
 	end
 end
 
 function addon:IsItemUnsafe(itemID)
-	for _, v in pairs(Altoholic.db.global.unsafeItems) do 	-- browse current realm's unsafe item list
+	for _, v in pairs(Altoholic_UI_Options.unsafeItems) do 	-- browse current realm's unsafe item list
 		if v == itemID then		-- if the itemID passed as parameter is a known unsafe item .. return true to skip it
 			return true
 		end

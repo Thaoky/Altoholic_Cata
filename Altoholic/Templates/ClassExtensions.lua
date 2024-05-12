@@ -30,8 +30,7 @@ Usage for all methods at once:
 	
 --]]
 
-local addonName = "Altoholic"
-local addon = _G[addonName]
+local addonName, addon = ...
 
 local classExtensions = {}
 

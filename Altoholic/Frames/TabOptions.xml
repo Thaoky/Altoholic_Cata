@@ -55,9 +55,9 @@
 					<OnClick>
 						AltoholicFrame:SetClampedToScreen(self:GetChecked())
 						if self:GetChecked() then 
-							Altoholic:SetOption("UI.ClampWindowToScreen", true)
+							Altoholic_UI_Options.ClampWindowToScreen = true
 						else
-							Altoholic:SetOption("UI.ClampWindowToScreen", false)
+							Altoholic_UI_Options.ClampWindowToScreen = false
 						end
 					</OnClick>
 					<OnEnter>
@@ -77,10 +77,10 @@
 				<Scripts>
 					<OnClick>
 						if self:GetChecked() then 
-							Altoholic:SetOption("UI.Minimap.ShowIcon", true)
+							Altoholic_UI_Options.ShowIcon = true
 							Minimap.AltoholicButton:Show()
 						else
-							Altoholic:SetOption("UI.Minimap.ShowIcon", false)
+							Altoholic_UI_Options.ShowIcon = false
 							Minimap.AltoholicButton:Hide()
 						end
 					</OnClick>
@@ -93,8 +93,14 @@
 				</Anchors>
 				<Scripts>
 					<OnValueChanged>
-						local L = LibStub("AceLocale-3.0"):GetLocale("Altoholic")
-						Altoholic:UpdateSlider(self, L["Minimap Icon Angle"], "UI.Minimap.IconAngle")
+						-- exit if called to early
+						if not Altoholic_UI_Options then return end
+					
+						local L = DataStore:GetLocale("Altoholic")
+						local value = self:GetValue()
+						
+						Altoholic_UI_Options.Minimap.IconAngle = value
+						Altoholic:UpdateSlider(self, L["Minimap Icon Angle"], value)
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
@@ -105,8 +111,14 @@
 				</Anchors>
 				<Scripts>
 					<OnValueChanged>
-						local L = LibStub("AceLocale-3.0"):GetLocale("Altoholic")
-						Altoholic:UpdateSlider(self, L["Minimap Icon Radius"], "UI.Minimap.IconRadius")
+						-- exit if called to early
+						if not Altoholic_UI_Options then return end
+						
+						local L = DataStore:GetLocale("Altoholic")
+						local value = self:GetValue()
+						
+						Altoholic_UI_Options.Minimap.IconRadius = value
+						Altoholic:UpdateSlider(self, L["Minimap Icon Radius"], value)
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
@@ -140,7 +152,7 @@
 						_G[name .. "_SliderScale"]:SetValue(1.0)
 						_G[name .. "_SliderScaleText"]:SetText(format("%s (%1.1f)", UI_SCALE, 1.0));
 						AltoholicFrame:SetScale(1.0)
-						Altoholic:SetOption("UI.Scale", 1.0)
+						Altoholic_UI_Options.Scale = 1.0
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -154,7 +166,7 @@
 						local name = self:GetParent():GetName()
 						local value = _G[name .. "_SliderScale"]:GetValue()
 						AltoholicFrame:SetScale(value)
-						Altoholic:SetOption("UI.Scale", value)
+						Altoholic_UI_Options.Scale = value
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -165,12 +177,15 @@
 				</Anchors>
 				<Scripts>
 					<OnValueChanged>
-						local L = LibStub("AceLocale-3.0"):GetLocale("Altoholic")
+						-- exit if called to early
+						if not Altoholic_UI_Options then return end
+					
+						local L = DataStore:GetLocale("Altoholic")
 						
 						local value = self:GetValue()
 						_G[self:GetName() .. "Text"]:SetText(format("%s (%1.2f)", L["Transparency"], value));
 						AltoholicFrame:SetAlpha(value)
-						Altoholic:SetOption("UI.Transparency", value)
+						Altoholic_UI_Options.Transparency = value
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
@@ -452,10 +467,10 @@
 				<Scripts>
 					<OnClick>
 						if self:GetChecked() then 
-							Altoholic:SetOption("UI.AccountSharing.IsEnabled", true)
+							Altoholic_Sharing_Options.IsEnabled = true
 							Altoholic.Comm.Sharing:SetMessageHandler("ActiveHandler")
 						else
-							Altoholic:SetOption("UI.AccountSharing.IsEnabled", false)
+							Altoholic_Sharing_Options.IsEnabled = false
 							Altoholic.Comm.Sharing:SetMessageHandler("EmptyHandler")
 						end
 					</OnClick>
@@ -608,7 +623,8 @@
 				</Anchors>      
 				<Scripts>
 					<OnClick>
-						Altoholic:ToggleOption(self, "UI.Calendar.WeekStartsOnMonday")
+						Altoholic_Calendar_Options.WeekStartsOnMonday = not Altoholic_Calendar_Options.WeekStartsOnMonday
+
 						if self:GetChecked() then 
 							Altoholic:SetFirstDayOfWeek(2)
 						else

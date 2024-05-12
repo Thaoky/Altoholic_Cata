@@ -53,7 +53,7 @@ end
 local function FilterMinimumLevel()
 	local minLevel = searchedItem["itemMinLevel"]
 	if minLevel == 0 then
-		if addon:GetOption("UI.Tabs.Search.IncludeNoMinLevel") then
+		if Altoholic_SearchTab_Options.IncludeNoMinLevel then
 			return true		-- include items with no minimum requireement
 		end
 	else

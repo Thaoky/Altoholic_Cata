@@ -60,10 +60,12 @@
 					child.Arrow:Hide()
 				end
 			
-				local option = parent.option
-				Altoholic:ToggleOption(nil, option)
+				local optionTable = _G[parent.optionTable]
+				local key = parent.optionKey
 
-				local ascending = Altoholic:GetOption(option)
+				optionTable[key] = not optionTable[key] 
+
+				local ascending = optionTable[key]
 				self:DrawArrow(ascending)
 	
 				if self.func then

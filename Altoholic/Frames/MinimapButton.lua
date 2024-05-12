@@ -1,11 +1,7 @@
-local addonName = ...
-local addon = _G[addonName]
+local addonName, addon = ...
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
-local OPTION_ICON_ANGLE = "UI.Minimap.IconAngle"
-local OPTION_ICON_RADIUS = "UI.Minimap.IconRadius"
+local L = DataStore:GetLocale(addonName)
 
 local function GetIconAngle()
 	local xPos, yPos = GetCursorPosition()
@@ -28,15 +24,15 @@ addon:Controller("AltoholicUI.MinimapButton", {
 			colors.white, L["Right-click to |cFF00FF00drag"])
 	end,
 	Move = function(frame)
-		local angle = addon:GetOption(OPTION_ICON_ANGLE)
-		local radius = addon:GetOption(OPTION_ICON_RADIUS)
+		local angle = Altoholic_UI_Options.Minimap.IconAngle
+		local radius = Altoholic_UI_Options.Minimap.IconRadius
 		
 		frame:SetPoint( "TOPLEFT", "Minimap", "TOPLEFT", 54 - (radius * cos(angle)), (radius * sin(angle)) - 55 )
 	end,
 	Update = function(frame)
 		if frame.isMoving then
 			local iconAngle = GetIconAngle()
-			addon:SetOption(OPTION_ICON_ANGLE, iconAngle)
+			Altoholic_UI_Options.Minimap.IconAngle = iconAngle
 			
 			-- this line should not be here, but stays temporarily
 			AltoholicGeneralOptions_SliderAngle:SetValue(iconAngle)

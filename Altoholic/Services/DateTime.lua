@@ -1,5 +1,4 @@
-local addonName = ...
-local addon = _G[addonName]
+local addonName, addon = ...
 
 local monthOffset = 0		-- month offset from the current month (-1 = past month, +1 = next month)
 

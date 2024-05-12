@@ -1,8 +1,7 @@
-local addonName = ...
-local addon = _G[addonName]
+local addonName, addon = ...
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local addonList = {
 	"Altoholic",
@@ -128,38 +127,6 @@ local whatsnew = {
 			"Added a tooltip option to display the counter for heartstones or not.",
 		},
 	},
-	{	name = "2.5.005 Changes",
-		bulletedList = {
-			"Fixed characters above 60 not being visible in the account summary.",
-		},
-	},
-	{	name = "2.5.004 Changes",
-		bulletedList = {
-			"Fixed the enchanting profession in the character's tab. Filtering by enchant name now also working.",
-		},
-	},
-	{	name = "2.5.003 Changes",
-		bulletedList = {
-			"Account Summary : Fixed improper level filtering causing alts not to be displayed.",
-			"Fixed a tooltip issue caused by RAID_CLASS_COLORS not yet being loaded, made it local.",
-			"Fixed a Lua error in the Skills panel when having to display a skill level higher than the maximum.",
-		},
-	},
-	{	name = "2.5.002 Changes",
-		bulletedList = {
-			"Fixed invisible backdrop in the message box object.",
-			"Fixed missing Jewelcrafting icon in the Skill panel.",
-			"Fixed account sharing.",
-			"DataStore_Talents : fixed and issue when reporting a character's main specialization",
-			"DataStore_Crafts : fixed the color of enchanting recipes in the skill panel, which were all displayed as orange.",
-			"You must reload the profession once to fix the database entries.",
-		},
-	},
-	{	name = "2.5.001 Changes",
-		bulletedList = {
-			"Initial release on Burning Crusade Classic.",
-		},
-	},
 	{	name = "Earlier changes",
 		textLines = {
 			"Refer to |cFF00FF00changelog.txt",
@@ -167,35 +134,21 @@ local whatsnew = {
 	},
 }
 
-function addon:GetOption(name)
-	if addon.db and addon.db.global and addon.db.global.options then
-		return addon.db.global.options[name]
-	end
-end
-
-function addon:SetOption(name, value)
-	if addon.db and addon.db.global and addon.db.global.options then 
-		addon.db.global.options[name] = value
-	end
-end
-
 function addon:ToggleOption(frame, option)
 	local value
 	
 	if frame then
 		value = frame:GetChecked() and true or false
 	else
-		value = not addon:GetOption(option)
 	end
 	
-	addon:SetOption(option, value)
 end
 
 function addon:SetupOptions()
 	-- create categories in Blizzard's options panel
 	
 	DataStore:AddOptionCategory(AltoholicGeneralOptions, addonName)
-	LibStub("LibAboutPanel").new(addonName, addonName);
+	-- LibStub("LibAboutPanel").new(addonName, addonName);
 	DataStore:AddOptionCategory(AltoholicHelp, HELP_LABEL, addonName)
 	DataStore:AddOptionCategory(AltoholicSupport, "Getting support", addonName)
 	DataStore:AddOptionCategory(AltoholicWhatsNew, "What's new?", addonName)
@@ -389,69 +342,69 @@ function addon:SetupOptions()
 end
 
 function addon:RestoreOptionsToUI()
-	local O = Altoholic.db.global.options
 	
-	local f = AltoholicGeneralOptions
-	
-	f.BankAutoUpdate:SetChecked(O["UI.Tabs.Guild.BankAutoUpdate"])
-	f.ClampWindowToScreen:SetChecked(O["UI.ClampWindowToScreen"])
-
-	AltoholicGeneralOptions_SliderAngle:SetValue(O["UI.Minimap.IconAngle"])
-	AltoholicGeneralOptions_SliderRadius:SetValue(O["UI.Minimap.IconRadius"])
-	f.ShowMinimapIcon:SetChecked(O["UI.Minimap.ShowIcon"])
-	AltoholicGeneralOptions_SliderScale:SetValue(O["UI.Scale"])
-	AltoholicFrame:SetScale(O["UI.Scale"])
-	AltoholicGeneralOptions_SliderAlpha:SetValue(O["UI.Transparency"])
-
 	-- set communication handlers according to user settings.
-	if O["UI.AccountSharing.IsEnabled"] then
+	if Altoholic_Sharing_Options.IsEnabled then
 		Altoholic.Comm.Sharing:SetMessageHandler("ActiveHandler")
 	else
 		Altoholic.Comm.Sharing:SetMessageHandler("EmptyHandler")
 	end
 	
+	local options = Altoholic_SearchTab_Options
 	
-	f = AltoholicSearchOptions
-	
-	f.ItemInfoAutoQuery:SetChecked(O["UI.Tabs.Search.ItemInfoAutoQuery"])
-	f.IncludeNoMinLevel:SetChecked(O["UI.Tabs.Search.IncludeNoMinLevel"])
-	f.IncludeMailboxItems:SetChecked(O["UI.Tabs.Search.IncludeMailboxItems"])
-	f.IncludeKnownRecipes:SetChecked(O["UI.Tabs.Search.IncludeKnownRecipes"])
+	local f = AltoholicSearchOptions
+	f.ItemInfoAutoQuery:SetChecked(options.ItemInfoAutoQuery)
+	f.IncludeNoMinLevel:SetChecked(options.IncludeNoMinLevel)
+	f.IncludeMailboxItems:SetChecked(options.IncludeMailboxItems)
+	f.IncludeKnownRecipes:SetChecked(options.IncludeKnownRecipes)
 
-	AltoholicSearchOptionsLootInfo:SetText(colors.green .. O.TotalLoots .. "|r " .. L["Loots"] .. " / " .. colors.green .. O.UnknownLoots .. "|r " .. L["Unknown"])
-	AltoholicSearchOptionsLootInfo:SetText(format("%s%s|r %s / %s%s|r %s", colors.green, O.TotalLoots, L["Loots"], colors.green, O.UnknownLoots, L["Unknown"]))
+	options = Altoholic_UI_Options
+	
+	AltoholicFrame:SetScale(options.Scale)
+	AltoholicGeneralOptions_SliderScale:SetValue(options.Scale)
+	AltoholicGeneralOptions_SliderAlpha:SetValue(options.Transparency)
+	AltoholicGeneralOptions_SliderAngle:SetValue(options.Minimap.IconAngle)
+	AltoholicGeneralOptions_SliderRadius:SetValue(options.Minimap.IconRadius)
+	AltoholicGeneralOptions.ShowMinimapIcon:SetChecked(options.Minimap.ShowIcon)
+	AltoholicGeneralOptions.ClampWindowToScreen:SetChecked(options.ClampWindowToScreen)
+	AltoholicGeneralOptions.BankAutoUpdate:SetChecked(Altoholic_GuildTab_Options.BankAutoUpdate)
+	
+	AltoholicSearchOptionsLootInfo:SetText(colors.green .. options.TotalLoots .. "|r " .. L["Loots"] .. " / " .. colors.green .. options.UnknownLoots .. "|r " .. L["Unknown"])
+	AltoholicSearchOptionsLootInfo:SetText(format("%s%s|r %s / %s%s|r %s", colors.green, options.TotalLoots, L["Loots"], colors.green, options.UnknownLoots, L["Unknown"]))
 	
 	f = AltoholicMailOptions
-	AltoholicMailOptions_SliderTimeToNextWarning:SetValue(O["UI.Mail.TimeToNextWarning"])
-	f.GuildMailWarning:SetChecked(O["UI.Mail.GuildMailWarning"])
-	f.AutoCompleteRecipient:SetChecked(O["UI.Mail.AutoCompleteRecipient"])
+	AltoholicMailOptions_SliderTimeToNextWarning:SetValue(options.Mail.TimeToNextWarning)
+	f.GuildMailWarning:SetChecked(options.Mail.GuildMailWarning)
+	f.AutoCompleteRecipient:SetChecked(options.Mail.AutoCompleteRecipient)
 	
 	f = AltoholicMiscOptions
-	f.AHColorCoding:SetChecked(O["UI.AHColorCoding"])
-	f.VendorColorCoding:SetChecked(O["UI.VendorColorCoding"])
+	f.AHColorCoding:SetChecked(options.AHColorCoding)
+	f.VendorColorCoding:SetChecked(options.VendorColorCoding)
 	
 	f = AltoholicAccountSharingOptions
-	f.IsEnabled:SetChecked(O["UI.AccountSharing.IsEnabled"])
+	f.IsEnabled:SetChecked(Altoholic_Sharing_Options.IsEnabled)
 	
+	options = Altoholic_Tooltip_Options
 	f = AltoholicTooltipOptions
-	f.ShowItemSource:SetChecked(O["UI.Tooltip.ShowItemSource"])
-	f.ShowItemCount:SetChecked(O["UI.Tooltip.ShowItemCount"])
-	f.ShowTotalItemCount:SetChecked(O["UI.Tooltip.ShowTotalItemCount"])
-	f.ShowKnownRecipes:SetChecked(O["UI.Tooltip.ShowKnownRecipes"])
-	f.ShowItemID:SetChecked(O["UI.Tooltip.ShowItemID"])
-	f.ShowGatheringNodesCount:SetChecked(O["UI.Tooltip.ShowGatheringNodesCount"])
-	f.ShowCrossFactionCount:SetChecked(O["UI.Tooltip.ShowCrossFactionCount"])
-	f.ShowMergedRealmsCount:SetChecked(O["UI.Tooltip.ShowMergedRealmsCount"])
-	f.ShowAllAccountsCount:SetChecked(O["UI.Tooltip.ShowAllAccountsCount"])
-	f.ShowGuildBankCount:SetChecked(O["UI.Tooltip.ShowGuildBankCount"])
-	f.IncludeGuildBankInTotal:SetChecked(O["UI.Tooltip.IncludeGuildBankInTotal"])
-	f.ShowGuildBankCountPerTab:SetChecked(O["UI.Tooltip.ShowGuildBankCountPerTab"])
-	f.ShowHearthstoneCount:SetChecked(O["UI.Tooltip.ShowHearthstoneCount"])
+	f.ShowItemSource:SetChecked(options.ShowItemSource)
+	f.ShowItemCount:SetChecked(options.ShowItemCount)
+	f.ShowTotalItemCount:SetChecked(options.ShowTotalItemCount)
+	f.ShowKnownRecipes:SetChecked(options.ShowKnownRecipes)
+	f.ShowItemID:SetChecked(options.ShowItemID)
+	f.ShowGatheringNodesCount:SetChecked(options.ShowGatheringNodesCount)
+	f.ShowCrossFactionCount:SetChecked(options.ShowCrossFactionCount)
+	f.ShowMergedRealmsCount:SetChecked(options.ShowMergedRealmsCount)
+	f.ShowAllAccountsCount:SetChecked(options.ShowAllAccountsCount)
+	f.ShowGuildBankCount:SetChecked(options.ShowGuildBankCount)
+	f.IncludeGuildBankInTotal:SetChecked(options.IncludeGuildBankInTotal)
+	f.ShowGuildBankCountPerTab:SetChecked(options.ShowGuildBankCountPerTab)
+	f.ShowHearthstoneCount:SetChecked(options.ShowHearthstoneCount)
 	
+	options = Altoholic_Calendar_Options
 	f = AltoholicCalendarOptions
-	f.WeekStartsOnMonday:SetChecked(O["UI.Calendar.WeekStartsOnMonday"])
-	f.UseDialogBoxForWarnings:SetChecked(O["UI.Calendar.UseDialogBoxForWarnings"])
-	f.WarningsEnabled:SetChecked(O["UI.Calendar.WarningsEnabled"])
+	f.WeekStartsOnMonday:SetChecked(options.WeekStartsOnMonday)
+	f.UseDialogBoxForWarnings:SetChecked(options.UseDialogBoxForWarnings)
+	f.WarningsEnabled:SetChecked(options.WarningsEnabled)
 end
 
 function addon:UpdateMyMemoryUsage()

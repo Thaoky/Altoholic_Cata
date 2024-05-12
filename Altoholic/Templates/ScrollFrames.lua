@@ -1,5 +1,4 @@
-local addonName = ...
-local addon = _G[addonName]
+local addonName, addon = ...
 
 --[[
 The methods below are slightly modified versions of Blizzard's own code to manage scroll frames.

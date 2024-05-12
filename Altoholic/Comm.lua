@@ -2,7 +2,7 @@ local addonName = ...
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 local LibDeflate = LibStub:GetLibrary("LibDeflate")
 local LibSerialize = LibStub:GetLibrary("LibSerialize")
 
@@ -428,7 +428,7 @@ end
 
 -- *** DataStore Event Handlers ***
 function addon:DATASTORE_GUILD_MAIL_RECEIVED(event, sender, recipient)
-	if addon:GetOption("UI.Mail.GuildMailWarning") then
+	if Altoholic_UI_Options.Mail.GuildMailWarning then
 		addon:Print(format(L["%s|r has received a mail from %s"], format("%s%s", colors.green, recipient), format("%s%s", colors.green, sender)))
 	end
 end
@@ -436,8 +436,8 @@ end
 function addon:DATASTORE_GLOBAL_MAIL_EXPIRY(event, threshold)
 	-- at least one mail has expired
 	
-	local lastWarning = addon:GetOption("UI.Mail.LastExpiryWarning")
-	local timeToNext = addon:GetOption("UI.Mail.TimeToNextWarning")
+	local lastWarning = Altoholic_UI_Options.Mail.LastExpiryWarning
+	local timeToNext = Altoholic_UI_Options.Mail.TimeToNextWarning
 	local now = time()
 	
 	if (now - lastWarning) < (timeToNext * 3600) then	-- has enough time passed ?
@@ -460,7 +460,7 @@ function addon:DATASTORE_GLOBAL_MAIL_EXPIRY(event, threshold)
 	
 	AltoMessageBox:Show()
 	
-	addon:SetOption("UI.Mail.LastExpiryWarning", now)
+	Altoholic_UI_Options.Mail.LastExpiryWarning = now
 end
 
 function addon:DATASTORE_MAIL_EXPIRY(event, character, key, threshold, numExpiredMails)

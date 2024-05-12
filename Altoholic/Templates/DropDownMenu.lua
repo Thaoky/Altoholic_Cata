@@ -1,5 +1,4 @@
-local addonName = "Altoholic"
-local addon = _G[addonName]
+local addonName, addon = ...
 
 -- ** Constants ** 
 local MAX_BUTTONS = 8

@@ -1,5 +1,4 @@
-local addonName = ...
-local addon = _G[addonName]
+local addonName, addon = ...
 
 addon:Controller("AltoholicUI.MessageBox", {
 	SetText = function(frame, text)

@@ -4,7 +4,7 @@ local addonName = ...
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 addon.Events = {}
 
@@ -252,7 +252,7 @@ local function ShowExpiryWarning(index, minutes)
 	if not warning then return end
 	
 	-- print instead of dialog box if player is in combat
-	if addon:GetOption("UI.Calendar.UseDialogBoxForWarnings") and not UnitAffectingCombat("player") then
+	if Altoholic_Calendar_Options.UseDialogBoxForWarnings and not UnitAffectingCombat("player") then
 		AltoMessageBox:SetHandler(Warning_MsgBox_Handler)
 		AltoMessageBox:SetText(format("%s%s\n%s", colors.white, warning, L["Do you want to open Altoholic's calendar for details ?"]))
 		AltoMessageBox:Show()
@@ -281,7 +281,7 @@ end
 
 local function ToggleWarningThreshold(self)
 	local id = self.arg1
-	local warnings = addon:GetOption("WarningType"..id)		-- Gets something like "15|5|1"
+	local warnings = Altoholic_Calendar_Options["WarningType"..id]		-- Gets something like "15|5|1"
 	
 	local t = {}		-- create a temporary table to store checked values
 	for v in warnings:gmatch("(%d+)") do
@@ -295,7 +295,7 @@ local function ToggleWarningThreshold(self)
 		table.insert(t, self.value)
 	end
 	
-	addon:SetOption("WarningType"..id, table.concat(t, "|"))		-- Sets something like "15|5|10|1"
+	Altoholic_Calendar_Options["WarningType"..id] = table.concat(t, "|")		-- Sets something like "15|5|10|1"
 end
 
 function ns:Get(index)
@@ -336,7 +336,7 @@ function ns:GetDayCount(year, month, day)
 end
 
 function ns:CheckExpiries(elapsed)
-	if addon:GetOption("UI.Calendar.WarningsEnabled") == false then	-- warnings disabled ? do nothing
+	if Altoholic_Calendar_Options.WarningsEnabled == false then	-- warnings disabled ? do nothing
 		return
 	end
 
@@ -352,7 +352,7 @@ function ns:CheckExpiries(elapsed)
 			ShowExpiryWarning(k, 0)
 			hasEventExpired = true		-- at least one event has expired
 		elseif numMin > 0 and numMin <= 30 then
-			local warnings = addon:GetOption("WarningType"..eventToWarningType[v.eventType])		-- Gets something like "15|5|1"
+			local warnings = Altoholic_Calendar_Options["WarningType"..eventToWarningType[v.eventType]]		-- Gets something like "15|5|1"
 			for _, threshold in pairs(timerThresholds) do
 				if threshold == numMin then			-- if snooze is allowed for this value
 					if IsNumberInString(threshold, warnings) then
@@ -378,7 +378,7 @@ end
 function ns:WarningType_Initialize()
 	local info = UIDropDownMenu_CreateInfo()
 	local id = self:GetID()
-	local warnings = addon:GetOption("WarningType"..id)		-- Gets something like "15|5|1"
+	local warnings = Altoholic_Calendar_Options["WarningType"..id]		-- Gets something like "15|5|1"
 	
 	for _, threshold in pairs(timerThresholds) do
 		info.text = format(D_MINUTES, threshold)
@@ -454,7 +454,7 @@ function ns:BuildList()
 				-- Salt Shaker
 				local saltShakerID = 15846
 				
-				DataStore:SearchBagsForItem(character, saltShakerID, function(bagName, container, slotID) 
+				DataStore:SearchBagsForItem(character, saltShakerID, function(containerID, container, slotID) 
 					local startTime, duration = DataStore:GetContainerCooldownInfo(container, slotID)
 					if startTime then
 						local expires = startTime + duration

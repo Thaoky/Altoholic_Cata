@@ -2,12 +2,13 @@ local addonName = ...
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local THIS_ACCOUNT = "Default"
 local THIS_REALM = GetRealmName()
 
 local storedLink = nil
+local options
 
 local hearthstoneItemIDs = {
 	[6948] = true,				-- Hearthstone
@@ -145,7 +146,7 @@ end
 local function WriteCounterLines(tooltip)
 	if #counterLines == 0 then return end
 
-	if addon:GetOption("UI.Tooltip.ShowItemCount") then			-- add count per character/guild
+	if options.ShowItemCount then			-- add count per character/guild
 		tooltip:AddLine(" ",1,1,1)
 		for _, line in ipairs (counterLines) do
 			tooltip:AddDoubleLine(line.owner,  format("%s%s", colors.teal, line.info))
@@ -154,7 +155,7 @@ local function WriteCounterLines(tooltip)
 end
 
 local function WriteTotal(tooltip)
-	if addon:GetOption("UI.Tooltip.ShowTotalItemCount") and cachedTotal then
+	if options.ShowTotalItemCount and cachedTotal then
 		tooltip:AddLine(cachedTotal, 1,1,1)
 	end
 end
@@ -164,7 +165,7 @@ local function GetRealmsList()
 	local realms = {}
 	table.insert(realms, THIS_REALM)		-- always "this realm" first
 	
-	if addon:GetOption("UI.Tooltip.ShowMergedRealmsCount") then
+	if options.ShowMergedRealmsCount then
 		for _, connectedRealm in pairs(DataStore:GetRealmsConnectedWith(THIS_REALM)) do
 			table.insert(realms, connectedRealm)
 		end
@@ -174,7 +175,10 @@ local function GetRealmsList()
 end
 
 local function GetCharacterItemCount(character, searchedID)
-	itemCounts[1], itemCounts[2], itemCounts[3], itemCounts[4] = DataStore:GetContainerItemCount(character, searchedID)
+	itemCounts[1], itemCounts[2] = DataStore:GetContainerItemCount(character, searchedID)
+	itemCounts[2] = itemCounts[2] + DataStore:GetPlayerBankItemCount(character, searchedID)
+	itemCounts[3] = DataStore:GetVoidStorageItemCount(character, searchedID)
+	itemCounts[4] = DataStore:GetReagentBankItemCount(character, searchedID)
 	itemCounts[5] = DataStore:GetAuctionHouseItemCount(character, searchedID)
 	itemCounts[6] = DataStore:GetInventoryItemCount(character, searchedID)
 	itemCounts[7] = DataStore:GetMailItemCount(character, searchedID)
@@ -207,7 +211,7 @@ local function GetCharacterItemCount(character, searchedID)
 			end
 		end
 
-		if addon:GetOption("UI.Tooltip.ShowSimpleCount") then
+		if options.ShowSimpleCount then
 			AddCounterLine(name, format("%s%s", colors.orange, charCount))
 		else
 			-- charInfo should look like 	(Bags: 4, Bank: 8, Equipped: 1, Mail: 7), table concat takes care of this
@@ -223,7 +227,7 @@ local function GetAccountItemCount(account, searchedID)
 
 	for _, realm in pairs(GetRealmsList()) do
 		for _, character in pairs(DataStore:GetCharacters(realm, account)) do
-			if addon:GetOption("UI.Tooltip.ShowCrossFactionCount") then
+			if options.ShowCrossFactionCount then
 				count = count + GetCharacterItemCount(character, searchedID)
 			else
 				if	DataStore:GetCharacterFaction(character) == UnitFactionGroup("player") then
@@ -240,7 +244,7 @@ local function GetItemCount(searchedID)
 	wipe(counterLines)
 
 	local count = 0
-	if addon:GetOption("UI.Tooltip.ShowAllAccountsCount") and not addon.Comm.Sharing.SharingInProgress then
+	if options.ShowAllAccountsCount and not addon.Comm.Sharing.SharingInProgress then
 		for account in pairs(DataStore:GetAccounts()) do
 			count = count + GetAccountItemCount(account, searchedID)
 		end
@@ -248,9 +252,9 @@ local function GetItemCount(searchedID)
 		count = GetAccountItemCount(THIS_ACCOUNT, searchedID)
 	end
 	
-	local showCrossFaction = addon:GetOption("UI.Tooltip.ShowCrossFactionCount")
+	local showCrossFaction = options.ShowCrossFactionCount
 	
-	if addon:GetOption("UI.Tooltip.ShowGuildBankCount") then
+	if options.ShowGuildBankCount then
 		for _, realm in pairs(GetRealmsList()) do
 			for guildName, guildKey in pairs(DataStore:GetGuilds(realm)) do
 				local altoGuild = addon:GetGuild(guildName)
@@ -262,7 +266,7 @@ local function GetItemCount(searchedID)
 					local guildCount = 0
 					local guildLabel = format("%s%s|r", colors.green, guildName)
 					
-					if addon:GetOption("UI.Tooltip.ShowGuildBankCountPerTab") then
+					if options.ShowGuildBankCountPerTab then
 						local tabCounters = {}
 						
 						local tabCount
@@ -284,7 +288,7 @@ local function GetItemCount(searchedID)
 						end
 					end
 						
-					if addon:GetOption("UI.Tooltip.IncludeGuildBankInTotal") then
+					if options.IncludeGuildBankInTotal then
 						count = count + guildCount
 					end
 				end
@@ -405,7 +409,7 @@ end
 
 local function ShowGatheringNodeCounters()
 	-- exit if player does not want counters for known gathering nodes
-	if addon:GetOption("UI.Tooltip.ShowGatheringNodesCount") == false then return end
+	if options.ShowGatheringNodesCount == false then return end
 
 	-- Get the first tooltip line
 	local line = _G["GameTooltipTextLeft1"]:GetText()
@@ -429,7 +433,7 @@ local function ShowGatheringNodeCounters()
 	end
 
 	-- check player bags to see how many times he owns this item, and where
-	if addon:GetOption("UI.Tooltip.ShowItemCount") or addon:GetOption("UI.Tooltip.ShowTotalItemCount") then
+	if options.ShowItemCount or options.ShowTotalItemCount then
 		cachedCount = GetItemCount(itemID) -- if one of the 2 options is active, do the count
 		cachedTotal = (cachedCount > 0) and format("%s%s: %s%d", colors.gold, L["Total owned"], colors.teal, cachedCount) or nil
 	end
@@ -468,7 +472,7 @@ local function ProcessTooltip(tooltip, link)
 		
 		-- these are the cpu intensive parts of the update .. so do them only if necessary
 		cachedSource = nil
-		if addon:GetOption("UI.Tooltip.ShowItemSource") then
+		if options.ShowItemSource then
 			local domain, subDomain = addon.Loots:GetSource(itemID)
 			
 			cachedItemID = itemID			-- we have searched this ID ..
@@ -479,7 +483,7 @@ local function ProcessTooltip(tooltip, link)
 		end
 		
 		-- .. then check player bags to see how many times he owns this item, and where
-		if addon:GetOption("UI.Tooltip.ShowItemCount") or addon:GetOption("UI.Tooltip.ShowTotalItemCount") then
+		if options.ShowItemCount or options.ShowTotalItemCount then
 			cachedCount = GetItemCount(itemID) -- if one of the 2 options is active, do the count
 			cachedTotal = (cachedCount > 0) and format("%s%s: %s%s", colors.gold, L["Total owned"], colors.teal, cachedCount) or nil
 		end
@@ -492,7 +496,7 @@ local function ProcessTooltip(tooltip, link)
 	end
 
 	local isHearth = hearthstoneItemIDs[itemID] 
-	local showHearth = addon:GetOption("UI.Tooltip.ShowHearthstoneCount")
+	local showHearth = options.ShowHearthstoneCount
 	
 	if showHearth or (not showHearth and not isHearth) then
 		WriteCounterLines(tooltip)
@@ -506,7 +510,7 @@ local function ProcessTooltip(tooltip, link)
 	
 	-- addon:CheckMaterialUtility(itemID)
 	
-	if addon:GetOption("UI.Tooltip.ShowItemID") then
+	if options.ShowItemID then
 		local iLevel = select(4, GetItemInfo(itemID))
 		
 		if iLevel then
@@ -517,12 +521,12 @@ local function ProcessTooltip(tooltip, link)
 	
 	local _, _, _, _, _, itemType, itemSubType, _, _, _, sellPrice = GetItemInfo(itemID)
 	
-	if sellPrice and sellPrice > 0 and addon:GetOption("UI.Tooltip.ShowSellPrice") then	-- 0 = cannot be sold
+	if sellPrice and sellPrice > 0 and options.ShowSellPrice then	-- 0 = cannot be sold
 		tooltip:AddLine(" ",1,1,1)
 		tooltip:AddLine("Sells for " .. addon:GetMoneyStringShort(sellPrice, colors.white) .. " per unit",1,1,1)
 	end
 	
-	if addon:GetOption("UI.Tooltip.ShowKnownRecipes") == false then return end -- exit if recipe information is not wanted
+	if options.ShowKnownRecipes == false then return end -- exit if recipe information is not wanted
 	
 	if itemType ~= L["ITEM_TYPE_RECIPE"] then return end		-- exit if not a recipe
 	if itemSubType == L["ITEM_SUBTYPE_BOOK"] then return end		-- exit if it's a book
@@ -695,6 +699,8 @@ function addon:InitTooltip()
 	if LinkWrangler then
 		LinkWrangler.RegisterCallback ("Altoholic",  Hook_LinkWrangler, "refresh")
 	end
+	
+	options = Altoholic_Tooltip_Options
 end
 
 function addon:RefreshTooltip()

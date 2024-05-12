@@ -2,7 +2,7 @@ local addonName = ...
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 local BB = LibStub("LibBabble-Boss-3.0"):GetLookupTable()
 local LCI = LibStub("LibCraftInfo-1.0")
 local LCL = LibStub("LibCraftLevels-1.0")
@@ -530,7 +530,7 @@ local function OnNoMatch()
 	unknownCount = unknownCount + 1
 	
 	if allowedQueries > 0 then
-		if addon:GetOption("UI.Tabs.Search.ItemInfoAutoQuery") then		-- if autoquery is enabled
+		if Altoholic_SearchTab_Options.ItemInfoAutoQuery then		-- if autoquery is enabled
 			local itemID = filters:GetSearchedItemInfo("itemID")
 			if not addon:IsItemUnsafe(itemID) then		-- if the item is not known to be unsafe
 				GameTooltip:SetHyperlink("item:"..itemID..":0:0:0:0:0:0:0")	-- this line queries the server for an unknown id
@@ -553,8 +553,8 @@ function ns:Find()
 	count = count + ParseLPTSet("InstanceLootHeroic", OnMatch, OnNoMatch)
 	count = count + ParseLPTSet("CurrencyItems", Currency_OnMatch, OnNoMatch)
 
-	addon:SetOption("TotalLoots", count)
-	addon:SetOption("UnknownLoots", unknownCount)
+	Altoholic_UI_Options.TotalLoots = count
+	Altoholic_UI_Options.UnknownLoots = unknownCount
 end
 
 function ns:FindUpgrade()
