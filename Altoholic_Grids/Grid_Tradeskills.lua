@@ -14,8 +14,8 @@ local xPacks = {
 	EXPANSION_NAME2,	-- "Wrath of the Lich King"													
 }
 
-local OPTION_XPACK = "UI.Tabs.Grids.Tradeskills.CurrentXPack"
-local OPTION_TRADESKILL = "UI.Tabs.Grids.Tradeskills.CurrentTradeSkill"
+local OPTION_XPACK = "Tradeskills.CurrentXPack"
+local OPTION_TRADESKILL = "Tradeskills.CurrentTradeSkill"
 
 local currentDDMText
 local currentItemID
@@ -25,8 +25,9 @@ local dropDownFrame
 
 local function OnXPackChange(self)
 	local currentXPack = self.value
+	local options = Altoholic_GridsTab_Options
 	
-	addon:SetOption(OPTION_XPACK, currentXPack)
+	options[OPTION_XPACK] = currentXPack
 
 	AltoholicTabGrids:SetViewDDMText(xPacks[currentXPack])
 	AltoholicTabGrids:Update()
@@ -34,7 +35,8 @@ end
 
 local function OnTradeSkillChange(self)
 	dropDownFrame:Close()
-	addon:SetOption(OPTION_TRADESKILL, self.value)
+	local options = Altoholic_GridsTab_Options
+	options[OPTION_TRADESKILL] = self.value
 	AltoholicTabGrids:Update()
 end
 
@@ -42,9 +44,10 @@ local function DropDown_Initialize(frame, level)
 
 	if not level then return end
 
+	local options = Altoholic_GridsTab_Options
+	local currentXPack = options[OPTION_XPACK]
+	local currentTradeSkill = options[OPTION_TRADESKILL]
 	local tradeskills = addon.TradeSkills.spellIDs
-	local currentXPack = addon:GetOption(OPTION_XPACK)
-	local currentTradeSkill = addon:GetOption(OPTION_TRADESKILL)
 	
 	if level == 1 then
 		frame:AddCategoryButton(PRIMARY_SKILLS, 1, level)
@@ -118,9 +121,10 @@ end
 
 local callbacks = {
 	OnUpdate = function() 
+			local options = Altoholic_GridsTab_Options
+			local currentXPack = options[OPTION_XPACK]
+			local currentTradeSkill = options[OPTION_TRADESKILL]
 			local tradeskills = addon.TradeSkills.spellIDs
-			local currentXPack = addon:GetOption(OPTION_XPACK)
-			local currentTradeSkill = addon:GetOption(OPTION_TRADESKILL)
 			
 			currentList = LCI:GetProfessionCraftList(tradeskills[currentTradeSkill], currentXPack)
 			if not currentList.isSorted then
@@ -180,9 +184,11 @@ local callbacks = {
 			local text = icons.notReady
 			local vc = 0.25	-- vertex color
 			local tradeskills = addon.TradeSkills.spellIDs
-			local profession = DataStore:GetProfession(character, GetSpellInfo(tradeskills[addon:GetOption(OPTION_TRADESKILL)]))			
+			
+			local professionName = GetSpellInfo(tradeskills[Altoholic_GridsTab_Options[OPTION_TRADESKILL]])
+			local profession = DataStore:GetProfession(character, professionName)
 
-			if #profession.Crafts ~= 0 then
+			if profession and #profession.Crafts ~= 0 then
 				-- do not enable this yet .. working fine, but better if more filtering allowed. ==> filtering on rarity
 				
 				-- local _, _, itemRarity, itemLevel = GetItemInfo(currentItemID)
@@ -225,7 +231,7 @@ local callbacks = {
 			
 			frame:SetMenuWidth(100) 
 			frame:SetButtonWidth(20)
-			frame:SetText(xPacks[addon:GetOption(OPTION_XPACK)])
+			frame:SetText(xPacks[Altoholic_GridsTab_Options[OPTION_XPACK]])
 			frame:Initialize(DropDown_Initialize, "MENU_NO_BORDERS")
 		end,
 }

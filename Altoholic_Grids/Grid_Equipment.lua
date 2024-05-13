@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 -- Class constants, for readability, these values match the ones in Altoholic.Classes (altoholic.lua)
 local CLASS_MAGE			= "MAGE"

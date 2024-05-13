@@ -3,7 +3,8 @@ local addon = _G[addonName]
 local colors = addon.Colors
 local icons = addon.Icons
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
+local PARAGON_LABEL = "Paragon"
 
 local TEXTURE_PATH = "Interface\\Icons\\"
 local LOCAL_TEXTURE_PATH = "Interface\\Addons\\Altoholic_Grids\\Textures\\"
@@ -155,24 +156,38 @@ local VertexColors = {
 	[FACTION_STANDING_LABEL6] = { r = 0.0, g = 0.6, b = 0.6 },		-- honored
 	[FACTION_STANDING_LABEL7] = { r = 0.9, g = 0.3, b = 0.9 },		-- revered
 	[FACTION_STANDING_LABEL8] = { r = 1.0, g = 1.0, b = 1.0 },		-- exalted
+	[PARAGON_LABEL] = { r = 1.0, g = 1.0, b = 1.0 },					-- Paragon
 }
 
 local view
 local isViewValid
 
-local OPTION_XPACK = "UI.Tabs.Grids.Reputations.CurrentXPack"
-local OPTION_FACTION = "UI.Tabs.Grids.Reputations.CurrentFactionGroup"
-
 local currentFaction
 local currentDDMText
 local dropDownFrame
+
+-- ** Options **
+local OPTION_XPACK = "Reputations.CurrentXPack"
+local OPTION_FACTION = "Reputations.CurrentFactionGroup"
+
+local function SetOptions(xPack, faction)
+	local options = Altoholic_GridsTab_Options
+
+	options[OPTION_XPACK] = xPack
+	options[OPTION_FACTION] = faction
+end
+
+local function GetOptions()
+	local options = Altoholic_GridsTab_Options
+	
+	return options[OPTION_XPACK], options[OPTION_FACTION]
+end
 
 local function BuildView()
 	view = view or {}
 	wipe(view)
 	
-	local currentXPack = addon:GetOption(OPTION_XPACK)
-	local currentFactionGroup = addon:GetOption(OPTION_FACTION)
+	local currentXPack, currentFactionGroup = GetOptions()
 
 	if (currentXPack ~= CAT_ALLINONE) then
 		for index, faction in ipairs(Factions[currentXPack][currentFactionGroup]) do
@@ -205,8 +220,7 @@ end
 local function OnFactionChange(self, xpackIndex, factionGroupIndex)
 	dropDownFrame:Close()
 
-	addon:SetOption(OPTION_XPACK, xpackIndex)
-	addon:SetOption(OPTION_FACTION, factionGroupIndex)
+	SetOptions(xpackIndex, factionGroupIndex)
 		
 	local factionGroup = Factions[xpackIndex][factionGroupIndex]
 	currentDDMText = factionGroup.name
@@ -218,8 +232,8 @@ end
 
 local function OnAllInOneSelected(self)
 	dropDownFrame:Close()
-	addon:SetOption(OPTION_XPACK, CAT_ALLINONE)
-	addon:SetOption(OPTION_FACTION, 1)
+	
+	SetOptions(CAT_ALLINONE, 1)
 	
 	currentDDMText = L["All-in-one"]
 	AltoholicTabGrids:SetViewDDMText(currentDDMText)
@@ -232,8 +246,7 @@ local function DropDown_Initialize(frame, level)
 
 	local info = frame:CreateInfo()
 	
-	local currentXPack = addon:GetOption(OPTION_XPACK)
-	local currentFactionGroup = addon:GetOption(OPTION_FACTION)
+	local currentXPack, currentFactionGroup = GetOptions()
 	
 	if level == 1 then
 		for xpackIndex = 1, (CAT_ALLINONE - 1) do
@@ -272,8 +285,7 @@ local callbacks = {
 				BuildView()
 			end
 
-			local currentXPack = addon:GetOption(OPTION_XPACK)
-			local currentFactionGroup = addon:GetOption(OPTION_FACTION)
+			local currentXPack, currentFactionGroup = GetOptions()
 			
 			if (currentXPack == CAT_ALLINONE) then
 				AltoholicTabGrids:SetStatus(L["All-in-one"])
@@ -310,10 +322,20 @@ local callbacks = {
 			button.Background:SetDesaturated(false)
 			
 			local status, _, _, rate = DataStore:GetReputationInfo(character, faction.name)
+			
 			if status and rate then 
 				local text
 				if status == FACTION_STANDING_LABEL8 then	-- If exalted .. 
 					text = icons.ready						-- .. just show the green check
+				elseif status == PARAGON_LABEL then					-- Else if paragon levels..
+					if rate >= 100 then
+						text = icons.waiting
+					else
+						button.Name:SetFontObject("NumberFontNormalSmall")
+						button.Name:SetJustifyH("RIGHT")
+						button.Name:SetPoint("BOTTOMRIGHT", 0, 0)
+						text = format("%2d%%", floor(rate))
+					end
 				else
 					button.Background:SetDesaturated(true)
 					button.Name:SetFontObject("NumberFontNormalSmall")
@@ -396,8 +418,7 @@ local callbacks = {
 			frame:Show()
 			title:Show()
 
-			local currentXPack = addon:GetOption(OPTION_XPACK)
-			local currentFactionGroup = addon:GetOption(OPTION_FACTION)
+			local currentXPack, currentFactionGroup = GetOptions()
 			
 			if (currentXPack ~= CAT_ALLINONE) then
 				currentDDMText = Factions[currentXPack][currentFactionGroup].name

@@ -3,7 +3,7 @@ local addon = _G[addonName]
 local colors = addon.Colors
 local icons = addon.Icons
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 -- *** Dungeons ***
 local Dungeons = {
@@ -25,19 +25,34 @@ local Dungeons = {
 local view
 local isViewValid
 
-local OPTION_XPACK = "UI.Tabs.Grids.Dungeons.CurrentXPack"
-local OPTION_RAIDS = "UI.Tabs.Grids.Dungeons.CurrentRaids"
 
 local currentDDMText
 local currentTexture
 local dropDownFrame
 
+-- ** Options **
+local OPTION_XPACK = "Dungeons.CurrentXPack"
+local OPTION_RAIDS = "Dungeons.CurrentRaids"
+
+local function SetOptions(xPack, raids)
+	local options = Altoholic_GridsTab_Options
+
+	options[OPTION_XPACK] = xPack
+	options[OPTION_RAIDS] = raids
+end
+
+local function GetOptions()
+	local options = Altoholic_GridsTab_Options
+	
+	return options[OPTION_XPACK], options[OPTION_RAIDS]
+end
+
+
 local function BuildView()
 	view = view or {}
 	wipe(view)
-	
-	local currentXPack = addon:GetOption(OPTION_XPACK)
-	local currentRaids = addon:GetOption(OPTION_RAIDS)
+
+	local currentXPack, currentRaids = GetOptions()
 
 	for index, raidList in ipairs(Dungeons[currentXPack][currentRaids]) do
 		table.insert(view, raidList)	-- insert the table pointer
@@ -49,8 +64,7 @@ end
 local function OnRaidListChange(self, xpackIndex, raidListIndex)
 	dropDownFrame:Close()
 
-	addon:SetOption(OPTION_XPACK, xpackIndex)
-	addon:SetOption(OPTION_RAIDS, raidListIndex)
+	SetOptions(xpackIndex, raidListIndex)
 		
 	local raidList = Dungeons[xpackIndex][raidListIndex]
 	currentDDMText = raidList.name
@@ -65,8 +79,7 @@ local function DropDown_Initialize(frame, level)
 
 	local info = frame:CreateInfo()
 	
-	local currentXPack = addon:GetOption(OPTION_XPACK)
-	local currentRaids = addon:GetOption(OPTION_RAIDS)
+	local currentXPack, currentRaids = GetOptions()
 	
 	if level == 1 then
 		for xpackIndex = 1, #Dungeons do
@@ -98,8 +111,7 @@ local callbacks = {
 				BuildView()
 			end
 
-			local currentXPack = addon:GetOption(OPTION_XPACK)
-			local currentRaids = addon:GetOption(OPTION_RAIDS)
+			local currentXPack, currentRaids = GetOptions()
 			
 			AltoholicTabGrids:SetStatus(format("%s / %s", Dungeons[currentXPack].name, Dungeons[currentXPack][currentRaids].name))
 		end,
@@ -187,8 +199,7 @@ local callbacks = {
 			frame:Show()
 			title:Show()
 
-			local currentXPack = addon:GetOption(OPTION_XPACK)
-			local currentRaids = addon:GetOption(OPTION_RAIDS)
+			local currentXPack, currentRaids = GetOptions()
 			
 			currentDDMText = Dungeons[currentXPack][currentRaids].name
 			
