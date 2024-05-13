@@ -593,7 +593,7 @@ local function Hook_SetCurrencyToken(self,index,...)
 	local characters = DataStore:HashValueToSortedArray(DataStore:GetCharacters())
 	
 	for _, character in pairs(characters) do
-		local count = DataStore:GetCurrencyInfoByName(character, currency)
+		local _, count = DataStore:GetCurrencyInfoByName(character, currency)
 		
 		if count and count > 0 then
 			GameTooltip:AddDoubleLine(DataStore:GetColoredCharacterName(character), format("%s%s", colors.teal, count))
