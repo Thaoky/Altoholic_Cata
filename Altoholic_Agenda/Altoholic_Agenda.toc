@@ -1,8 +1,10 @@
-## Interface: 30403
+## Interface: 40400
 ## Title: Altoholic_Agenda
+## IconTexture: Interface\Icons\inv_drink_13
+
 ## Notes: Altoholic's Agenda UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 3.4.012
+## Version: 4.4.001
 ## Dependencies: Altoholic, DataStore, DataStore_Agenda, DataStore_Characters
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
@@ -11,4 +13,4 @@ Templates\UITemplates.xml
 TabAgenda.xml
 
 Frames\Calendar.xml
-Frames\Contacts.xml
+#Frames\Contacts.xml

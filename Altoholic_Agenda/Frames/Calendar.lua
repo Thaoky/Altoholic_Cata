@@ -54,7 +54,7 @@ addon:Controller("AltoholicUI.Calendar", { "AltoholicUI.DateTime", function(date
 	return {
 		OnBind = function(frame)
 			-- by default, the week starts on Sunday, adjust first day of the week if necessary
-			if addon:GetOption("UI.Calendar.WeekStartsOnMonday") then
+			if Altoholic_Calendar_Options.WeekStartsOnMonday then
 				addon:SetFirstDayOfWeek(2)
 			end
 			
