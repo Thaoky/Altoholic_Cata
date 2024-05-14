@@ -50,7 +50,7 @@ local CALENDAR_FULLDATE_MONTH_NAMES = {
 
 local monthOffset = 0		-- month offset from the current month (-1 = past month, +1 = next month)
 
-addon:Controller("AltoholicUI.Calendar", { "AltoholicUI.DateTime", function(dateTime)
+addon:Controller("AltoholicUI.Calendar", function()
 	return {
 		OnBind = function(frame)
 			-- by default, the week starts on Sunday, adjust first day of the week if necessary
@@ -87,9 +87,6 @@ addon:Controller("AltoholicUI.Calendar", { "AltoholicUI.DateTime", function(date
 			local CurMonthInfo = C_Calendar.GetMonthInfo()
 			local PrevMonthInfo = C_Calendar.GetMonthInfo(-1)
 			local NextMonthInfo = C_Calendar.GetMonthInfo(1)
-			--local CurMonthInfo = dateTime.GetMonthInfo(0, monthOffset)
-			--local PrevMonthInfo = dateTime.GetMonthInfo(-1, monthOffset)
-			--local NextMonthInfo = dateTime.GetMonthInfo(1, monthOffset)
 			local prevMonth, prevYear, prevNumDays = PrevMonthInfo.month, PrevMonthInfo.year, PrevMonthInfo.numDays
 			local nextMonth, nextYear, nextNumDays = NextMonthInfo.month, NextMonthInfo.year, NextMonthInfo.numDays
 			local month, year, numDays, firstWeekday = CurMonthInfo.month, CurMonthInfo.year, CurMonthInfo.numDays, CurMonthInfo.firstWeekday
@@ -164,5 +161,4 @@ addon:Controller("AltoholicUI.Calendar", { "AltoholicUI.DateTime", function(date
 		SetMonth = function(frame, month)
 			monthOffset = monthOffset + month
 		end,
-	}
-end})
+}end)
