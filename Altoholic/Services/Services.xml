@@ -3,4 +3,5 @@
 	<Script file="ColumnOptions.lua"></Script>
 	<Script file="DateTime.lua"></Script>
 	<Script file="Formatter.lua"></Script>
+	<Script file="Events.lua"></Script>
 </Ui>

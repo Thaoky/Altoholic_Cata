@@ -8,6 +8,7 @@ local colors = addon.Colors
 
 local L = DataStore:GetLocale(addonName)
 local LCI = LibStub("LibCraftInfo-1.0")
+local MVC = LibStub("LibMVC-1.0")
 
 local THIS_ACCOUNT = "Default"
 
@@ -307,10 +308,7 @@ end
 DataStore:OnPlayerLogin(function() 
 	InitLocalization()
 	addon:SetupOptions()
-	-- Only needed in debug
-	-- addon.Profiler:Init()
-	addon.Tasks:Init()
-	addon.Events:Init()
+	MVC:GetService("AltoholicUI.Events"):Initialize()
 	addon:InitTooltip()
 
 	addon:ListenTo("AUCTION_HOUSE_SHOW", OnAuctionHouseShow)	-- must stay here for the AH hook (to manage recipe coloring)
@@ -339,16 +337,7 @@ DataStore:OnPlayerLogin(function()
 	addon:ListenTo("CHAT_MSG_LOOT", OnChatMsgLoot)
 	
 	BuildUnsafeItemList()
-	
-	-- create an empty frame to manage the timer via its Onupdate
-	addon.TimerFrame = CreateFrame("Frame", "AltoholicTimerFrame", UIParent)
-	local f = addon.TimerFrame
-	
-	f:SetWidth(1)
-	f:SetHeight(1)
-	f:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 1, 1)
-	f:SetScript("OnUpdate", function(addon, elapsed) Altoholic.Tasks:OnUpdate(elapsed) end)
-	f:Show()
+
 end)
 
 function addon:ToggleUI()

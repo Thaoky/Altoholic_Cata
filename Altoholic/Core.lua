@@ -339,7 +339,6 @@ function addon:OnInitialize()
 	-- this event MUST stay here, we have to be able to respond to a request event if the guild tab is not loaded
 
 	-- TO DO !!
-	addon:RegisterMessage("DATASTORE_CS_TIMEGAP_FOUND")
 	addon:RegisterMessage("DATASTORE_GUILD_LEFT")
 end
 

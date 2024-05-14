@@ -470,11 +470,6 @@ function addon:DATASTORE_MAIL_EXPIRY(event, character, key, threshold, numExpire
  	-- end
 end
 
-function addon:DATASTORE_CS_TIMEGAP_FOUND(event, clientServerTimeGap)
-	-- once the Client-Server time gap is known, check for expiries every 60 seconds
-	addon:ScheduleRepeatingTimer(addon.Events.CheckExpiries, 60)
-end
-
 function addon:DATASTORE_GUILD_LEFT(event)
 	if addon.Summary then
 		addon.Summary:Update()

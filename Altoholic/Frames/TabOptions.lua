@@ -332,13 +332,13 @@ function addon:SetupOptions()
 	L["Warn %d minutes before an event starts"] = nil
 	L["Display warnings in a dialog box"] = nil
 	
-	for i = 1, 4 do 
-		addon:DDM_Initialize(_G["AltoholicCalendarOptions_WarningType"..i], Altoholic.Events.WarningType_Initialize)
-	end
-	UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType1, "Profession Cooldowns")
-	UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType2, "Dungeon Resets")
-	UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType3, "Calendar Events")
-	UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType4, "Item Timers")
+	-- for i = 1, 4 do 
+		-- addon:DDM_Initialize(_G["AltoholicCalendarOptions_WarningType"..i], Altoholic.Events.WarningType_Initialize)
+	-- end
+	-- UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType1, "Profession Cooldowns")
+	-- UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType2, "Dungeon Resets")
+	-- UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType3, "Calendar Events")
+	-- UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType4, "Item Timers")
 end
 
 function addon:RestoreOptionsToUI()
