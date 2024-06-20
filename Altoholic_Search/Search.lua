@@ -695,9 +695,7 @@ local function BrowseCharacter(character)
 	DataStore:IterateContainerSlots(character, function(containerID, itemID, itemLink, itemCount, isBattlePet) 
 		local location
 
-		if containerID == enum.Keyring then
-			location = KEYRING
-		elseif containerID <= 4 then
+		if containerID <= 4 then
 			location = L["Bags"]
 		else
 			location = L["Bank"]
