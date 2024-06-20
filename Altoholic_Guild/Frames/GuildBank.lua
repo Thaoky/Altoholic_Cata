@@ -1,7 +1,7 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 addon:Controller("AltoholicUI.GuildBank", { "AltoholicUI.Formatter", function(formatter)
 	local THIS_ACCOUNT = "Default"
@@ -13,7 +13,8 @@ addon:Controller("AltoholicUI.GuildBank", { "AltoholicUI.Formatter", function(fo
 	return {
 		OnBind = function(frame)
 			local menuIcons = frame.MenuIcons
-			menuIcons.RarityIcon:SetRarity(addon:GetOption("UI.Tabs.Guild.BankItemsRarity"))
+			
+			-- menuIcons.RarityIcon:SetRarity(Altoholic_GuildTab_Options.BankItemsRarity)
 				
 			-- load the drop down with a guild
 			local currentRealm = GetRealmName()
@@ -73,7 +74,9 @@ addon:Controller("AltoholicUI.GuildBank", { "AltoholicUI.Formatter", function(fo
 			local money = DataStore:GetGuildBankMoney(currentGuildKey)
 			frame.Info3:SetText(format("%s: %s", MONEY, formatter.MoneyString(money or 0, colors.white)))
 			
-			local rarity = addon:GetOption("UI.Tabs.Guild.BankItemsRarity")
+			local menuIcons = frame.MenuIcons
+			local rarity = Altoholic_GuildTab_Options.BankItemsRarity
+			menuIcons.RarityIcon:SetRarity(rarity)
 			
 			local numGuildBankRows = #frame.ItemRows
 			

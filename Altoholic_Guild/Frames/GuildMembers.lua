@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 -- *** Guild Members ***
 
@@ -198,18 +198,21 @@ local function BuildView()
 	isViewValid = true
 end
 
-local function OnPlayerEquipmentReceived(frame, event, sender, player)
-	frame.Equipment:Update(player)
+local panel
+
+local function OnPlayerEquipmentReceived(event, sender, player)
+	panel.Equipment:Update(player)
 end
 
 addon:Controller("AltoholicUI.GuildMembers", {
 	OnBind = function(frame)
-		addon:RegisterMessage("DATASTORE_PLAYER_EQUIPMENT_RECEIVED", OnPlayerEquipmentReceived, frame)
+		panel = frame
+		DataStore:ListenTo("DATASTORE_PLAYER_EQUIPMENT_RECEIVED", OnPlayerEquipmentReceived)
 		frame:Update()
 	end,
 	Sort = function(frame, field)
 		viewSortField = field
-		viewSortOrder = addon:GetOption("UI.Tabs.Guild.SortAscending")
+		viewSortOrder = Altoholic_GuildTab_Options.SortAscending
 		
 		frame:InvalidateView()
 		frame:Update()
@@ -360,7 +363,11 @@ addon:Controller("AltoholicUI.GuildMembers", {
 		if line.lineType == NORMALPLAYER_LINE then return end
 
 		DataStore:RequestGuildMemberEquipment(characterName)
-		frame.Equipment.Name:SetText(characterName)
+		
+		local englishClass = select(11, DataStore:GetGuildMemberInfo(characterName))
+		local coloredName = format("%s%s", DataStore:GetClassColor(englishClass), characterName)
+		
+		frame.Equipment.Name:SetText(coloredName)
 	end,
 })
 

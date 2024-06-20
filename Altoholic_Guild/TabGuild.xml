@@ -46,7 +46,8 @@
 			<Frame parentKey="SortButtons" inherits="AltoSortButtonsContainerTemplate">
 				<KeyValues>
 					<KeyValue key="numButtons" value="5" type="number" />
-					<KeyValue key="option" value="UI.Tabs.Guild.SortAscending" />
+					<KeyValue key="optionTable" value="Altoholic_GuildTab_Options" />
+					<KeyValue key="optionKey" value="SortAscending" />
 				</KeyValues>
 			</Frame>
 		</Frames>

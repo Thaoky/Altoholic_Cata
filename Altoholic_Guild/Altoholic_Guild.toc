@@ -1,9 +1,12 @@
-## Interface: 30403
+## Interface: 40400
 ## Title: Altoholic_Guild
+## IconTexture: Interface\Icons\inv_drink_13
+
 ## Notes: Altoholic's Guild UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 3.4.012
+## Version: 4.4.001
 ## Dependencies: Altoholic, DataStore, DataStore_Characters
+## SavedVariables: Altoholic_GuildTab_Options
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
 

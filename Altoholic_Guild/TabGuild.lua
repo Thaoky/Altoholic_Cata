@@ -1,56 +1,62 @@
+local addonTabName = ...
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
+local L = DataStore:GetLocale(addonName)
+
+local tab		-- small shortcut to easily address the frame (set in OnBind)
 
 -- *** Event Handlers ***
 
-local function OnGuildAltsReceived(frame, event, sender, alts)
-	frame.Members:InvalidateView()
-	frame:Refresh()
+local function OnGuildAltsReceived(event, sender, alts)
+	tab.Members:InvalidateView()
+	tab:Refresh()
 end
 
-local function OnBankTabRequestAck(frame, event, sender)
+local function OnBankTabRequestAck(event, sender)
 	addon:Print(format(L["Waiting for %s to accept .."], sender))
 end
 
-local function OnBankTabRequestRejected(frame, event, sender)
+local function OnBankTabRequestRejected(event, sender)
 	addon:Print(format(L["Request rejected by %s"], sender))
 end
 
-local function OnBankTabUpdateSuccess(frame, event, sender, guildName, tabName, tabID)
+local function OnBankTabUpdateSuccess(event, sender, guildName, tabName, tabID)
 	addon:Print(format(L["Guild bank tab %s successfully updated !"], tabName ))
-	frame.Bank:Update()
+	tab.Bank:Update()
 end
 
-local function OnGuildMemberOffline(frame, event, member)
-	frame.Members:InvalidateView()
-	frame:Refresh()
+local function OnGuildMemberOffline(event, member)
+	tab.Members:InvalidateView()
+	tab:Refresh()
 end
 
-local function OnRosterUpdate(frame)
+local function OnRosterUpdate()
 	local _, onlineMembers = GetNumGuildMembers()
-	frame.MenuItem1.Text:SetText(format("%s %s(%d)", L["Guild Members"], colors.green, onlineMembers))
+	tab.MenuItem1.Text:SetText(format("%s %s(%d)", L["Guild Members"], colors.green, onlineMembers))
 	
-	frame.Members:InvalidateView()
-	frame:Refresh()
+	tab.Members:InvalidateView()
+	tab:Refresh()
 end
 
 addon:Controller("AltoholicUI.TabGuild", {
 	OnBind = function(frame)
+		tab = frame
+		
 		frame.MenuItem1:SetText(L["Guild Members"])
 		frame.MenuItem2:SetText(GUILD_BANK)
 		frame:MenuItem_Highlight(1)
 		frame:SetMode(1)
 
-		addon:RegisterMessage("DATASTORE_GUILD_ALTS_RECEIVED", OnGuildAltsReceived, frame)
-		addon:RegisterMessage("DATASTORE_BANKTAB_REQUEST_ACK", OnBankTabRequestAck, frame)
-		addon:RegisterMessage("DATASTORE_BANKTAB_REQUEST_REJECTED", OnBankTabRequestRejected, frame)
-		addon:RegisterMessage("DATASTORE_BANKTAB_UPDATE_SUCCESS", OnBankTabUpdateSuccess, frame)
-		addon:RegisterMessage("DATASTORE_GUILD_MEMBER_OFFLINE", OnGuildMemberOffline, frame)
+		DataStore:ListenTo("DATASTORE_GUILD_ALTS_RECEIVED", OnGuildAltsReceived)
+		DataStore:ListenTo("DATASTORE_BANKTAB_REQUEST_ACK", OnBankTabRequestAck)
+		DataStore:ListenTo("DATASTORE_BANKTAB_REQUEST_REJECTED", OnBankTabRequestRejected)
+		DataStore:ListenTo("DATASTORE_BANKTAB_UPDATE_SUCCESS", OnBankTabUpdateSuccess)
+		DataStore:ListenTo("DATASTORE_GUILD_MEMBER_OFFLINE", OnGuildMemberOffline)
 		
 		if IsInGuild() then
-			addon:RegisterEvent("GUILD_ROSTER_UPDATE", OnRosterUpdate, frame)
+			addon:ListenTo("GUILD_ROSTER_UPDATE", OnRosterUpdate)
 		end
 	end,
 	HideAll = function(frame)
@@ -97,3 +103,10 @@ addon:Controller("AltoholicUI.TabGuild", {
 		end
 	end,
 })
+
+DataStore:OnAddonLoaded(addonTabName, function() 
+	Altoholic_GuildTab_Options = Altoholic_GuildTab_Options or {
+		["BankItemsRarity"] = 0,				-- rarity filter in the guild bank tab
+		["SortAscending"] = true,				-- ascending or descending sort order
+	}
+end)
