@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local currentCategoryID
 
@@ -54,16 +54,19 @@ addon:Controller("AltoholicUI.QuestLog", {
 			rowFrame:Hide()
 			
 			if line <= #questList then	-- if the line is visible
-				rowFrame:SetID(questList[line])
+				local lineID = questList[line]
+				rowFrame:SetID(lineID)
 				
-				local questName, questID, link, groupName, level, groupSize, tagID, 
-						isComplete, isDaily, isTask, isBounty, isStory, isHidden, isSolo = DataStore:GetQuestLogInfo(character, questList[line])
-				local money = DataStore:GetQuestLogMoney(character, questList[line])
-				
-				rowFrame:SetName(questName, level)
-				rowFrame:SetType(tagID)
+				local questID = DataStore:GetQuestLogID(character, lineID)
+
+				rowFrame:SetName(DataStore:GetQuestName(questID), DataStore:GetQuestLevel(questID))
+				rowFrame:SetType(DataStore:GetQuestLogTag(character, lineID))
 				rowFrame:SetRewards()
-				rowFrame:SetInfo(isComplete, isDaily, groupSize, money)
+				rowFrame:SetInfo(
+							DataStore:IsQuestCompleted(character, lineID), 
+							DataStore:IsQuestDaily(questID), 
+							DataStore:GetQuestGroupSize(questID), 
+							DataStore:GetQuestLogMoney(character, lineID))
 				rowFrame:Show()
 			end
 		end

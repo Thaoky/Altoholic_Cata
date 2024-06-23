@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 addon.Mail = {}
 
@@ -138,7 +138,7 @@ function ns:Update()
 end
 
 function ns:Sort(self, field)
-	ns:BuildView(field, addon:GetOption("UI.Tabs.Characters.SortAscending"))
+	ns:BuildView(field, Altoholic_CharactersTab_Options.SortAscending)
 	ns:Update()
 end
 

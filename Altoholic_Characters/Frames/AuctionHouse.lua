@@ -2,7 +2,8 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local DataStore = DataStore
+local L = DataStore:GetLocale(addonName)
 
 local view
 local viewSortField = "name"
@@ -11,11 +12,10 @@ local isViewValid
 local listType			-- "Auctions" or "Bids"
 
 local function SortByName(a, b)
-	local DS = DataStore
 	local character = addon.Tabs.Characters:GetAltKey()
 
-	local _, idA = DS:GetAuctionHouseItemInfo(character, listType, a)
-	local _, idB = DS:GetAuctionHouseItemInfo(character, listType, b)
+	local _, idA = DataStore:GetAuctionHouseItemInfo(character, listType, a)
+	local _, idB = DataStore:GetAuctionHouseItemInfo(character, listType, b)
 	
 	local textA = GetItemInfo(idA) or ""
 	local textB = GetItemInfo(idB) or ""
@@ -29,11 +29,10 @@ end
 
 local function SortByPlayer(a, b)
 	-- sort by owner (for bids), or highBidder (for auctions), both the 4th return value
-	local DS = DataStore
 	local character = addon.Tabs.Characters:GetAltKey()
 	
-	local _, _, _, nameA = DS:GetAuctionHouseItemInfo(character, listType, a)
-	local _, _, _, nameB = DS:GetAuctionHouseItemInfo(character, listType, b)
+	local _, _, _, nameA = DataStore:GetAuctionHouseItemInfo(character, listType, a)
+	local _, _, _, nameB = DataStore:GetAuctionHouseItemInfo(character, listType, b)
 
 	nameA = nameA or ""
 	nameB = nameB or ""
@@ -47,11 +46,10 @@ end
 
 local function SortByPrice(a, b)
 	-- sort by owner (for bids), or highBidder (for auctions), both the 4th return value
-	local DS = DataStore
 	local character = addon.Tabs.Characters:GetAltKey()
 	
-	local _, _, _, _, _, priceA = DS:GetAuctionHouseItemInfo(character, listType, a)
-	local _, _, _, _, _, priceB = DS:GetAuctionHouseItemInfo(character, listType, b)
+	local _, _, _, _, _, priceA = DataStore:GetAuctionHouseItemInfo(character, listType, a)
+	local _, _, _, _, _, priceB = DataStore:GetAuctionHouseItemInfo(character, listType, b)
 
 	if viewSortOrder then
 		return priceA < priceB
@@ -115,7 +113,7 @@ end
 
 function ns:Sort(self, field, AHType)
 	viewSortField = field
-	viewSortOrder = addon:GetOption("UI.Tabs.Characters.SortAscending")
+	viewSortOrder = Altoholic_CharactersTab_Options.SortAscending
 	
 	ns:SetListType(AHType)
 	ns:InvalidateView()
@@ -135,10 +133,9 @@ function ns:UpdateAuctions()
 
 	local scrollFrame = _G[ frame.."ScrollFrame" ]
 	
-	local DS = DataStore
 	local character = addon.Tabs.Characters:GetAltKey()
 	
-	local numAuctions = DS:GetNumAuctions(character) or 0
+	local numAuctions = DataStore:GetNumAuctions(character) or 0
 	AltoholicTabCharacters.Status:SetText(format("%s|r / %s", DataStore:GetColoredCharacterName(character), format(L["Auctions %s(%d)"], colors.green, numAuctions)))
 	
 	if numAuctions == 0 then		-- make sure the scroll frame is cleared !
@@ -158,7 +155,7 @@ function ns:UpdateAuctions()
 		if line <= numAuctions then
 			local index = view[line]
 
-			local isGoblin, itemID, count, highBidder, startPrice, buyoutPrice, timeLeft = DS:GetAuctionHouseItemInfo(character, "Auctions", index)
+			local isGoblin, itemID, count, highBidder, startPrice, buyoutPrice, timeLeft = DataStore:GetAuctionHouseItemInfo(character, "Auctions", index)
 
 			local itemName, _, itemRarity = GetItemInfo(itemID)
 			itemName = itemName or L["N/A"]
@@ -206,10 +203,9 @@ function ns:UpdateBids()
 	
 	local scrollFrame = _G[ frame.."ScrollFrame" ]
 	
-	local DS = DataStore
 	local character = addon.Tabs.Characters:GetAltKey()
 	
-	local numBids = DS:GetNumBids(character) or 0
+	local numBids = DataStore:GetNumBids(character) or 0
 	AltoholicTabCharacters.Status:SetText(format("%s|r / %s", DataStore:GetColoredCharacterName(character), format(L["Bids %s(%d)"], colors.green, numBids)))
 	
 	if numBids == 0 then		-- make sure the scroll frame is cleared !
@@ -227,7 +223,7 @@ function ns:UpdateBids()
 		local line = i + offset
 		if line <= numBids then
 			local index = view[line]
-			local isGoblin, itemID, count, ownerName, bidPrice, buyoutPrice, timeLeft = DS:GetAuctionHouseItemInfo(character, "Bids", index)
+			local isGoblin, itemID, count, ownerName, bidPrice, buyoutPrice, timeLeft = DataStore:GetAuctionHouseItemInfo(character, "Bids", index)
 			
 			local itemName, _, itemRarity = GetItemInfo(itemID)
 			itemName = itemName or L["N/A"]

@@ -14,7 +14,6 @@ addon:Controller("AltoholicUI.SpellButton", {
 		if not spellID then return end
 
 		local name, _, icon = GetSpellInfo(spellID)
-		print()
 		if not name or not icon then return end	-- exit on invalid data
 		
 		frame.spellID = spellID

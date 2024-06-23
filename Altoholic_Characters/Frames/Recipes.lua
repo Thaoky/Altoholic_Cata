@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local SKILL_ANY = 0
 local SKILL_ORANGE = 1
@@ -98,11 +98,9 @@ end
 
 local function GetRecipeList(character, professionName, mainCategory)
 	local list = {}
-	
 	local profession = DataStore:GetProfession(character, professionName)
 
-	DataStore:IterateRecipes(profession, mainCategory, function(color, recipeID, index) 
-		
+	DataStore:IterateRecipes(profession, mainCategory, 0, function(color, recipeID, index) 
 		if RecipePassesColorFilter(color) and RecipePassesSlotFilter(recipeID) and RecipePassesSearchFilter(recipeID) then
 			table.insert(list, index)
 		end
@@ -138,7 +136,7 @@ addon:Controller("AltoholicUI.Recipes", {
 			local line = rowIndex + offset
 			
 			if line <= #recipeList then	-- if the line is visible
-				local color, recipeID, icon = DataStore:GetRecipeInfo(character, currentProfession, recipeList[line])
+				local color, recipeID, icon = DataStore:GetRecipeInfo_NonRetail(character, currentProfession, recipeList[line])
 				
 				rowFrame:Update(currentProfession, recipeID, RecipeColors[color])
 				rowFrame:Show()

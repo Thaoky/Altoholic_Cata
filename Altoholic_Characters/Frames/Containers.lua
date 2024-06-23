@@ -1,11 +1,37 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local DataStore, TableInsert = DataStore, table.insert
+
+local L = DataStore:GetLocale(addonName)
+local enum = DataStore.Enum.ContainerIDs
 
 addon.Containers = {}
 
 local ns = addon.Containers		-- ns = namespace
+
+local function Bag_OnEnter(self)
+	local id = self:GetID()
+	GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+	
+	if id == 0 then
+		GameTooltip:AddLine(BACKPACK_TOOLTIP, 1, 1, 1)
+		GameTooltip:AddLine(format(CONTAINER_SLOTS, 16, BAGSLOT), 1, 1, 1)
+	
+	elseif id == enum.MainBankSlots then
+		GameTooltip:AddLine(L["Bank"], 0.5, 0.5, 1)
+		GameTooltip:AddLine(format("%d %s", 28, L["slots"]), 1, 1, 1)
+	
+	else
+		local character = Altoholic.Tabs.Characters:GetAltKey()
+		local link = DataStore:GetContainerLink(character, id)
+		GameTooltip:SetHyperlink(link)
+		if (id >= 5) and (id <= 11) then
+			GameTooltip:AddLine(L["Bank bag"], 0, 1, 0)
+		end
+	end
+	GameTooltip:Show() 
+end
 
 local bagIndices
 
@@ -17,7 +43,7 @@ local function UpdateBagIndices(bag, size)
 	local lowerLimit = 1
 
 	while size > 0 do					-- as long as there are slots to process ..
-		table.insert(bagIndices, { bagID = bag, from = lowerLimit} )
+		TableInsert(bagIndices, { bagID = bag, from = lowerLimit} )
 	
 		if size <= 12 then			-- no more lines ? leave
 			return
@@ -28,9 +54,17 @@ local function UpdateBagIndices(bag, size)
 	end
 end
 
-local function UpdateSpread()
+local function GetContainer(character, containerID)
+	if containerID == enum.MainBankSlots then
+		return DataStore:GetPlayerBank(character)
+	else
+		return DataStore:GetContainer(character, containerID)
+	end
+end
 
-	local rarity = addon:GetOption("UI.Tabs.Characters.ViewBagsRarity")
+local function UpdateSpread()
+	local options = Altoholic_CharactersTab_Options
+	local rarity = options.ViewBagsRarity
 	
 	local frame = AltoholicFrameContainers
 	local scrollFrame = frame.ScrollFrame
@@ -47,7 +81,6 @@ local function UpdateSpread()
 	end
 	
 	local character = Altoholic.Tabs.Characters:GetAltKey()
-	local DS = DataStore
 	local offset = scrollFrame:GetOffset()
 	
 	AltoholicTabCharacters.Status:SetText(format("%s|r / %s", DataStore:GetColoredCharacterName(character), L["Containers"]))
@@ -61,39 +94,21 @@ local function UpdateSpread()
 		local line = i + offset
 		
 		if line <= #bagIndices then
-		
 			local containerID = bagIndices[line].bagID
-			local container = DS:GetContainer(character, containerID)
-			local containerIcon, _, containerSize = DS:GetContainerInfo(character, containerID)
+			
+			local container = GetContainer(character, containerID)
+			local containerIcon = DataStore:GetContainerIcon(character, containerID)
+			local containerSize = DataStore:GetContainerSize(character, containerID)
 			
 			-- Column 1 : the bag
 			itemButton = rowFrame.Item1
 			
 			if bagIndices[line].from == 1 then		-- if this is the first line for this bag .. draw bag icon
-				itemButton.Icon:SetDesaturated(false)
 				itemButton:SetID(containerID)
 				
+				itemButton.Icon:SetDesaturated(false)
 				itemButton.Icon:SetTexture(containerIcon)
-				itemButton:SetScript("OnEnter", function(self)
-					local id = self:GetID()
-					GameTooltip:SetOwner(self, "ANCHOR_LEFT");
-					if id == 0 then
-						GameTooltip:AddLine(BACKPACK_TOOLTIP,1,1,1);
-						GameTooltip:AddLine(format(CONTAINER_SLOTS, 16, BAGSLOT),1,1,1);
-						
-					elseif id == 100 then
-						GameTooltip:AddLine(L["Bank"],0.5,0.5,1);
-						GameTooltip:AddLine(L["28 Slot"],1,1,1);
-					else
-						local character = Altoholic.Tabs.Characters:GetAltKey()
-						local _, link = DS:GetContainerInfo(character, id)
-						GameTooltip:SetHyperlink(link);
-						if (id >= 5) and (id <= 11) then
-							GameTooltip:AddLine(L["Bank bag"],0,1,0);
-						end
-					end
-					GameTooltip:Show();
-				end)
+				itemButton:SetScript("OnEnter", Bag_OnEnter)
 				itemButton.Count:Hide()
 				itemButton:Show()
 			else
@@ -110,7 +125,7 @@ local function UpdateSpread()
 				itemButton = rowFrame["Item"..j]
 				
 				local slotID = bagIndices[line].from - 3 + j
-				local itemID, itemLink, itemCount, isBattlePet = DS:GetSlotInfo(container, slotID)
+				local itemID, itemLink, itemCount, isBattlePet = DataStore:GetSlotInfo(container, slotID)
 				
 				if (slotID <= containerSize) then 
 					itemButton:SetItem(itemID, itemLink, rarity)
@@ -119,7 +134,7 @@ local function UpdateSpread()
 						itemButton:SetIcon(itemID)	-- override the icon if one is returned by datastore
 					end
 					
-					local startTime, duration, isEnabled = DS:GetContainerCooldownInfo(container, slotID)
+					local startTime, duration, isEnabled = DataStore:GetContainerCooldownInfo(containerID, slotID)
 					itemButton:SetCooldown(startTime, duration, isEnabled)
 					itemButton:Show()
 				else
@@ -143,7 +158,8 @@ local function UpdateSpread()
 end	
 
 local function UpdateAllInOne()
-	local rarity = addon:GetOption("UI.Tabs.Characters.ViewBagsRarity")
+	local options = Altoholic_CharactersTab_Options
+	local rarity = options.ViewBagsRarity
 	local frame = AltoholicFrameContainers
 	local scrollFrame = frame.ScrollFrame
 	local numRows = scrollFrame.numRows
@@ -160,29 +176,28 @@ local function UpdateAllInOne()
 	
 	local containerList = {}
 
-	if addon:GetOption("UI.Tabs.Characters.ViewBags") then
+	if options.ViewBags then
 		for i = 0, 4 do
-			table.insert(containerList, i)
+			TableInsert(containerList, i)
 		end
 	end
 	
-	if addon:GetOption("UI.Tabs.Characters.ViewBank") then
+	if options.ViewBank then
 		for i = 5, 11 do
-			table.insert(containerList, i)
+			TableInsert(containerList, i)
 		end
-		table.insert(containerList, 100)
+		TableInsert(containerList, enum.MainBankSlots)
 	end
 	
 	local itemButton
 	if #containerList > 0 then
-		local DS = DataStore
-		
+	
 		for _, containerID in pairs(containerList) do
-			local container = DS:GetContainer(character, containerID)
-			local _, _, containerSize = DS:GetContainerInfo(character, containerID)
+			local container = GetContainer(character, containerID)
+			local containerSize = DataStore:GetContainerSize(character, containerID)
 
 			for slotID = 1, containerSize do
-				local itemID, itemLink, itemCount, isBattlePet = DS:GetSlotInfo(container, slotID)
+				local itemID, itemLink, itemCount, isBattlePet = DataStore:GetSlotInfo(container, slotID)
 
 				if itemID then
 					currentSlotIndex = currentSlotIndex + 1
@@ -194,7 +209,7 @@ local function UpdateAllInOne()
 							itemButton:SetIcon(itemID)	-- override the icon if one is returned by datastore
 						end
 						
-						local startTime, duration, isEnabled = DS:GetContainerCooldownInfo(container, slotID)
+						local startTime, duration, isEnabled = DataStore:GetContainerCooldownInfo(containerID, slotID)
 						itemButton:SetCooldown(startTime, duration, isEnabled)
 						itemButton:Show()
 						
@@ -248,26 +263,25 @@ function ns:UpdateCache()
 	wipe(bagIndices)
 
 	local character = addon.Tabs.Characters:GetAltKey()
+	local options = Altoholic_CharactersTab_Options
 	
-	if addon:GetOption("UI.Tabs.Characters.ViewBags") then
+	if options.ViewBags then
 		for bagID = 0, 4 do
 			if DataStore:GetContainer(character, bagID) then
-				local _, _, size = DataStore:GetContainerInfo(character, bagID)
-				UpdateBagIndices(bagID, size)
+				UpdateBagIndices(bagID, DataStore:GetContainerSize(character, bagID))
 			end
 		end	
 	end
 	
-	if addon:GetOption("UI.Tabs.Characters.ViewBank") then
+	if options.ViewBank then
 		for bagID = 5, 11 do
 			if DataStore:GetContainer(character, bagID) then
-				local _, _, size = DataStore:GetContainerInfo(character, bagID)
-				UpdateBagIndices(bagID, size)
+				UpdateBagIndices(bagID, DataStore:GetContainerSize(character, bagID))
 			end
 		end
 		
-		if DataStore:GetContainer(character, 100) then 	-- if bank has been visited, add it
-			UpdateBagIndices(100, 28)
+		if DataStore:HasPlayerVisitedBank(character) then 	-- if bank has been visited, add it
+			UpdateBagIndices(enum.MainBankSlots, 28)
 		end
 	end
 end
@@ -283,4 +297,4 @@ local function OnBagUpdate(bag)
 	end
 end
 
-addon:RegisterEvent("BAG_UPDATE", OnBagUpdate)
+addon:ListenTo("BAG_UPDATE", OnBagUpdate)

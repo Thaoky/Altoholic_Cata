@@ -1,8 +1,9 @@
+local addonTabName = ...
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local parentName = "AltoholicTabCharacters"
 local parent
@@ -113,7 +114,8 @@ end
 
 function ns:ShowCharInfo(view)
 	if view == VIEW_BAGS then
-		addon.Containers:SetView(addon:GetOption("UI.Tabs.Characters.ViewBagsAllInOne"))
+		local options = Altoholic_CharactersTab_Options
+		addon.Containers:SetView(options.ViewBagsAllInOne)
 		AltoholicFrameContainers:Show()
 		addon.Containers:Update()
 		
@@ -257,19 +259,21 @@ local function OnCharacterChange(self)
 end
 
 local function OnContainerChange(self)
+	local options = Altoholic_CharactersTab_Options
+
 	if self.value == 1 then
-		addon:ToggleOption(nil, "UI.Tabs.Characters.ViewBags")
+		options.ViewBags = not options.ViewBags
 	elseif self.value == 2 then
-		addon:ToggleOption(nil, "UI.Tabs.Characters.ViewBank")
+		options.ViewBank = not options.ViewBank
 	elseif self.value == 3 then
-		addon:ToggleOption(nil, "UI.Tabs.Characters.ViewBagsAllInOne")
+		options.ViewBagsAllInOne = not options.ViewBagsAllInOne
 	end
 	
 	ns:ViewCharInfo(VIEW_BAGS)
 end
 
 local function OnRarityChange(self)
-	addon:SetOption("UI.Tabs.Characters.ViewBagsRarity", self.value)
+	Altoholic_CharactersTab_Options.ViewBagsRarity = self.value
 	addon.Containers:Update()
 end
 
@@ -442,15 +446,17 @@ local function BagsIcon_Initialize(self, level)
 	local currentCharacterKey = ns:GetAltKey()
 	if not currentCharacterKey then return end
 
+	local options = Altoholic_CharactersTab_Options
+
 	DDM_AddTitle(format("%s / %s", L["Containers"], DataStore:GetColoredCharacterName(currentCharacterKey)))
 	DDM_Add(L["View"], nil, function() ns:ViewCharInfo(VIEW_BAGS) end)
-	DDM_Add(L["Bags"], 1, OnContainerChange, nil, addon:GetOption("UI.Tabs.Characters.ViewBags"))
-	DDM_Add(L["Bank"], 2, OnContainerChange, nil, addon:GetOption("UI.Tabs.Characters.ViewBank"))
-	DDM_Add(L["All-in-one"], 3, OnContainerChange, nil, addon:GetOption("UI.Tabs.Characters.ViewBagsAllInOne"))
+	DDM_Add(L["Bags"], 1, OnContainerChange, nil, options.ViewBags)
+	DDM_Add(L["Bank"], 2, OnContainerChange, nil, options.ViewBank)
+	DDM_Add(L["All-in-one"], 3, OnContainerChange, nil, options.ViewBagsAllInOne)
 		
 	DDM_AddTitle(" ")
 	DDM_AddTitle("|r" ..RARITY)
-	local rarity = addon:GetOption("UI.Tabs.Characters.ViewBagsRarity")
+	local rarity = options.ViewBagsRarity
 	DDM_Add(L["Any"], 0, OnRarityChange, nil, (rarity == 0))
 	
 	for i = LE_ITEM_QUALITY_UNCOMMON, LE_ITEM_QUALITY_HEIRLOOM do		-- Quality: 0 = poor .. 5 = legendary
@@ -508,16 +514,18 @@ local function AuctionIcon_Initialize(self, level)
 	
 	DDM_AddTitle(format("%s / %s", BUTTON_LAG_AUCTIONHOUSE, DataStore:GetColoredCharacterName(currentCharacterKey)))
 	
-	local last = DataStore:GetModuleLastUpdateByKey("DataStore_Auctions", currentCharacterKey)
-	if DataStore_Auctions and last then
-		local numAuctions = DataStore:GetNumAuctions(currentCharacterKey) or 0
-		local numBids = DataStore:GetNumBids(currentCharacterKey) or 0
-		
-		DDM_Add(format(L["Auctions %s(%d)"], colors.green, numAuctions), VIEW_AUCTIONS, OnViewChange, nil, (currentView == VIEW_AUCTIONS))
-		DDM_Add(format(L["Bids %s(%d)"], colors.green, numBids), VIEW_BIDS, OnViewChange, nil, (currentView == VIEW_BIDS))
-	else
+	local numAuctions = DataStore:GetNumAuctions(currentCharacterKey) or 0
+	if numAuctions == 0 then
 		DDM_Add(format(L["Auctions %s(%d)"], colors.grey, 0), nil, nil)
+	else
+		DDM_Add(format(L["Auctions %s(%d)"], colors.green, numAuctions), VIEW_AUCTIONS, OnViewChange, nil, (currentView == VIEW_AUCTIONS))
+	end
+	
+	local numBids = DataStore:GetNumBids(currentCharacterKey) or 0
+	if numBids == 0 then
 		DDM_Add(format(L["Bids %s(%d)"], colors.grey, 0), nil, nil)
+	else
+		DDM_Add(format(L["Bids %s(%d)"], colors.green, numBids), VIEW_BIDS, OnViewChange, nil, (currentView == VIEW_BIDS))
 	end
 	
 	-- actions
@@ -539,13 +547,12 @@ local function MailIcon_Initialize(self, level)
 	if not currentCharacterKey then return end
 		
 	DDM_AddTitle(format("%s / %s", MINIMAP_TRACKING_MAILBOX, DataStore:GetColoredCharacterName(currentCharacterKey)))
-
-	local last = DataStore:GetModuleLastUpdateByKey("DataStore_Mails", currentCharacterKey)
-	if DataStore_Mails and last then
-		local numMails = DataStore:GetNumMails(currentCharacterKey) or 0
-		DDM_Add(format(L["Mails %s(%d)"], colors.green, numMails), VIEW_MAILS, OnViewChange, nil, (currentView == VIEW_MAILS))
-	else
+	
+	local numMails = DataStore:GetNumMails(currentCharacterKey) or 0
+	if numMails == 0 then
 		DDM_Add(format(L["Mails %s(%d)"], colors.grey, 0), nil, nil)
+	else
+		DDM_Add(format(L["Mails %s(%d)"], colors.green, numMails), VIEW_MAILS, OnViewChange, nil, (currentView == VIEW_MAILS))
 	end
 
 	DDM_Add(colors.white .. L["Clear all entries"], nil, OnClearMailboxEntries)
@@ -573,21 +580,19 @@ local function SpellbookIcon_Initialize(self, level)
 end
 
 local function ProfessionsIcon_Initialize(self, level)
-	if not DataStore_Crafts then return end
-	
-	local currentCharacterKey = ns:GetAltKey()
-	if not currentCharacterKey then return end
+	local character = ns:GetAltKey()
+	if not character then return end
 	
 	local recipes = AltoholicTabCharacters.Recipes
 	
 	if level == 1 then
-		DDM_AddTitle(format("%s / %s", TRADE_SKILLS, DataStore:GetColoredCharacterName(currentCharacterKey)))
+		DDM_AddTitle(format("%s / %s", TRADE_SKILLS, DataStore:GetColoredCharacterName(character)))
 
-		local last = DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", currentCharacterKey)
+		local last = DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character)
 		local rank, professionName, _
 
 		-- Cooking
-		rank = DataStore:GetCookingRank(currentCharacterKey)
+		rank = DataStore:GetCookingRank(character)
 		if last and rank then
 			local info = UIDropDownMenu_CreateInfo()
 			
@@ -603,7 +608,7 @@ local function ProfessionsIcon_Initialize(self, level)
 		end
 		
 		-- First Aid
-		rank = DataStore:GetFirstAidRank(currentCharacterKey)
+		rank = DataStore:GetFirstAidRank(character)
 		if last and rank then
 			local info = UIDropDownMenu_CreateInfo()
 			local firstAidLabel = GetSpellInfo(3273)
@@ -621,7 +626,9 @@ local function ProfessionsIcon_Initialize(self, level)
 		
 		
 		-- Profession 1
-		rank, _, _, professionName = DataStore:GetProfession1(currentCharacterKey)
+		rank = DataStore:GetProfession1Rank(character)
+		professionName = DataStore:GetProfession1Name(character)
+		
 		if last and rank and professionName then
 			local info = UIDropDownMenu_CreateInfo()
 			
@@ -633,11 +640,12 @@ local function ProfessionsIcon_Initialize(self, level)
 			UIDropDownMenu_AddButton(info, level)
 			
 		elseif professionName then
-			DDM_Add(colors.grey..professionName, nil, nil)
+			DDM_Add(format("%s%s", colors.grey, professionName), nil, nil)
 		end
 		
 		-- Profession 2
-		rank, _, _, professionName = DataStore:GetProfession2(currentCharacterKey)
+		rank = DataStore:GetProfession2Rank(character)
+		professionName = DataStore:GetProfession2Name(character)
 		if last and rank and professionName then
 			local info = UIDropDownMenu_CreateInfo()
 			
@@ -649,7 +657,7 @@ local function ProfessionsIcon_Initialize(self, level)
 			UIDropDownMenu_AddButton(info, level)
 			
 		elseif professionName then
-			DDM_Add(colors.grey..professionName, nil, nil)
+			DDM_Add(format("%s%s", colors.grey, professionName), nil, nil)
 		end
 		
 		DDM_AddTitle(" ")
@@ -705,9 +713,9 @@ local function ProfessionsIcon_Initialize(self, level)
 			UIDropDownMenu_AddButton(info, level)
 			
 			local invSlots = {}
-			local profession = DataStore:GetProfession(currentCharacterKey, currentProfession)
+			local profession = DataStore:GetProfession(character, currentProfession)
 			
-			DataStore:IterateRecipes(profession, 0, function(color, itemID, index) 
+			DataStore:IterateRecipes(profession, 0, 0, function(color, itemID, index) 
 			
 				if not itemID then return end
 					
@@ -737,7 +745,7 @@ local function ProfessionsIcon_Initialize(self, level)
 			UIDropDownMenu_AddButton(info, level)
 			
 		else
-			local profession = DataStore:GetProfession(currentCharacterKey, UIDROPDOWNMENU_MENU_VALUE)
+			local profession = DataStore:GetProfession(character, UIDROPDOWNMENU_MENU_VALUE)
 			
 			for index = 1, DataStore:GetNumRecipeCategories(profession) do
 				local name = DataStore:GetRecipeCategoryInfo(profession, index)
@@ -774,6 +782,19 @@ function ns:Icon_OnEnter(frame)
 	ToggleDropDownMenu(1, nil, parent.ContextualMenu, AltoholicTabCharacters_MenuIcons, (currentMenuID-1)*42, -5)
 end
 
+local function OnRecipesScanned(event, sender, tradeskillName)
+	local recipes = AltoholicTabCharacters.Recipes
+	if recipes:IsVisible() then
+		recipes:Update()
+	end
+end
+
+local function OnQuestLogScanned(event, sender)
+	if AltoholicTabCharacters.QuestLog:IsVisible() then 
+		AltoholicTabCharacters.QuestLog:Update()
+	end
+end
+
 function ns:OnLoad()
 	parent = _G[parentName]
 
@@ -806,20 +827,17 @@ function ns:OnLoad()
 	menuIcons.BagsIcon.Icon:SetTexture(bagIcon)
 	-- menuIcons.QuestsIcon.Icon:SetTexCoord(0, 0.75, 0, 0.75)
 		
-	addon:RegisterMessage("DATASTORE_RECIPES_SCANNED")
-	addon:RegisterMessage("DATASTORE_QUESTLOG_SCANNED")
+	DataStore:ListenTo("DATASTORE_RECIPES_SCANNED", OnRecipesScanned)
+	DataStore:ListenTo("DATASTORE_QUESTLOG_SCANNED", OnQuestLogScanned)
 end
 
-function addon:DATASTORE_RECIPES_SCANNED(event, sender, tradeskillName)
-	local recipes = AltoholicTabCharacters.Recipes
-	if recipes:IsVisible() then
-		recipes:Update()
-	end
-end
 
-function addon:DATASTORE_QUESTLOG_SCANNED(event, sender)
-	if AltoholicTabCharacters.QuestLog:IsVisible() then 
-		AltoholicTabCharacters.QuestLog:Update()
-	end
-end
-
+DataStore:OnAddonLoaded(addonTabName, function() 
+	Altoholic_CharactersTab_Options = Altoholic_CharactersTab_Options or {
+		["ViewBags"] = true,
+		["ViewBank"] = true,
+		["ViewBagsAllInOne"] = false,
+		["ViewBagsRarity"] = 0,						-- rarity level of items (not a boolean !)
+		["SortAscending"] = true,					-- ascending or descending sort order
+	}
+end)

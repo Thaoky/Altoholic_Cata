@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local PETS_PER_PAGE = 12
 
@@ -175,4 +175,4 @@ function ns:OnChange()
 	end
 end
 
-addon:RegisterEvent("UNIT_PET", addon.Pets.OnChange);
+addon:ListenTo("UNIT_PET", addon.Pets.OnChange);

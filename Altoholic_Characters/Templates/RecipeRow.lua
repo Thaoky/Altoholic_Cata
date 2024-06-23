@@ -1,12 +1,12 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 addon:Controller("AltoholicUI.RecipeRow", {
 	Update = function(frame, profession, recipeID, color)
 
 		-- ** set the crafted item **
-		local craftedItemID, maxMade = DataStore:GetCraftResultItem(recipeID)
+		local maxMade, craftedItemID = DataStore:GetCraftResultItem(recipeID)
 		local itemName, itemLink, itemRarity, spellLink, spellIcon
 
 		if craftedItemID then

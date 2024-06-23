@@ -99,7 +99,8 @@
 			<Frame parentKey="SortButtons" inherits="AltoSortButtonsContainerTemplate">
 				<KeyValues>
 					<KeyValue key="numButtons" value="4" type="number" />
-					<KeyValue key="option" value="UI.Tabs.Characters.SortAscending" />
+					<KeyValue key="optionTable" value="Altoholic_CharactersTab_Options" />
+					<KeyValue key="optionKey" value="SortAscending" />
 				</KeyValues>
 			</Frame>
 		</Frames>

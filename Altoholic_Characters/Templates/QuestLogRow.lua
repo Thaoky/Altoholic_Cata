@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 addon:Controller("AltoholicUI.QuestLogRow", { "AltoholicUI.Formatter", function(formatter)
 	return {
@@ -65,8 +65,12 @@ addon:Controller("AltoholicUI.QuestLogRow", { "AltoholicUI.Formatter", function(
 			if id == 0 then return end
 
 			local character = addon.Tabs.Characters:GetAltKey()
-			local questName, questID, link, _, level = DataStore:GetQuestLogInfo(character, id)
-			if not link then return end
+			
+			local questID = DataStore:GetQuestLogID(character, id)
+			local questName = DataStore:GetQuestName(questID)
+			local level = DataStore:GetQuestLevel(questID)
+			local link = DataStore:GetQuestLogLink(character, id)
+			if not link then return end			
 
 			GameTooltip:ClearLines()
 			GameTooltip:SetOwner(frame.Name, "ANCHOR_LEFT")
@@ -89,7 +93,7 @@ addon:Controller("AltoholicUI.QuestLogRow", { "AltoholicUI.Formatter", function(
 			if id == 0 then return end
 			
 			local character = addon.Tabs.Characters:GetAltKey()
-			local _, _, link = DataStore:GetQuestLogInfo(character, id)
+			local link = DataStore:GetQuestLogLink(character, id)
 			if link then
 				chat:Insert(link)
 			end
