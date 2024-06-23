@@ -24,27 +24,36 @@
 			</OnLeave>
 		</Scripts>
 	</CheckButton>
+	
+	<CheckButton name="AltoTooltipOptionTemplate" inherits="AltoToggleableOptionTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				Altoholic_Tooltip_Options[self.option] = not Altoholic_Tooltip_Options[self.option]
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	
+	<CheckButton name="AltoCalendarOptionTemplate" inherits="AltoToggleableOptionTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				Altoholic_Calendar_Options[self.option] = not Altoholic_Calendar_Options[self.option]
+			</OnClick>
+		</Scripts>
+	</CheckButton>	
 
 	<Frame name="AltoholicGeneralOptions" hidden="true">
 		<Size x="615" y="306" />
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString parentKey="Title" inherits="GameFontHighlightLarge" justifyH="CENTER">
-					<Size x="400" y="30" />
-					<Anchors>
-						<Anchor point="TOP" />
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
 		<Frames>
 			<CheckButton parentKey="BankAutoUpdate" inherits="AltoToggleableOptionTemplate" >
 				<Anchors> 
-					<Anchor point="TOPLEFT" x="30" y="-50" />
+					<Anchor point="TOPLEFT" x="30" y="-20" />
 				</Anchors>
-				<KeyValues>
-					<KeyValue key="option" value="UI.Tabs.Guild.BankAutoUpdate" />
-				</KeyValues>
+				<Scripts>
+					<OnClick>
+						-- Toggle the option
+						Altoholic_Sharing_Options.GuildBankAutoUpdate = not Altoholic_Sharing_Options.GuildBankAutoUpdate
+					</OnClick>
+				</Scripts>
 			</CheckButton>
 			<CheckButton parentKey="ClampWindowToScreen" inherits="InterfaceOptionsCheckButtonTemplate" >
 				<Size x="20" y="20" />
@@ -126,7 +135,7 @@
 			<Slider name="$parent_SliderScale" inherits="OptionsSliderTemplate"  minValue="0.5" maxValue="4.0" defaultValue="1.0" valueStep="0.1">
 				<Size x="180" y="16" />
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeKey="$parent.ShowMinimapIcon" relativePoint="BOTTOMLEFT" x="20" y="-130" />
+					<Anchor point="TOPLEFT" relativeKey="$parent.ShowMinimapIcon" relativePoint="BOTTOMLEFT" x="350" y="-80" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
@@ -144,7 +153,7 @@
 			<Button name="$parent_ResetButton" inherits="UIPanelButtonTemplate" text="RESET">
 				<Size x="80" y="24" />
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeKey="$parent.ShowMinimapIcon" relativePoint="BOTTOMLEFT" x="20" y="-165" />
+					<Anchor point="TOPLEFT" relativeKey="$parent.ShowMinimapIcon" relativePoint="BOTTOMLEFT" x="350" y="-130" />
 				</Anchors>
 				<Scripts>
 					<OnClick>
@@ -173,7 +182,7 @@
 			<Slider name="$parent_SliderAlpha" inherits="OptionsSliderTemplate"  minValue="0.1" maxValue="1" defaultValue="1" valueStep="0.05">
 				<Size x="180" y="16" />
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeKey="$parent.ShowMinimapIcon" relativePoint="BOTTOMLEFT" x="20" y="-210" />
+					<Anchor point="TOPLEFT" relativeKey="$parent.ShowMinimapIcon" relativePoint="BOTTOMLEFT" x="350" y="-30" />
 				</Anchors>
 				<Scripts>
 					<OnValueChanged>
@@ -259,17 +268,25 @@
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeTo="$parent_SliderTimeToNextWarning" relativePoint="BOTTOMLEFT" x="0" y="-20" />
 				</Anchors>
-				<KeyValues>
-					<KeyValue key="option" value="UI.Mail.GuildMailWarning" />
-				</KeyValues>
+				<Scripts>
+					<OnClick>
+						-- Toggle the option
+						local options = Altoholic_UI_Options.Mail
+						options.GuildMailWarning = not options.GuildMailWarning
+					</OnClick>
+				</Scripts>
 			</CheckButton>
 			<CheckButton parentKey="AutoCompleteRecipient" inherits="AltoToggleableOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOP" relativeKey="$parent.GuildMailWarning" relativePoint="BOTTOM" x="0" y="-10" />
 				</Anchors>
-				<KeyValues>
-					<KeyValue key="option" value="UI.Mail.AutoCompleteRecipient" />
-				</KeyValues>
+				<Scripts>
+					<OnClick>
+						-- Toggle the option
+						local options = Altoholic_UI_Options.Mail
+						options.AutoCompleteRecipient = not options.AutoCompleteRecipient
+					</OnClick>
+				</Scripts>
 			</CheckButton>
 		</Frames>
 	</Frame>
@@ -281,17 +298,25 @@
 				<Anchors> 
 					<Anchor point="TOPLEFT" x="40" y="-40" />
 				</Anchors>      
-				<KeyValues>
-					<KeyValue key="option" value="UI.AHColorCoding" />
-				</KeyValues>
+				<Scripts>
+					<OnClick>
+						-- Toggle the option
+						local options = Altoholic_UI_Options
+						options.AHColorCoding = not options.AHColorCoding
+					</OnClick>
+				</Scripts>
 			</CheckButton>
 			<CheckButton parentKey="VendorColorCoding" inherits="AltoToggleableOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOP" relativeKey="$parent.AHColorCoding" relativePoint="BOTTOM" x="0" y="-10" />
 				</Anchors>
-				<KeyValues>
-					<KeyValue key="option" value="UI.VendorColorCoding" />
-				</KeyValues>
+				<Scripts>
+					<OnClick>
+						-- Toggle the option
+						local options = Altoholic_UI_Options
+						options.VendorColorCoding = not options.VendorColorCoding
+					</OnClick>
+				</Scripts>
 			</CheckButton>
 		</Frames>
 	</Frame>
@@ -299,124 +324,124 @@
 	<Frame name="AltoholicTooltipOptions" hidden="true">
 		<Size x="615" y="306" />
 		<Frames>
-			<CheckButton parentKey="ShowItemSource" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowItemSource" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" x="20" y="-20" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowItemSource" />
+					<KeyValue key="option" value="ShowItemSource" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowItemCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowItemCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowItemSource" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowItemCount" />
+					<KeyValue key="option" value="ShowItemCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowSimpleCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowSimpleCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowItemCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowSimpleCount" />
+					<KeyValue key="option" value="ShowSimpleCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowTotalItemCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowTotalItemCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowSimpleCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowTotalItemCount" />
+					<KeyValue key="option" value="ShowTotalItemCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowItemSellPrice" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowItemSellPrice" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowTotalItemCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowSellPrice" />
+					<KeyValue key="option" value="ShowSellPrice" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowKnownRecipes" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowKnownRecipes" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowItemSellPrice" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowKnownRecipes" />
+					<KeyValue key="option" value="ShowKnownRecipes" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowItemID" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowItemID" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowKnownRecipes" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowItemID" />
+					<KeyValue key="option" value="ShowItemID" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowGatheringNodesCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowGatheringNodesCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowItemID" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowGatheringNodesCount" />
+					<KeyValue key="option" value="ShowGatheringNodesCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowCrossFactionCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowCrossFactionCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowGatheringNodesCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowCrossFactionCount" />
+					<KeyValue key="option" value="ShowCrossFactionCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowMergedRealmsCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowMergedRealmsCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
-					<Anchor point="TOPLEFT" relativeKey="$parent.ShowCrossFactionCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
+					<Anchor point="TOPLEFT" relativeKey="$parent.ShowItemSource" relativePoint="TOPRIGHT" x="300" y="0" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowMergedRealmsCount" />
+					<KeyValue key="option" value="ShowMergedRealmsCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowAllAccountsCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowAllAccountsCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowMergedRealmsCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowAllAccountsCount" />
+					<KeyValue key="option" value="ShowAllAccountsCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowGuildBankCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowGuildBankCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowAllAccountsCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowGuildBankCount" />
+					<KeyValue key="option" value="ShowGuildBankCount" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="IncludeGuildBankInTotal" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="IncludeGuildBankInTotal" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowGuildBankCount" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.IncludeGuildBankInTotal" />
+					<KeyValue key="option" value="IncludeGuildBankInTotal" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowGuildBankCountPerTab" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowGuildBankCountPerTab" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.IncludeGuildBankInTotal" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowGuildBankCountPerTab" />
+					<KeyValue key="option" value="ShowGuildBankCountPerTab" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="ShowHearthstoneCount" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="ShowHearthstoneCount" inherits="AltoTooltipOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.ShowGuildBankCountPerTab" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Tooltip.ShowHearthstoneCount" />
+					<KeyValue key="option" value="ShowHearthstoneCount" />
 				</KeyValues>
 			</CheckButton>
 		</Frames>
@@ -637,20 +662,20 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			<CheckButton parentKey="UseDialogBoxForWarnings" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="UseDialogBoxForWarnings" inherits="AltoCalendarOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.WeekStartsOnMonday" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Calendar.UseDialogBoxForWarnings" />
+					<KeyValue key="option" value="UseDialogBoxForWarnings" />
 				</KeyValues>
 			</CheckButton>
-			<CheckButton parentKey="WarningsEnabled" inherits="AltoToggleableOptionTemplate">
+			<CheckButton parentKey="WarningsEnabled" inherits="AltoCalendarOptionTemplate">
 				<Anchors> 
 					<Anchor point="TOPLEFT" relativeKey="$parent.UseDialogBoxForWarnings" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 				<KeyValues>
-					<KeyValue key="option" value="UI.Calendar.WarningsEnabled" />
+					<KeyValue key="option" value="WarningsEnabled" />
 				</KeyValues>
 			</CheckButton>
 			<Frame name="$parent_WarningType1" inherits="AltoWarningTypeTemplate" id="1">

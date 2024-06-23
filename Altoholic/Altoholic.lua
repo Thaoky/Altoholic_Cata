@@ -2,8 +2,7 @@
 Written by : Thaoky, EU-Marécages de Zangar
 --]]
 
-local addonName = ...
-local addon = _G[addonName]
+local addonName, addon = ...
 local colors = addon.Colors
 
 local L = DataStore:GetLocale(addonName)
@@ -285,14 +284,14 @@ end
 
 -- *** Event Handlers ***
 local function OnAuctionHouseClosed()
-	addon:UnregisterEvent("AUCTION_HOUSE_CLOSED")
+	addon:StopListeningTo("AUCTION_HOUSE_CLOSED")
 	if addon.AuctionHouse then
 		addon.AuctionHouse:InvalidateView()
 	end
 end
 
 local function OnAuctionHouseShow()
-	addon:RegisterEvent("AUCTION_HOUSE_CLOSED", OnAuctionHouseClosed)
+	addon:ListenTo("AUCTION_HOUSE_CLOSED", OnAuctionHouseClosed)
 
 	-- hook the AH update function
 	if not Orig_AuctionFrameBrowse_Update then
@@ -310,6 +309,8 @@ DataStore:OnPlayerLogin(function()
 	addon:SetupOptions()
 	MVC:GetService("AltoholicUI.Events"):Initialize()
 	addon:InitTooltip()
+
+	AltoholicFrame:SetClampedToScreen(Altoholic_UI_Options.ClampWindowToScreen)
 
 	addon:ListenTo("AUCTION_HOUSE_SHOW", OnAuctionHouseShow)	-- must stay here for the AH hook (to manage recipe coloring)
 
@@ -333,7 +334,7 @@ DataStore:OnPlayerLogin(function()
 	end
 	
 	-- to be moved to their respective tabs
-	-- addon:RestoreOptionsToUI()
+	addon:RestoreOptionsToUI()
 	addon:ListenTo("CHAT_MSG_LOOT", OnChatMsgLoot)
 	
 	BuildUnsafeItemList()

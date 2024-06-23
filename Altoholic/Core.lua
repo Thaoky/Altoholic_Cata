@@ -178,6 +178,7 @@ local GuildCommCallbacks = {
 
 DataStore:OnAddonLoaded(addonName, function() 
 	addon.ListenTo = function(self, ...) DataStore:ListenToEvent(self, ...)	end
+	addon.StopListeningTo = function(self, ...) DataStore:StopListeningToEvent(self, ...)	end
 	
 	Altoholic_UI_Options = Altoholic_UI_Options or {
 		Mail = {
@@ -410,6 +411,7 @@ local tabList = {
 	"Achievements",
 	"Agenda",
 	"Grids",
+	"Options",
 }
 
 local frameToID = {}
@@ -454,7 +456,7 @@ function addon.Tabs:OnClick(index)
 	self:HideAll()
 	self.current = index
 	
-	if index >= 1 and index <= 7 then
+	if index >= 1 and index <= 8 then
 		local moduleName = format("%s_%s", addonName, tabList[index])
 		SafeLoadAddOn(moduleName)		-- make this part a bit more generic once we'll have more LoD parts
 		

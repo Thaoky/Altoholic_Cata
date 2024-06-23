@@ -173,7 +173,7 @@ function addon:SetupOptions()
 	local f = AltoholicGeneralOptions
 	
 	-- ** General **
-	f.Title:SetText(colors.teal..format("%s %s", addonName, addon.Version))
+
 	f.BankAutoUpdate.Text:SetText(L["Automatically authorize guild bank updates"])
 	f.BankAutoUpdate.tooltip = format("%s%s%s",
 		L["|cFFFFFFFFWhen |cFF00FF00enabled|cFFFFFFFF, this option will allow other Altoholic users\nto update their guild bank information with yours automatically.\n\n"],
@@ -350,15 +350,15 @@ function addon:RestoreOptionsToUI()
 		Altoholic.Comm.Sharing:SetMessageHandler("EmptyHandler")
 	end
 	
-	local options = Altoholic_SearchTab_Options
+	-- local options = Altoholic_SearchTab_Options
 	
-	local f = AltoholicSearchOptions
-	f.ItemInfoAutoQuery:SetChecked(options.ItemInfoAutoQuery)
-	f.IncludeNoMinLevel:SetChecked(options.IncludeNoMinLevel)
-	f.IncludeMailboxItems:SetChecked(options.IncludeMailboxItems)
-	f.IncludeKnownRecipes:SetChecked(options.IncludeKnownRecipes)
+	-- local f = AltoholicSearchOptions
+	-- f.ItemInfoAutoQuery:SetChecked(options.ItemInfoAutoQuery)
+	-- f.IncludeNoMinLevel:SetChecked(options.IncludeNoMinLevel)
+	-- f.IncludeMailboxItems:SetChecked(options.IncludeMailboxItems)
+	-- f.IncludeKnownRecipes:SetChecked(options.IncludeKnownRecipes)
 
-	options = Altoholic_UI_Options
+	local options = Altoholic_UI_Options
 	
 	AltoholicFrame:SetScale(options.Scale)
 	AltoholicGeneralOptions_SliderScale:SetValue(options.Scale)
@@ -367,12 +367,12 @@ function addon:RestoreOptionsToUI()
 	AltoholicGeneralOptions_SliderRadius:SetValue(options.Minimap.IconRadius)
 	AltoholicGeneralOptions.ShowMinimapIcon:SetChecked(options.Minimap.ShowIcon)
 	AltoholicGeneralOptions.ClampWindowToScreen:SetChecked(options.ClampWindowToScreen)
-	AltoholicGeneralOptions.BankAutoUpdate:SetChecked(Altoholic_GuildTab_Options.BankAutoUpdate)
+	-- AltoholicGeneralOptions.BankAutoUpdate:SetChecked(Altoholic_GuildTab_Options.BankAutoUpdate)
 	
-	AltoholicSearchOptionsLootInfo:SetText(colors.green .. options.TotalLoots .. "|r " .. L["Loots"] .. " / " .. colors.green .. options.UnknownLoots .. "|r " .. L["Unknown"])
-	AltoholicSearchOptionsLootInfo:SetText(format("%s%s|r %s / %s%s|r %s", colors.green, options.TotalLoots, L["Loots"], colors.green, options.UnknownLoots, L["Unknown"]))
+	-- AltoholicSearchOptionsLootInfo:SetText(colors.green .. options.TotalLoots .. "|r " .. L["Loots"] .. " / " .. colors.green .. options.UnknownLoots .. "|r " .. L["Unknown"])
+	-- AltoholicSearchOptionsLootInfo:SetText(format("%s%s|r %s / %s%s|r %s", colors.green, options.TotalLoots, L["Loots"], colors.green, options.UnknownLoots, L["Unknown"]))
 	
-	f = AltoholicMailOptions
+	local f = AltoholicMailOptions
 	AltoholicMailOptions_SliderTimeToNextWarning:SetValue(options.Mail.TimeToNextWarning)
 	f.GuildMailWarning:SetChecked(options.Mail.GuildMailWarning)
 	f.AutoCompleteRecipient:SetChecked(options.Mail.AutoCompleteRecipient)
@@ -389,6 +389,7 @@ function addon:RestoreOptionsToUI()
 	f.ShowItemSource:SetChecked(options.ShowItemSource)
 	f.ShowItemCount:SetChecked(options.ShowItemCount)
 	f.ShowTotalItemCount:SetChecked(options.ShowTotalItemCount)
+	f.ShowItemSellPrice:SetChecked(options.ShowSellPrice)
 	f.ShowKnownRecipes:SetChecked(options.ShowKnownRecipes)
 	f.ShowItemID:SetChecked(options.ShowItemID)
 	f.ShowGatheringNodesCount:SetChecked(options.ShowGatheringNodesCount)

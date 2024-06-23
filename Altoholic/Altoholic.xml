@@ -25,7 +25,7 @@
 			<OnLoad>
 				self:RegisterForDrag("LeftButton")
 				self.elapsed = 0
-				PanelTemplates_SetNumTabs(self, 7)
+				PanelTemplates_SetNumTabs(self, 8)
 				PanelTemplates_SetTab(self, 1)
 			</OnLoad>
 			<OnDragStart>
@@ -162,6 +162,14 @@
 				</Anchors>
 				<KeyValues>
 					<KeyValue key="context" value="Grids" />
+				</KeyValues>
+			</Button>
+			<Button name="$parentTab8" inherits="AltoTabTemplate" id="8" text="OPTIONS">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTab7" relativePoint="TOPRIGHT" x="-8" y="0" />
+				</Anchors>
+				<KeyValues>
+					<KeyValue key="context" value="Options" />
 				</KeyValues>
 			</Button>
 

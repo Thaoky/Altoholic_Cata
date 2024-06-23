@@ -1,6 +1,11 @@
-Altoholic BC & WotLK Classic Changelog (dates in dd/mm/yyyy)
+Altoholic Cataclysm Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
+
+4.4.001 (23/06/2024)
+
+- Same as for retail, the DataStore layer has been completely rewritten, and the Cataclysm now benefits from all the improvements that were done there.
+- Updated the addon's compatibility for this new DataStore and Cataclysm.
 
 3.4.014 (29/12/2023)
 

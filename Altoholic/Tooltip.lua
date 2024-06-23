@@ -333,7 +333,7 @@ function addon:GetRecipeOwners(professionName, link, recipeLevel)
 				isKnownByChar = DataStore:IsCraftKnown(profession, spellID)
 			else
 				DataStore:IterateRecipes(profession, 0, function(color, itemID)
-					--local _, recipeID, _ = DataStore:GetRecipeInfo(character, profession, itemID) -- retail has the COMPLETE recipe list for a tradeskill added tothe database.. dont enable till that is part of the wrath API -- TechnoHunter
+					--local _, recipeID, _ = DataStore:GetRecipeInfo_NonRetail(character, profession, itemID) -- retail has the COMPLETE recipe list for a tradeskill added tothe database.. dont enable till that is part of the wrath API -- TechnoHunter
 					local skillName = GetSpellInfo(itemID) or ""
 
 					if string.lower(skillName) == string.lower(craftName) then
@@ -348,7 +348,8 @@ function addon:GetRecipeOwners(professionName, link, recipeLevel)
 			if isKnownByChar then
 				table.insert(know, coloredName)
 			else
-				local currentLevel = DataStore:GetProfessionInfo(DataStore:GetProfession(character, professionName))
+				local currentLevel = DataStore:GetProfessionRank(character, professionName)
+
 				if currentLevel > 0 then
 					if currentLevel < recipeLevel then
 						table.insert(willLearn, format("%s |r(%d)", coloredName, currentLevel))
@@ -522,7 +523,7 @@ local function ProcessTooltip(tooltip, link)
 	
 	local _, _, _, _, _, itemType, itemSubType, _, _, _, sellPrice = GetItemInfo(itemID)
 	
-	if sellPrice and sellPrice > 0 and options.ShowSellPrice then	-- 0 = cannot be sold
+	if (sellPrice and sellPrice > 0) and (options.ShowSellPrice == true) then	-- 0 = cannot be sold
 		tooltip:AddLine(" ",1,1,1)
 		tooltip:AddLine("Sells for " .. addon:GetMoneyStringShort(sellPrice, colors.white) .. " per unit",1,1,1)
 	end
