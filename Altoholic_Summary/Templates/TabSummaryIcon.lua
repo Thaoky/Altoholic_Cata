@@ -114,7 +114,8 @@ local function LevelIcon_Initialize(frame, level)
 	frame:AddButtonWithArgs("40-59", 4, OnLevelFilterChange, 40, 59, (option == 4))
 	frame:AddButtonWithArgs("60-69", 5, OnLevelFilterChange, 60, 69, (option == 5))
 	frame:AddButtonWithArgs("70-79", 6, OnLevelFilterChange, 70, 79, (option == 6))
-	frame:AddButtonWithArgs("80", 7, OnLevelFilterChange, 80, 80, (option == 7))
+	frame:AddButtonWithArgs("80-84", 7, OnLevelFilterChange, 80, 84, (option == 7))
+	frame:AddButtonWithArgs("85", 8, OnLevelFilterChange, 85, 85, (option == 8))
 	frame:AddCloseMenu()
 end
 

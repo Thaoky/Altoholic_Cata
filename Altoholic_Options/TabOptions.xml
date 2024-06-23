@@ -1,0 +1,87 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="TabOptions.lua"></Script>
+	
+	<Frame name="AltoholicTabOptions" parent="AltoholicFrame" hidden="true">
+		<Size x="758" y="447" />
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="Status" inherits="GameFontNormal" justifyH="LEFT">
+					<Size x="350" y="24" />
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="200" y="4" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button parentKey="MenuItem1" inherits="AltoTabOptionsMenuItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="23" y="-105" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem2" inherits="AltoTabOptionsMenuItemTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem1" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem3" inherits="AltoTabOptionsMenuItemTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem2" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem4" inherits="AltoTabOptionsMenuItemTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem3" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem5" inherits="AltoTabOptionsMenuItemTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem4" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem6" inherits="AltoTabOptionsMenuItemTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem5" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem7" inherits="AltoTabOptionsMenuItemTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem6" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem8" inherits="AltoTabOptionsMenuItemTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem7" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem9" inherits="AltoTabOptionsMenuItemTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem8" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem10" inherits="AltoTabOptionsMenuItemTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem9" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem11" inherits="AltoTabOptionsMenuItemTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem10" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem12" inherits="AltoTabOptionsMenuItemTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem11" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				Altoholic:BindViewToController(self, "AltoholicUI.TabOptions")
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>

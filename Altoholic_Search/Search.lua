@@ -734,7 +734,8 @@ local function BrowseCharacter(character)
 			local isEnchanting = (professionName == GetSpellInfo(7411))
 		
 			DataStore:IterateRecipes(profession, 0, 0, function(recipeData)
-				local _, spellID, isLearned = DataStore:GetRecipeInfo(recipeData)
+				-- 2024/06/23 : this need double checking
+				local _, spellID, isLearned = DataStore:GetRecipeInfo_NonRetail(recipeData)
 				
 				if isLearned and CraftMatchFound(spellID, currentValue, isEnchanting) then
 					ns:AddResult(	{
@@ -748,7 +749,6 @@ local function BrowseCharacter(character)
 			end)
 		end
 	end
-	-- end
 	
 	currentResultType = nil
 	currentResultKey = nil
