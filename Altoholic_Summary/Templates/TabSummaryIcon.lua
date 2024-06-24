@@ -50,8 +50,8 @@ local function OnClassFilterChange(frame)
 end
 
 local function ShowOptionsCategory(self)
-	addon:ToggleUI()
-	InterfaceOptionsFrame_OpenToCategory(self.value)
+	addon.Tabs:OnClick("Options")
+	AltoholicTabOptions["MenuItem"..self.value]:Item_OnClick()
 end
 
 local function ResetAllData_MsgBox_Handler(self, button)
@@ -107,7 +107,7 @@ local function LevelIcon_Initialize(frame, level)
 	local option = options[OPTION_LEVELS]
 	
 	frame:AddTitle(L["FILTER_LEVELS"])
-	frame:AddButtonWithArgs(ALL, 1, OnLevelFilterChange, 1, 80, (option == 1))
+	frame:AddButtonWithArgs(ALL, 1, OnLevelFilterChange, 1, 85, (option == 1))
 	frame:AddTitle()
 	frame:AddButtonWithArgs("1-59", 2, OnLevelFilterChange, 1, 59, (option == 2))
 	frame:AddButtonWithArgs("1-39", 3, OnLevelFilterChange, 1, 39, (option == 3))
@@ -173,19 +173,19 @@ end
 local function AltoholicOptionsIcon_Initialize(frame, level)
 	frame:AddTitle(format("%s: %s", GAMEOPTIONS_MENU, addonName))
 
-	frame:AddButton(GENERAL, AltoholicGeneralOptions, ShowOptionsCategory)
-	frame:AddButton(L["Calendar"], AltoholicCalendarOptions, ShowOptionsCategory)
-	frame:AddButton(MAIL_LABEL, AltoholicMailOptions, ShowOptionsCategory)
-	frame:AddButton(MISCELLANEOUS, AltoholicMiscOptions, ShowOptionsCategory)
-	frame:AddButton(SEARCH, AltoholicSearchOptions, ShowOptionsCategory)
-	frame:AddButton(L["Tooltip"], AltoholicTooltipOptions, ShowOptionsCategory)
+	frame:AddButton(GENERAL, 2, ShowOptionsCategory)
+	frame:AddButton(L["Calendar"], 5, ShowOptionsCategory)
+	frame:AddButton(MAIL_LABEL, 3, ShowOptionsCategory)
+	frame:AddButton(MISCELLANEOUS, 6, ShowOptionsCategory)
+	-- frame:AddButton(SEARCH, AltoholicSearchOptions, ShowOptionsCategory)
+	frame:AddButton(L["Tooltip"], 4, ShowOptionsCategory)
 	
-	frame:AddTitle()
-	frame:AddTitle(OTHER)	
-	frame:AddButton("What's new?", AltoholicWhatsNew, ShowOptionsCategory)
-	frame:AddButton("Getting support", AltoholicSupport, ShowOptionsCategory)
-	frame:AddButton(L["Memory used"], AltoholicMemoryOptions, ShowOptionsCategory)
-	frame:AddButton(HELP_LABEL, AltoholicHelp, ShowOptionsCategory)
+	-- frame:AddTitle()
+	-- frame:AddTitle(OTHER)	
+	-- frame:AddButton("What's new?", AltoholicWhatsNew, ShowOptionsCategory)
+	-- frame:AddButton("Getting support", AltoholicSupport, ShowOptionsCategory)
+	-- frame:AddButton(L["Memory used"], AltoholicMemoryOptions, ShowOptionsCategory)
+	-- frame:AddButton(HELP_LABEL, AltoholicHelp, ShowOptionsCategory)
 	frame:AddCloseMenu()
 end
 
@@ -199,16 +199,15 @@ local addonList = {
 
 local function DataStoreOptionsIcon_Initialize(frame, level)
 	frame:AddTitle(format("%s: %s", GAMEOPTIONS_MENU, "DataStore"))
+	frame:AddButton("Auctions", 8, ShowOptionsCategory)
+	frame:AddButton("Characters", 9, ShowOptionsCategory)
+	frame:AddButton("Inventory", 10, ShowOptionsCategory)
+	frame:AddButton("Mails", 11, ShowOptionsCategory)
+	frame:AddButton("Quests", 12, ShowOptionsCategory)
 	
-	for _, module in ipairs(addonList) do
-		if _G[module] then	-- only add loaded modules
-			frame:AddButton(module, module, ShowOptionsCategory)
-		end
-	end
-	
-	frame:AddTitle()
-	frame:AddButton(L["Reset all data"], nil, ResetAllData)
-	frame:AddButton(HELP_LABEL, DataStoreHelp, ShowOptionsCategory)
+	-- frame:AddTitle()
+	-- frame:AddButton(L["Reset all data"], nil, ResetAllData)
+	-- frame:AddButton(HELP_LABEL, DataStoreHelp, ShowOptionsCategory)
 	frame:AddCloseMenu()
 end
 
