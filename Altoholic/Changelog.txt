@@ -2,6 +2,17 @@ Altoholic Cataclysm Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
 
+4.4.002 (24/06/2024)
+
+- Summary Tab : Fixed the level filter.
+- Summary Tab : Fixed the option links under the cogwheel. Disabled the help temporarily.
+- Change the default Minimap Icon Radius to a more decent value of 75.
+- DataStore_Quests : Fixed an error when scanning a quest with no level (daily, holiday, ..) at logon.
+- Search Edit Box: Fixed a lua error when linking an item into it.
+- DataStore_Reputations : Added the Cataclysm factions.
+- DataStore_Crafts : Fixed an error when gaining a skill point.
+
+
 4.4.001 (23/06/2024)
 
 - Same as for retail, the DataStore layer has been completely rewritten, and the Cataclysm now benefits from all the improvements that were done there.

@@ -1,8 +1,8 @@
 local addonName, addon = ...
 _G[addonName] = addon
 
-addon.Version = "v4.4.001"
-addon.VersionNum = 404001
+addon.Version = "v4.4.002"
+addon.VersionNum = 404002
 
 LibStub("LibMVC-1.0"):Embed(addon)
 
@@ -191,7 +191,7 @@ DataStore:OnAddonLoaded(addonName, function()
 		Minimap = { 
 			ShowIcon = true, 
 			IconAngle = 180, 
-			IconRadius = 102
+			IconRadius = 75
 		},
 		Scale = 1.0,
 		Transparency = 1.0,

@@ -103,7 +103,7 @@ local Orig_ChatEdit_InsertLink = ChatEdit_InsertLink
 
 function ChatEdit_InsertLink(text, ...)
 	if text and AltoholicFrame_SearchEditBox:IsVisible() then
-		if not DataStore_Crafts:IsTradeSkillWindowOpen() then
+		if not DataStore:IsTradeSkillWindowOpen() then
 			AltoholicFrame_SearchEditBox:Insert(GetItemInfo(text))
 			return true
 		end
@@ -354,7 +354,11 @@ function addon:OnShow()
 	
 	if not addon.Tabs.current then
 		addon.Tabs:OnClick("Summary")
-		local mode = Altoholic_SummaryTab_Options.CurrentMode
+		local mode = 1
+		
+		if Altoholic_SummaryTab_Options and Altoholic_SummaryTab_Options.CurrentMode then
+			more = Altoholic_SummaryTab_Options.CurrentMode
+		end
 		AltoholicTabSummary["MenuItem"..mode]:Item_OnClick()
 	end
 end
