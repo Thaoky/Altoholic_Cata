@@ -143,6 +143,21 @@ local Factions = {
 			{ name = DataStore:GetFactionName(1105), icon = Texture("Achievement_Reputation_MurlocOracle") },	-- "The Oracles" 
 		},		
 	},
+	{	-- [4]
+		name = EXPANSION_NAME3,	-- "Cataclysm"
+		{	-- [1]
+			name = OTHER,
+			{ name = DataStore:GetFactionName(1158), icon = Texture("Achievement_Zone_mount hyjal") },		-- "Guardians of Hyjal" 
+			{ name = DataStore:GetFactionName(1135), icon = Texture("Spell_Nature_EarthElemental_Totem") },		-- "The Earthen Ring" 
+			{ name = DataStore:GetFactionName(1171), icon = Texture("inv_misc_tabard_therazane") },		-- "Therazane" 
+			{ name = DataStore:GetFactionName(1174), icon = Texture("inv_misc_tabard_wildhammerclan") },		-- "Wildhammer Clan" 
+			{ name = DataStore:GetFactionName(1173), icon = Texture("inv_misc_tabard_tolvir") },		-- "Ramkahen" 
+			{ name = DataStore:GetFactionName(1177), icon = Texture("inv_misc_tabard_baradinwardens") },		-- "Baradin's Wardens" 
+			{ name = DataStore:GetFactionName(1172), icon = Texture("inv_misc_tabard_dragonmawclan") },		-- "Dragonmaw Clan" 
+			{ name = DataStore:GetFactionName(1178), icon = Texture("inv_misc_tabard_hellscream") },		-- "Hellscream's Reach" 
+			{ name = DataStore:GetFactionName(1204), icon = Texture("inv_neck_hyjaldaily_04") },		-- "Avengers of Hyjal" 
+		}
+	},
 }
 
 local CAT_ALLINONE = #Factions + 1
