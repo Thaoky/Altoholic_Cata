@@ -2,6 +2,10 @@ Altoholic Cataclysm Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
 
+4.4.003 (25/06/2024)
+
+- Added missing achievements, I might have forgotten one along the way, if you spot anything, please post it on GitHub !
+
 4.4.002 (24/06/2024)
 
 - Summary Tab : Fixed the level filter.
