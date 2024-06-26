@@ -589,75 +589,84 @@ local function ProfessionsIcon_Initialize(self, level)
 		DDM_AddTitle(format("%s / %s", TRADE_SKILLS, DataStore:GetColoredCharacterName(character)))
 
 		local last = DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character)
-		local rank, professionName, _
+		local rank, maxRank, professionName, _
 
 		-- Cooking
-		rank = DataStore:GetCookingRank(character)
-		if last and rank then
-			local info = UIDropDownMenu_CreateInfo()
-			
-			info.text = format("%s %s(%s)", PROFESSIONS_COOKING, colors.green, rank )
-			info.hasArrow = 1
-			info.checked = (PROFESSIONS_COOKING == (currentProfession or ""))
-			info.value = PROFESSIONS_COOKING
-			info.func = OnProfessionChange
-			UIDropDownMenu_AddButton(info, level)
-			
-		else
-			DDM_Add(format("%s%s", colors.grey, PROFESSIONS_COOKING), nil, nil)
+		rank, maxRank = DataStore:GetCookingRank(character)
+		if maxRank > 0 then
+			if last and rank then
+				local info = UIDropDownMenu_CreateInfo()
+				
+				info.text = format("%s %s(%s)", PROFESSIONS_COOKING, colors.green, rank )
+				info.hasArrow = 1
+				info.checked = (PROFESSIONS_COOKING == (currentProfession or ""))
+				info.value = PROFESSIONS_COOKING
+				info.func = OnProfessionChange
+				UIDropDownMenu_AddButton(info, level)
+				
+			else
+				DDM_Add(format("%s%s", colors.grey, PROFESSIONS_COOKING), nil, nil)
+			end
 		end
 		
 		-- First Aid
-		rank = DataStore:GetFirstAidRank(character)
-		if last and rank then
-			local info = UIDropDownMenu_CreateInfo()
-			local firstAidLabel = GetSpellInfo(3273)
-			
-			info.text = format("%s %s(%s)", firstAidLabel, colors.green, rank )
-			info.hasArrow = 1
-			info.checked = (firstAidLabel == (currentProfession or ""))
-			info.value = firstAidLabel
-			info.func = OnProfessionChange
-			UIDropDownMenu_AddButton(info, level)
-			
-		else
-			DDM_Add(format("%s%s", colors.grey, firstAidLabel), nil, nil)
+		rank, maxRank = DataStore:GetFirstAidRank(character)
+		if maxRank > 0 then
+			if last and rank then
+				local info = UIDropDownMenu_CreateInfo()
+				local firstAidLabel = GetSpellInfo(3273)
+				
+				info.text = format("%s %s(%s)", firstAidLabel, colors.green, rank )
+				info.hasArrow = 1
+				info.checked = (firstAidLabel == (currentProfession or ""))
+				info.value = firstAidLabel
+				info.func = OnProfessionChange
+				UIDropDownMenu_AddButton(info, level)
+				
+			else
+				DDM_Add(format("%s%s", colors.grey, firstAidLabel), nil, nil)
+			end
 		end		
 		
 		
 		-- Profession 1
-		rank = DataStore:GetProfession1Rank(character)
-		professionName = DataStore:GetProfession1Name(character)
-		
-		if last and rank and professionName then
-			local info = UIDropDownMenu_CreateInfo()
+		rank, maxRank = DataStore:GetProfession1Rank(character)
+		if maxRank > 0 then
+			professionName = DataStore:GetProfession1Name(character)
 			
-			info.text = format("%s %s(%s)", professionName, colors.green, rank )
-			info.hasArrow = 1
-			info.checked = (professionName == (currentProfession or ""))
-			info.value = professionName
-			info.func = OnProfessionChange
-			UIDropDownMenu_AddButton(info, level)
-			
-		elseif professionName then
-			DDM_Add(format("%s%s", colors.grey, professionName), nil, nil)
+			if last and rank and professionName then
+				local info = UIDropDownMenu_CreateInfo()
+				
+				info.text = format("%s %s(%s)", professionName, colors.green, rank )
+				info.hasArrow = 1
+				info.checked = (professionName == (currentProfession or ""))
+				info.value = professionName
+				info.func = OnProfessionChange
+				UIDropDownMenu_AddButton(info, level)
+				
+			elseif professionName then
+				DDM_Add(format("%s%s", colors.grey, professionName), nil, nil)
+			end
 		end
 		
 		-- Profession 2
-		rank = DataStore:GetProfession2Rank(character)
-		professionName = DataStore:GetProfession2Name(character)
-		if last and rank and professionName then
-			local info = UIDropDownMenu_CreateInfo()
+		rank, maxRank = DataStore:GetProfession2Rank(character)
+		if maxRank > 0 then
+			professionName = DataStore:GetProfession2Name(character)
 			
-			info.text = format("%s %s(%s)", professionName, colors.green, rank )
-			info.hasArrow = 1
-			info.checked = (professionName == (currentProfession or ""))
-			info.value = professionName
-			info.func = OnProfessionChange
-			UIDropDownMenu_AddButton(info, level)
-			
-		elseif professionName then
-			DDM_Add(format("%s%s", colors.grey, professionName), nil, nil)
+			if last and rank and professionName then
+				local info = UIDropDownMenu_CreateInfo()
+				
+				info.text = format("%s %s(%s)", professionName, colors.green, rank )
+				info.hasArrow = 1
+				info.checked = (professionName == (currentProfession or ""))
+				info.value = professionName
+				info.func = OnProfessionChange
+				UIDropDownMenu_AddButton(info, level)
+				
+			elseif professionName then
+				DDM_Add(format("%s%s", colors.grey, professionName), nil, nil)
+			end
 		end
 		
 		DDM_AddTitle(" ")
