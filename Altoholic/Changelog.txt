@@ -2,6 +2,12 @@ Altoholic Cataclysm Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
 
+4.4.004 (26/06/2024)
+
+- Fixed invalid item counters after leaving the bank.
+- Fixed an error when opening the runeforging panel.
+- Characters tab : Fixed an error when viewing professions on a character with unlearned professions.
+
 4.4.003 (25/06/2024)
 
 - Added missing achievements, I might have forgotten one along the way, if you spot anything, please post it on GitHub !
