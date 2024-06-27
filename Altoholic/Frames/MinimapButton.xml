@@ -16,7 +16,7 @@
 				self:Button_OnClick(button)
 			</OnClick>
 			<OnUpdate>
-				--self:Update()
+				self:Update()
 			</OnUpdate>
 			<OnDragStart>
 				self.isMoving = true

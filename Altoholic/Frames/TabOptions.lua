@@ -367,7 +367,8 @@ function addon:RestoreOptionsToUI()
 	AltoholicGeneralOptions_SliderRadius:SetValue(options.Minimap.IconRadius)
 	AltoholicGeneralOptions.ShowMinimapIcon:SetChecked(options.Minimap.ShowIcon)
 	AltoholicGeneralOptions.ClampWindowToScreen:SetChecked(options.ClampWindowToScreen)
-	-- AltoholicGeneralOptions.BankAutoUpdate:SetChecked(Altoholic_GuildTab_Options.BankAutoUpdate)
+	AltoholicGeneralOptions.BankAutoUpdate:SetChecked(Altoholic_Sharing_Options.GuildBankAutoUpdate)
+	
 	
 	-- AltoholicSearchOptionsLootInfo:SetText(colors.green .. options.TotalLoots .. "|r " .. L["Loots"] .. " / " .. colors.green .. options.UnknownLoots .. "|r " .. L["Unknown"])
 	-- AltoholicSearchOptionsLootInfo:SetText(format("%s%s|r %s / %s%s|r %s", colors.green, options.TotalLoots, L["Loots"], colors.green, options.UnknownLoots, L["Unknown"]))
