@@ -2,6 +2,14 @@ Altoholic Cataclysm Classic Changelog (dates in dd/mm/yyyy)
 =======================================
 
 
+4.4.005 (27/06/2024)
+
+- Fixed invalid storage and reporting of XP related values (max xp, rest xp) for characters higher than level 80.
+- Fixed returning player-specific partially completed achievements (bits offset by 1)
+- The Minimap icon can be moved again with the right mouse button.
+- The option "Automatically authorize guild bank updates" is now properly saved.
+- The Active Spec is now tracked. Although the API does not support it per se, the active spec is the one where the most points were invested.
+
 4.4.004 (26/06/2024)
 
 - Fixed invalid item counters after leaving the bank.
