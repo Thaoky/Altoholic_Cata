@@ -1379,7 +1379,7 @@ columns["ClassAndSpec"] = {
 	GetText = function(character)
 	
 		local class = DataStore:GetCharacterClass(character)
-		local spec = DataStore:GetMainSpecialization(character)
+		local spec = DataStore:GetActiveSpecInfo(character)
 		local color = DataStore:GetCharacterClassColor(character)
 		
 		return format("%s%s |r/ %s", color, class, FormatGreyIfEmpty(spec, color))
@@ -1389,7 +1389,7 @@ columns["ClassAndSpec"] = {
 			if not character then return end
 
 			-- Exit if no specialization yet
-			local spec = DataStore:GetMainSpecialization(character)
+			local spec = DataStore:GetActiveSpecInfo(character)
 			if not spec or spec == "" or spec == NONE then return end
 
 			addon.Tabs:OnClick("Characters")
