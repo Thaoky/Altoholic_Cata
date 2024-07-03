@@ -1471,7 +1471,7 @@ function ns:Update()
 	-- rebuild and get the view, then sort it
 	Characters:InvalidateView()
 	local view = Characters:GetView()
-	if columns[currentColumn] then	-- an old column name might still be in the DB.
+	if columns[currentColumn] and columns[currentColumn].headerSort then	-- an old column name might still be in the DB.
 		Characters:Sort(sortOrder, columns[currentColumn].headerSort)
 	end
 
