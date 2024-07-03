@@ -244,7 +244,7 @@ DataStore:OnAddonLoaded("Altoholic_Summary", function()
 		["CurrentFactions"] = 3,						-- 1 = Alliance, 2 = Horde, 3 = Both
 		["CurrentLevels"] = 1,							-- 1 = All
 		["CurrentLevelsMin"] = 1,							
-		["CurrentLevelsMax"] = 70,					
+		["CurrentLevelsMax"] = 85,					
 		["CurrentBankType"] = 0,						-- 0 = All
 		["CurrentClasses"] = 0,							-- 0 = All
 		["CurrentTradeSkill"] = 0,						-- 0 = All
