@@ -385,7 +385,7 @@ local function GetRecipeOwnersText(professionName, link, recipeLevel)
 end
 
 local function AddGlyphOwners(itemID, tooltip)
-	local know = {}				-- list of alts who know this glyoh
+	local know = {}				-- list of alts who know this glyph
 	local couldLearn = {}		-- list of alts who could learn it
 
 	local knows, could
@@ -400,12 +400,12 @@ local function AddGlyphOwners(itemID, tooltip)
 	
 	if #know > 0 then
 		tooltip:AddLine(" ",1,1,1)
-		tooltip:AddLine(format("%s%s|r : %s%s", colors.teal, L["Already known by "], colors.white, table.concat(know, ", ")), 1, 1, 1, 1)
+		tooltip:AddLine(format("%s%s|r: %s%s", colors.teal, L["Already known by "], colors.white, table.concat(know, ", ")), 1, 1, 1, 1)
 	end
 	
 	if #couldLearn > 0 then
 		tooltip:AddLine(" ",1,1,1)
-		tooltip:AddLine(format("%s%s|r : %s%s", colors.yellow, L["Could be learned by "], colors.white, table.concat(couldLearn, ", ")), 1, 1, 1, 1)
+		tooltip:AddLine(format("%s%s|r: %s%s", colors.yellow, L["Could be learned by "], colors.white, table.concat(couldLearn, ", ")), 1, 1, 1, 1)
 	end
 end
 
@@ -464,7 +464,7 @@ local function ProcessTooltip(tooltip, link)
 			end
 		end
 	end
-	 
+
 	if (itemID == 0) then return end
 	-- if there's no cached item id OR if it's different from the previous one ..
 	if (not cachedItemID) or 
@@ -527,9 +527,12 @@ local function ProcessTooltip(tooltip, link)
 		tooltip:AddLine(" ",1,1,1)
 		tooltip:AddLine("Sells for " .. addon:GetMoneyStringShort(sellPrice, colors.white) .. " per unit",1,1,1)
 	end
-	
+
+	if itemType == "Glyph" and options.ShowKnownRecipes then
+		AddGlyphOwners(itemID, tooltip)
+	end
+
 	if options.ShowKnownRecipes == false then return end -- exit if recipe information is not wanted
-	
 	if itemType ~= L["ITEM_TYPE_RECIPE"] then return end		-- exit if not a recipe
 	if itemSubType == L["ITEM_SUBTYPE_BOOK"] then return end		-- exit if it's a book
 
@@ -601,7 +604,7 @@ local function Hook_SetCurrencyToken(self,index,...)
 			total = total + count
 		end
 	end
-	
+
 	if total > 0 then
 		GameTooltip:AddLine(" ",1,1,1);
 	end
