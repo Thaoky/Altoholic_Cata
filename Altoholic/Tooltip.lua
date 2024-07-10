@@ -332,7 +332,7 @@ function addon:GetRecipeOwners(professionName, link, recipeLevel)
 			if spellID then			-- if spell id is known, just find its equivalent in the professions
 				isKnownByChar = DataStore:IsCraftKnown(profession, spellID)
 			else
-				DataStore:IterateRecipes(profession, 0, function(color, itemID)
+				DataStore:IterateRecipes(profession, 0, 0, function(color, itemID)
 					--local _, recipeID, _ = DataStore:GetRecipeInfo_NonRetail(character, profession, itemID) -- retail has the COMPLETE recipe list for a tradeskill added tothe database.. dont enable till that is part of the wrath API -- TechnoHunter
 					local skillName = GetSpellInfo(itemID) or ""
 
