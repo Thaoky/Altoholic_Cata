@@ -1332,7 +1332,8 @@ columns["GuildName"] = {
 	Width = 120,
 	JustifyH = "CENTER",
 	GetText = function(character) 
-		local guildName, guildRank = DataStore:GetGuildInfo(character)
+		local guildName = DataStore:GetGuildName(character)
+		local guildRank = DataStore:GetGuildInfo(character, DataStore:GetCharacterGuildID(character))
 		
 		if Altoholic_SummaryTab_Options.ShowGuildRank then
 			return FormatGreyIfEmpty(guildRank)
