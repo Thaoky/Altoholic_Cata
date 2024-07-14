@@ -26,6 +26,8 @@ L["%s will be unlocked in %d minutes (%s on %s)"] = true
 L[ [=[%s%s|r has requested the bank tab %s%s|r
 Send this information ?]=] ] = true
 L["%s|r has received a mail from %s"] = true
+L["AUCTION_HOUSE_NOT_VISITED_WARNING"] = "Auctions have not been checked on %s|r since %d days, check the auction house and your mailbox !"
+
 L[ [=[%sWarning:|r if you accept, %sALL|r information known
 by Altoholic will be sent to %s%s|r (bags, money, etc..)]=] ] = true
 L["%sWarning:|r make sure this user may view this information before accepting"] = true
