@@ -1070,6 +1070,26 @@ columns["ProfFishing"] = {
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Fishing, true) end,
 }
 
+columns["ProfArchaeology"] = {
+	-- Header
+	headerWidth = 60,
+	headerLabel = format("   %s", Formatter.Texture18(addon:GetSpellIcon(78670))),
+	tooltipTitle = GetSpellInfo(78670),
+	tooltipSubTitle = nil,
+	headerOnEnter = TradeskillHeader_OnEnter,
+	headerOnClick = function() SortView("ProfArchaeology") end,
+	headerSort = DataStore.GetArchaeologyRank,
+	
+	-- Content
+	Width = 60,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local rank = DataStore:GetArchaeologyRank(character)
+			return format("%s%s", GetSkillRankColor(rank), rank)
+		end,
+	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Archaeology, true) end,
+}
+
 -- ** Activity **
 columns["Mails"] = {
 	-- Header
@@ -1431,7 +1451,7 @@ end
 local modes = {
 	[MODE_SUMMARY] = { "Name", "Level", "RestXP", "Money", "Played", "AiL", "LastOnline" },
 	[MODE_BAGS] = { "Name", "Level", "BagSlots", "FreeBagSlots", "BankSlots", "FreeBankSlots" },
-	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing" },
+	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing", "ProfArchaeology" },
 	[MODE_ACTIVITY] = { "Name", "Level", "Mails", "LastMailCheck", "Auctions", "Bids", "AHLastVisit" },
 	[MODE_MISCELLANEOUS] = { "Name", "Level", "GuildName", "Hearthstone", "ClassAndSpec" },
 }
