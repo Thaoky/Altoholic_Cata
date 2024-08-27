@@ -33,6 +33,7 @@ L[ [=[%s%s|r has requested the bank tab %s%s|r
 Send this information ?]=] ] = [=[%s%s|r запросил информацию по закладкам банка %s%s|r
 Отослать информацию ?]=]
 L["%s|r has received a mail from %s"] = "%s|r получил(а) письмо от %s"
+L["AUCTION_HOUSE_NOT_VISITED_WARNING"] = "Аукцион не проверялся персонажем %s|r уже %d дн. Посетите аукционный дом и проверьте почту!"
 L[ [=[%sWarning:|r if you accept, %sALL|r information known
 by Altoholic will be sent to %s%s|r (bags, money, etc..)]=] ] = [=[%sВнимание:|r Если вы согласитесь то, %sВСЯ|r известная информация 
 Altoholic'ом будет отослана к %s%s|r (сумки, валюта, и т.д..)]=]
