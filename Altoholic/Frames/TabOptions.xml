@@ -10,7 +10,7 @@
 		</Scripts>
 	</Frame>
 	
-	<CheckButton name="AltoToggleableOptionTemplate" inherits="InterfaceOptionsCheckButtonTemplate" virtual="true">
+	<CheckButton name="AltoToggleableOptionTemplate" inherits="UICheckButtonTemplate" virtual="true">
 		<Size x="20" y="20" />
 		<Scripts>
 			<OnClick>
@@ -606,7 +606,7 @@
 				<NormalTexture name="$parentIcon" file="Interface\Buttons\UI-MinusButton-UP" />
 				<HighlightTexture file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD" />
 			</Button>
-			<CheckButton name="$parent_CheckAll" inherits="InterfaceOptionsSmallCheckButtonTemplate">
+			<CheckButton name="$parent_CheckAll" inherits="UICheckButtonTemplate">
 				<Size x="20" y="20" />
 				<Anchors> 
 					<Anchor point="LEFT" relativeTo="$parent_ToggleAll" relativePoint="RIGHT" x="5" y="0" />
