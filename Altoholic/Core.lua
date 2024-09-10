@@ -296,11 +296,11 @@ DataStore:OnAddonLoaded(addonName, function()
 		local lastWarning = Altoholic_UI_Options.Mail.LastExpiryWarning
 		local timeToNext = Altoholic_UI_Options.Mail.TimeToNextWarning
 		local now = time()
-		
+
 		if (now - lastWarning) < (timeToNext * 3600) then	-- has enough time passed ?
 			return		-- no ? exit !
 		end
-		
+
 		AltoMessageBox:SetHeight(130)
 		AltoMessageBox.Text:SetHeight(60)
 		AltoMessageBox:Ask(format("%sAltoholic: %s\n%s\n%s\n\n%s", colors.teal, colors.white, 
@@ -311,12 +311,14 @@ DataStore:OnAddonLoaded(addonName, function()
 			-- On Yes
 			function()
 				AltoholicFrame:Show()
+				--[[ Disable switching to a tab for now
 				AltoholicFrame:SwitchToTab("Summary")
 				
 				-- Show the activity panel
 				local tab = AltoholicFrame.TabSummary
 				tab.CategoriesList:ClickCategory("profile", 9)
 				tab:Update()
+				--]]
 			end)
 		
 		Altoholic_UI_Options.Mail.LastExpiryWarning = now
