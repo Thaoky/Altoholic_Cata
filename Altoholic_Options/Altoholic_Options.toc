@@ -1,4 +1,4 @@
-﻿## Interface: 40400
+﻿## Interface: 40401
 ## Title: Altoholic_Options
 ## Notes: Altoholic's Options UI
 ## Author: Thaoky (EU-Marécages de Zangar)
