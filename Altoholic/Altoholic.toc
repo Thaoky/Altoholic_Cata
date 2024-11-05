@@ -1,4 +1,4 @@
-## Interface: 40400, 40401
+## Interface: 40401
 ## Title: Altoholic Cataclysm Classic by |cFF69CCF0Thaoky|r
 ## Title-zhCN: |cffeedd99 [物品] |r: 全角色统计 Altoholic
 
