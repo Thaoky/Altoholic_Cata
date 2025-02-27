@@ -86,10 +86,10 @@
 				<Scripts>
 					<OnClick>
 						if self:GetChecked() then 
-							Altoholic_UI_Options.ShowIcon = true
+							Altoholic_UI_Options.Minimap.ShowIcon = true
 							Minimap.AltoholicButton:Show()
 						else
-							Altoholic_UI_Options.ShowIcon = false
+							Altoholic_UI_Options.Minimap.ShowIcon = false
 							Minimap.AltoholicButton:Hide()
 						end
 					</OnClick>
