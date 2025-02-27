@@ -120,8 +120,8 @@
 				</KeyValues>
 				<Scripts>
 					<OnClick>
-						Altoholic:ToggleUI()
-						InterfaceOptionsFrame_OpenToCategory("DataStore")
+						Altoholic.Tabs:OnClick("Options")
+						AltoholicTabOptions.MenuItem7:Click()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -134,8 +134,8 @@
 				</KeyValues>
 				<Scripts>
 					<OnClick>
-						Altoholic:ToggleUI()
-						InterfaceOptionsFrame_OpenToCategory("Altoholic")
+						Altoholic.Tabs:OnClick("Options")
+						AltoholicTabOptions.MenuItem1:Click()
 					</OnClick>
 				</Scripts>
 			</Button>
