@@ -118,16 +118,14 @@ local function AddRealm(AccountName, RealmName)
 		if (class ~= 0) and CLASS_SORT_ORDER[class] ~= characterClass then shouldAddCharacter = false end
 		if (tradeskill ~= 0) then 
 
-			-- primary profession
+			-- primary profession(s)
 			if tradeskill < addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex then
 				local tradeskillID = addon.TradeSkills.AccountSummaryFiltersSpellIDs[tradeskill]
-				local _, _, _, name1 = DataStore:GetProfession1(character)
-				local _, _, _, name2 = DataStore:GetProfession2(character)
-				local prof1 = DataStore:GetProfessionSpellID(name1) or 0
-				local prof2 = DataStore:GetProfessionSpellID(name2) or 0
-				
-				if tradeskillID ~= prof1 and tradeskillID ~= prof2 then 
-					shouldAddCharacter = false 
+				local prof1 = DataStore:GetProfessionSpellID(DataStore:GetProfession1Name(character)) or 0
+				local prof2 = DataStore:GetProfessionSpellID(DataStore:GetProfession2Name(character)) or 0
+
+				if tradeskillID ~= prof1 and tradeskillID ~= prof2 then
+					shouldAddCharacter = false
 				end
 				
 			elseif tradeskill == firstSecondary then
