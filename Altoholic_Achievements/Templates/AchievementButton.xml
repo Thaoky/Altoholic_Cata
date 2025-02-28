@@ -29,6 +29,7 @@
 				</FontString>
 			</Layer>
 		</Layers>
+		<!-- No longer supported
 		<Backdrop parentKey="Backdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="8"/>
@@ -41,6 +42,11 @@
 			</BackgroundInsets>
 			<Color r="1" g="1" b="1" a="0"/>
 		</Backdrop>
+		-->
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_DIALOG_32_32" type="global"/>
+		</KeyValues>
+
 		<Scripts>
 			<OnLoad>
 				Altoholic:BindViewToController(self, "AltoholicUI.AchievementButton")
