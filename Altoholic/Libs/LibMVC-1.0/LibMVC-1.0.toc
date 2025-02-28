@@ -1,8 +1,8 @@
-## Interface: 90005
+## Interface: 40402, 90005
 
 ## Title: Lib: LibMVC
 ## Notes: LibMVC
-## Author: Thaoky (EU-Marécages de Zangar)
+## Author: Thaoky (EU-Marï¿½cages de Zangar)
 ## X-Category: Library
 ## X-License: Public Domain
 
