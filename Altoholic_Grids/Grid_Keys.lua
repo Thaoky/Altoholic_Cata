@@ -81,7 +81,7 @@ local callbacks = {
 			
 			local bagCount, bankCount = DataStore:GetContainerItemCount(character, dungeon.itemID)
 			
-			if bagCount > 0 or bankCount > 0 then
+			if (bagCount or 0) > 0 or (bankCount or 0) > 0 then
 				button.Background:SetVertexColor(1.0, 1.0, 1.0)
 				button.Name:SetText(icons.ready)
 			else
