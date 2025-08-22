@@ -3,7 +3,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local parentName = "AltoholicTabSearch"
 local parent
@@ -22,7 +22,8 @@ local currentSubClass
 local categories = {
 	{
 		name = AUCTION_CATEGORY_WEAPONS,
-		class = LE_ITEM_CLASS_WEAPON,
+		class = LE_ITEM_CLASS_WEAPON or Enum.ItemClass.Weapon,
+		--[[
 		subClasses = {
 			LE_ITEM_WEAPON_AXE1H, LE_ITEM_WEAPON_MACE1H, LE_ITEM_WEAPON_SWORD1H,
 			LE_ITEM_WEAPON_AXE2H, LE_ITEM_WEAPON_MACE2H, LE_ITEM_WEAPON_SWORD2H, 
@@ -31,75 +32,80 @@ local categories = {
 			LE_ITEM_WEAPON_BOWS, LE_ITEM_WEAPON_CROSSBOW, LE_ITEM_WEAPON_GUNS, LE_ITEM_WEAPON_THROWN,
 			LE_ITEM_WEAPON_FISHINGPOLE,
 		},
+		--]]
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_WEAPON or Enum.ItemClass.Weapon),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_ARMOR,
-		class = LE_ITEM_CLASS_ARMOR,
+		class = LE_ITEM_CLASS_ARMOR or Enum.ItemClass.Armor,
+		--[[
 		subClasses = {
 			LE_ITEM_ARMOR_PLATE, LE_ITEM_ARMOR_MAIL, LE_ITEM_ARMOR_LEATHER, LE_ITEM_ARMOR_CLOTH, 
 			LE_ITEM_ARMOR_GENERIC, LE_ITEM_ARMOR_SHIELD, LE_ITEM_ARMOR_COSMETIC,
 		},
+		--]]
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_ARMOR or Enum.ItemClass.Armor),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_CONTAINERS,
-		class = LE_ITEM_CLASS_CONTAINER,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_CONTAINER) },
+		class = LE_ITEM_CLASS_CONTAINER or Enum.ItemClass.Container,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_CONTAINER or Enum.ItemClass.Container),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_GEMS,
-		class = LE_ITEM_CLASS_GEM,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_GEM) },
+		class = LE_ITEM_CLASS_GEM or Enum.ItemClass.Gem,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_GEM or Enum.ItemClass.Gem),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_ITEM_ENHANCEMENT,
-		class = LE_ITEM_CLASS_ITEM_ENHANCEMENT,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_ITEM_ENHANCEMENT) },
+		class = LE_ITEM_CLASS_ITEM_ENHANCEMENT or Enum.ItemClass.ItemEnhancement,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_ITEM_ENHANCEMENT or Enum.ItemClass.ItemEnhancement),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_CONSUMABLES,
-		class = LE_ITEM_CLASS_CONSUMABLE,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_CONSUMABLE) },
+		class = LE_ITEM_CLASS_CONSUMABLE or Enum.ItemClass.Consumable,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_CONSUMABLE or Enum.ItemClass.Consumable),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_GLYPHS,
-		class = LE_ITEM_CLASS_GLYPH,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_GLYPH) },
+		class = LE_ITEM_CLASS_GLYPH or Enum.ItemClass.Glyph,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_GLYPH or Enum.ItemClass.Glyph),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_TRADE_GOODS,
-		class = LE_ITEM_CLASS_TRADEGOODS,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_TRADEGOODS) },
+		class = LE_ITEM_CLASS_TRADEGOODS or Enum.ItemClass.Tradegoods,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_TRADEGOODS or Enum.ItemClass.Tradegoods) or {},
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_RECIPES,
-		class = LE_ITEM_CLASS_RECIPE,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_RECIPE) },
+		class = LE_ITEM_CLASS_RECIPE or Enum.ItemClass.Recipe,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_RECIPE or Enum.ItemClass.Recipe),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_BATTLE_PETS,
-		class = LE_ITEM_CLASS_BATTLEPET,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_BATTLEPET) },
+		class = LE_ITEM_CLASS_BATTLEPET or Enum.ItemClass.Battlepet,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_BATTLEPET or Enum.ItemClass.Battlepet),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_QUEST_ITEMS,
-		class = LE_ITEM_CLASS_QUESTITEM,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_QUESTITEM) },
+		class = LE_ITEM_CLASS_QUESTITEM or Enum.ItemClass.Questitem,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_QUESTITEM or Enum.ItemClass.Questitem),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_MISCELLANEOUS,
-		class = LE_ITEM_CLASS_MISCELLANEOUS,
-		subClasses = { GetAuctionItemSubClasses(LE_ITEM_CLASS_MISCELLANEOUS) },
+		class = LE_ITEM_CLASS_MISCELLANEOUS or Enum.ItemClass.Miscellaneous,
+		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_MISCELLANEOUS or Enum.ItemClass.Miscellaneous),
 		isCollapsed = true,
 	},
 }
@@ -120,7 +126,7 @@ local function Item_OnClick(frame)
 	highlightIndex = (frame.itemTypeIndex * 1000) + frame.itemSubTypeIndex
 	ns:Update()
 	
-	addon.Search:FindItem(GetItemClassInfo(class), GetItemSubClassInfo(class, subClass))
+	addon.Search:FindItem(C_Item.GetItemClassInfo(class), C_Item.GetItemSubClassInfo(class, subClass))
 end
 
 function ns:OnLoad()
@@ -189,8 +195,8 @@ function ns:Update()
 				local category = categories[p.parentIndex]
 				local class = category.class
 				local subClass = category.subClasses[p.dataIndex]
-			
-				menuButton.Text:SetText("|cFFBBFFBB   " .. GetItemSubClassInfo(class, subClass))
+
+				menuButton.Text:SetText("|cFFBBFFBB   " .. C_Item.GetItemSubClassInfo(class, subClass))
 				menuButton:SetScript("OnClick", Item_OnClick)
 				menuButton.itemTypeIndex = p.parentIndex
 				menuButton.itemSubTypeIndex = p.dataIndex
@@ -375,7 +381,7 @@ function ns:TooltipStats(frame)
 	AltoTooltip:Show()
 end
 
-DataStore:OnAddonLoaded(addonTabName, function() 
+AddonFactory:OnAddonLoaded(addonTabName, function() 
 	Altoholic_SearchTab_Options = Altoholic_SearchTab_Options or {
 		["ItemInfoAutoQuery"] = false,
 		["IncludeNoMinLevel"] = true,				-- include items with no minimum level

@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 local enum = DataStore.Enum.ContainerIDs
 
 local THIS_ACCOUNT = "Default"
@@ -71,10 +71,10 @@ local function Realm_UpdateEx(self, offset, desc)
 			local item = result.link or result.id
 			
 			if item then
-				local _, _, itemRarity = GetItemInfo(item)
+				local _, _, itemRarity = C_Item.GetItemInfo(item)
 				if itemRarity then
 					local r, g, b
-					r, g, b, hex = GetItemQualityColor(itemRarity)
+					r, g, b, hex = C_Item.GetItemQualityColor(itemRarity)
 					if itemRarity >= 2 then
 						itemButton.IconBorder:SetVertexColor(r, g, b, 0.5)
 						itemButton.IconBorder:Show()
@@ -125,13 +125,13 @@ local RealmScrollFrame_Desc = {
 	Lines = {
 		[PLAYER_ITEM_LINE] = {
 			GetItemData = function(self, result)		-- GetItemData..just to avoid calling it GetItemInfo
-					local name = GetItemInfo(result.id)
+					local name = C_Item.GetItemInfo(result.id)
 					
 					-- return name, source, sourceID
 					return name, colors.teal .. result.location, 0 
 				end,
 			GetItemTexture = function(self, result)
-					return (result.id) and GetItemIcon(result.id) or "Interface\\Icons\\Trade_Engraving"
+					return (result.id) and C_Item.GetItemIconByID(result.id) or "Interface\\Icons\\Trade_Engraving"
 				end,
 			GetCharacter = function(self, result)
 					local character = result.source
@@ -148,13 +148,13 @@ local RealmScrollFrame_Desc = {
 		},
 		[GUILD_ITEM_LINE] = {
 			GetItemData = function(self, result)		-- GetItemData..just to avoid calling it GetItemInfo
-					local name = GetItemInfo(result.id)
+					local name = C_Item.GetItemInfo(result.id)
 			
 					-- return name, source, sourceID
 					return name, colors.teal .. result.location, 0 
 				end,
 			GetItemTexture = function(self, result)
-					return (result.id) and GetItemIcon(result.id) or "Interface\\Icons\\Trade_Engraving"
+					return (result.id) and GetItemIconByID(result.id) or "Interface\\Icons\\Trade_Engraving"
 				end,
 			GetCharacter = function(self, result)
 					local _, _, guildName = strsplit(".", result.source)
@@ -182,7 +182,7 @@ local RealmScrollFrame_Desc = {
 						
 						return GetSpellInfo(result.spellID), source, line
 					else
-						return GetItemInfo(result.spellID), result.professionName, line
+						return C_Item.GetItemInfo(result.spellID), result.professionName, line
 					end
 				end,
 			GetItemTexture = function(self, result)
@@ -194,7 +194,7 @@ local RealmScrollFrame_Desc = {
 						return "Interface\\Icons\\Trade_Engraving"
 					else
 						local itemID = result.spellID
-						return (itemID) and GetItemIcon(itemID) or "Interface\\Icons\\Trade_Engraving"
+						return (itemID) and C_Item.GetItemIconByID(itemID) or "Interface\\Icons\\Trade_Engraving"
 					end
 				end,
 			GetCharacter = function(self, result)
@@ -233,7 +233,7 @@ local RealmScrollFrame_Desc = {
 			GetItemTexture = function(self, result)
 					local itemID = DataStore:GetCraftResultItem(result.spellID)
 					if itemID then		-- if the craft is known, return its icon, else return the profession icon
-						return GetItemIcon(itemID)	
+						return C_Item.GetItemIconByID(itemID)	
 					end
 			
 					local profession = LTL:GetSkillName(result.skillID)
@@ -337,7 +337,7 @@ function ns:Loots_Update()
 				itemButton.IconBorder:Show()
 			end
 			
-			itemButton.Icon:SetTexture(GetItemIcon(itemID));
+			itemButton.Icon:SetTexture(GetItemIconByID(itemID));
 
 			rowFrame.Stat2:SetText(colors.yellow .. itemLevel)
 			rowFrame.Name:SetText("|c" .. hex .. itemName)
@@ -419,7 +419,7 @@ function ns:Upgrade_Update()
 				itemButton.IconBorder:Show()
 			end
 			
-			itemButton.Icon:SetTexture(GetItemIcon(itemID));
+			itemButton.Icon:SetTexture(C_Item.GetItemIconByID(itemID));
 
 			rowFrame.Name:SetText("|c" .. hex .. itemName)
 			rowFrame.Source.Text:SetText(colors.teal .. result.dropLocation)
