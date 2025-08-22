@@ -7,12 +7,16 @@ local LCI = LibStub("LibCraftInfo-1.0")
 local LCL = LibStub("LibCraftLevels-1.0")
 
 local ICON_QUESTIONMARK = "Interface\\RaidFrame\\ReadyCheck-Waiting"
+local isMists = LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MISTS_OF_PANDARIA
 
 local xPacks = {
 	EXPANSION_NAME0,	-- "Classic"
 	EXPANSION_NAME1,	-- "The Burning Crusade"
-	EXPANSION_NAME2,	-- "Wrath of the Lich King"													
+	EXPANSION_NAME2,	-- "Wrath of the Lich King"
+	EXPANSION_NAME3,	-- "Cataclysm"
+	--EXPANSION_NAME4,	-- "Mists of Pandaria"
 }
+if isMists then table.insert(xPacks, EXPANSION_NAME4) end
 
 local OPTION_XPACK = "Tradeskills.CurrentXPack"
 local OPTION_TRADESKILL = "Tradeskills.CurrentTradeSkill"
@@ -151,7 +155,7 @@ local callbacks = {
 			currentItemID = LCI:GetCraftResultItem(spellID)
 			local orange, yellow, green, grey = LCL:GetCraftLevels(spellID)
 			
-			currentTexture = GetItemIcon(currentItemID) or icons.questionMark
+			currentTexture = C_Item.GetItemIconByID(currentItemID) or icons.questionMark
 			-- print("currentItemID : " .. (currentItemID or "nil"))
 			-- print("currentTexture : " .. (currentTexture or "nil"))
 			
@@ -188,7 +192,7 @@ local callbacks = {
 			local professionName = GetSpellInfo(tradeskills[Altoholic_GridsTab_Options[OPTION_TRADESKILL]])
 			local profession = DataStore:GetProfession(character, professionName)
 
-			if profession and #profession.Crafts ~= 0 then
+			if profession and profession.Crafts and #profession.Crafts ~= 0 then
 				-- do not enable this yet .. working fine, but better if more filtering allowed. ==> filtering on rarity
 				
 				-- local _, _, itemRarity, itemLevel = GetItemInfo(currentItemID)
@@ -200,7 +204,9 @@ local callbacks = {
 				
 				-- if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then
 				-- Search on the item ID, not the spellID, it's not available when scanning professions !
-				if DataStore:IsCraftKnown(profession, currentItemID) then
+				--if DataStore:IsCraftKnown(profession, currentItemID) then
+				--if DataStore:IsCraftKnown(profession, LCI:GetCraftResultItem(currentList[dataRowID])) then
+				if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then
 					vc = 1.0
 					text = icons.ready
 				else

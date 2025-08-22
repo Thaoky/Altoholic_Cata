@@ -3,7 +3,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local tab		-- small shortcut to easily address the frame (set in OnBind)
 
@@ -104,7 +104,7 @@ addon:Controller("AltoholicUI.TabGuild", {
 	end,
 })
 
-DataStore:OnAddonLoaded(addonTabName, function() 
+AddonFactory:OnAddonLoaded(addonTabName, function() 
 	Altoholic_GuildTab_Options = Altoholic_GuildTab_Options or {
 		["BankItemsRarity"] = 0,				-- rarity filter in the guild bank tab
 		["SortAscending"] = true,				-- ascending or descending sort order

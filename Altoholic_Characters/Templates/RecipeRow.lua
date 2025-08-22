@@ -1,6 +1,6 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 addon:Controller("AltoholicUI.RecipeRow", {
 	Update = function(frame, profession, recipeID, color)
@@ -10,9 +10,9 @@ addon:Controller("AltoholicUI.RecipeRow", {
 		local itemName, itemLink, itemRarity, spellLink, spellIcon
 
 		if craftedItemID then
-			frame.CraftedItem:SetIcon(GetItemIcon(craftedItemID))
+			frame.CraftedItem:SetIcon(C_Item.GetItemIconByID(craftedItemID))
 			frame.CraftedItem.itemID = craftedItemID
-			itemName, itemLink, itemRarity = GetItemInfo(craftedItemID)
+			itemName, itemLink, itemRarity = C_Item.GetItemInfo(craftedItemID)
 			
 			frame.CraftedItem.Icon:SetVertexColor(1, 1, 1)
 			if itemRarity then
@@ -44,7 +44,7 @@ addon:Controller("AltoholicUI.RecipeRow", {
 
 			-- Set the resulting item color IF it makes an item (Enchanting mostly?)
 			if itemName then
-				local _, _, _, hexColor = GetItemQualityColor(itemRarity)
+				local _, _, _, hexColor = C_Item.GetItemQualityColor(itemRarity)
 				recipeText = format("|c%s%s|r", hexColor, recipeText)
 			end
 
@@ -70,7 +70,7 @@ addon:Controller("AltoholicUI.RecipeRow", {
 					reagentCount = tonumber(reagentCount)
 
 					reagentIcon.itemID = reagentID
-					reagentIcon:SetIcon(GetItemIcon(reagentID))
+					reagentIcon:SetIcon(C_Item.GetItemIconByID(reagentID))
 					reagentIcon.Count:SetText(reagentCount)
 					reagentIcon.Count:Show()
 

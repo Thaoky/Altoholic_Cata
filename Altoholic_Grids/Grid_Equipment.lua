@@ -2,10 +2,11 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 -- Class constants, for readability, these values match the ones in Altoholic.Classes (altoholic.lua)
 local CLASS_MAGE			= "MAGE"
+local CLASS_MONK			= "MONK"
 local CLASS_WARRIOR		= "WARRIOR"
 local CLASS_HUNTER		= "HUNTER"
 local CLASS_ROGUE			= "ROGUE"
@@ -63,6 +64,7 @@ local STAT_AP = L["Increases attack power by %d+"]
 local STAT_MP5 = L["Restores %d+ mana per"]
 local STAT_SHAMAN_ONLY = L["Classes: Shaman"] .. "$"
 local STAT_MAGE_ONLY = L["Classes: Mage"] .. "$"
+local STAT_MONK_ONLY = L["Classes: Monk"] .. "$"
 local STAT_ROGUE_ONLY = L["Classes: Rogue"] .. "$"
 local STAT_HUNTER_ONLY = L["Classes: Hunter"] .. "$"
 local STAT_WARRIOR_ONLY = L["Classes: Warrior"] .. "$"
@@ -386,12 +388,12 @@ local callbacks = {
 			if item then
 				button.key = character
 				
-				button.Background:SetTexture(GetItemIcon(item))
+				button.Background:SetTexture(C_Item.GetItemIconByID(item))
 				
 				-- display the coloured border
-				local _, _, itemRarity, itemLevel = GetItemInfo(item)
+				local _, _, itemRarity, itemLevel = C_Item.GetItemInfo(item)
 				if itemRarity and itemRarity >= 2 then
-					local r, g, b = GetItemQualityColor(itemRarity)
+					local r, g, b = C_Item.GetItemQualityColor(itemRarity)
 					button.IconBorder:SetVertexColor(r, g, b, 0.5)
 					button.IconBorder:Show()
 				end
@@ -399,7 +401,7 @@ local callbacks = {
 				-- This returns a correct iLvl for upgraded items
 				-- There are mistakes though, sometimes for leveling items, it returns an iLvl higher than what is shown in the tooltip (+10, +20)
 				if type(item) == "string" then
-					itemLevel = GetDetailedItemLevelInfo(item)
+					itemLevel = C_Item.GetDetailedItemLevelInfo(item)
 				end
 
 				button.Name:SetText(itemLevel)
@@ -422,7 +424,7 @@ local callbacks = {
 			GameTooltip:SetOwner(frame, "ANCHOR_LEFT")
 			local link
 			if type(item) == "number" then
-				link = select(2, GetItemInfo(item))
+				link = select(2, C_Item.GetItemInfo(item))
 			else
 				link = item
 			end
@@ -434,8 +436,10 @@ local callbacks = {
 			end
 			
 			GameTooltip:SetHyperlink(link)
+			--[[ This functionality hasn't been available for a while, right?
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(colors.green .. L["Right-Click to find an upgrade"])
+			--]]
 			GameTooltip:Show()
 		end,
 	OnClick = function(frame, button)
@@ -450,7 +454,7 @@ local callbacks = {
 			
 			local link
 			if type(item) == "number" then
-				link = select(2, GetItemInfo(item))
+				link = select(2, C_Item.GetItemInfo(item))
 			else
 				link = item
 			end
@@ -458,8 +462,8 @@ local callbacks = {
 			if not link then return end
 			
 			if button == "RightButton" then
-				if not IsAddOnLoaded("Altoholic_Search") then
-					LoadAddOn("Altoholic_Search")
+				if not C_AddOns.IsAddOnLoaded("Altoholic_Search") then
+					C_AddOns.LoadAddOn("Altoholic_Search")
 					addon:DDM_Initialize(AltoholicFrameGridsRightClickMenu, RightClickMenu_Initialize)
 				end
 				

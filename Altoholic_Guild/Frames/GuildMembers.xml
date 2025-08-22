@@ -111,7 +111,7 @@
 							<Anchor point="TOPRIGHT" relativeKey="$parent.Item13" relativePoint="TOPLEFT" x="-3" y="0" />
 						</Anchors>
 					</Button>
-					<Button parentKey="Item16" inherits="AltoItemIconTemplate" id="19">
+					<Button parentKey="Item16" inherits="AltoItemIconTemplate" id="18">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.Item14" relativePoint="TOPRIGHT" x="3" y="0" />
 						</Anchors>
@@ -127,7 +127,7 @@
 							<Anchor point="TOPRIGHT" relativeKey="$parent.Item18" relativePoint="TOPLEFT" x="-3" y="0" />
 						</Anchors>
 					</Button>
-					<Button parentKey="Item19" inherits="AltoItemIconTemplate" id="18">
+					<Button parentKey="Item19" inherits="AltoItemIconTemplate" id="19">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.Item18" relativePoint="TOPRIGHT" x="3" y="0" />
 						</Anchors>

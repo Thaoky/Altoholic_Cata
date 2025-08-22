@@ -3,7 +3,7 @@ local addon = _G[addonName]
 
 local DataStore, TableInsert = DataStore, table.insert
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 local enum = DataStore.Enum.ContainerIDs
 
 addon.Containers = {}

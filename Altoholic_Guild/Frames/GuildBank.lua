@@ -1,7 +1,7 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 addon:Controller("AltoholicUI.GuildBank", { "AltoholicUI.Formatter", function(formatter)
 	local THIS_ACCOUNT = "Default"

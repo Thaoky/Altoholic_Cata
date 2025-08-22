@@ -2,7 +2,7 @@ local addonTabName = ...
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local CHARS_PER_FRAME = 12
 local gridCallbacks = {}
@@ -114,7 +114,7 @@ addon:Controller("AltoholicUI.TabGrids", { "AltoholicUI.ColumnOptions", function
 	}
 end})
 
-DataStore:OnAddonLoaded(addonTabName, function() 
+AddonFactory:OnAddonLoaded(addonTabName, function() 
 	Altoholic_GridsTab_Columns = Altoholic_GridsTab_Columns or {}
 	Altoholic_GridsTab_Options = Altoholic_GridsTab_Options or {
 		["Reputations.CurrentXPack"] = 1,				-- Current expansion pack 

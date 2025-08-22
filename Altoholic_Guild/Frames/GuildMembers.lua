@@ -2,7 +2,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 -- *** Guild Members ***
 
@@ -200,6 +200,21 @@ end
 
 local panel
 
+local function ClearPlayerEquipmentFrame(frame)
+	for i=1, 19 do
+		local button = frame.Equipment["Item"..i]
+		if button then
+			local id = button:GetID()
+			if id then
+				button:SetItem(nil, nil, nil)
+				button:SetIcon(addon:GetEquipmentSlotIcon(id))
+				button:SetCount(nil)
+				button:SetInfo(nil, nil)
+			end
+		end
+	end
+end
+
 local function OnPlayerEquipmentReceived(event, sender, player)
 	panel.Equipment:Update(player)
 end
@@ -362,6 +377,7 @@ addon:Controller("AltoholicUI.GuildMembers", {
 		local line = view[rowID]
 		if line.lineType == NORMALPLAYER_LINE then return end
 
+		ClearPlayerEquipmentFrame(frame)
 		DataStore:RequestGuildMemberEquipment(characterName)
 		
 		local englishClass = select(11, DataStore:GetGuildMemberInfo(characterName))
@@ -383,18 +399,17 @@ addon:Controller("AltoholicUI.GuildMemberEquipment", {
 		--[[
 			button layout				equipment table layout
 			
-			1	5	9							1	10	11
+			1	5	9						1	10	11
 			2	6	10 						3	6	12
-			3	7	11							5	7	13
+			3	7	11						5	7	13
 			4	8	12 						9	8	14
 			
 			15 13 14 16						2 15 4 19
 			
-			17 18 19							16 17 18
+			17 18 19						16 17 18
 		--]]
 
 		local guild = DataStore:GetGuild()
-		
 		for _, button in pairs(frame.Items) do
 			local id = button:GetID()
 			button.Count:Hide()
@@ -403,7 +418,7 @@ addon:Controller("AltoholicUI.GuildMemberEquipment", {
 			local itemID = DataStore:GetGuildMemberInventoryItem(guild, member, id)
 			if itemID then
 				-- display the coloured border
-				local _, _, itemRarity, itemLevel = GetItemInfo(itemID)
+				local _, _, itemRarity, itemLevel = C_Item.GetItemInfo(itemID)
 				button:SetItem(itemID, nil, itemRarity)
 				button:SetCount(itemLevel)
 			else

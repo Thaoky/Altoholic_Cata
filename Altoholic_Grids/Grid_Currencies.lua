@@ -1,7 +1,7 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local WHITE		= "|cFFFFFFFF"
 local GREEN		= "|cFF00FF00"
@@ -127,17 +127,19 @@ local callbacks = {
 			button.Name:SetPoint("BOTTOMRIGHT", 5, 0)
 			button.Background:SetDesaturated(false)
 			button.Background:SetTexCoord(0, 1, 0, 1)
-		
+
 			local token = view[dataRowID]
-			local _, count, currencyID = DataStore:GetCurrencyInfoByName(character, token)
+			local _, count, icon = DataStore:GetCurrencyInfoByName(character, token)
+
+			--button.count = count or 0
 			button.count = count
-			
+			button.Background:SetTexture(icon)
+			button.key = character
+			button:SetID(dataRowID)
+
 			if count then
-				local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(currencyID)
-				button.Background:SetTexture(currencyInfo.iconFileID)		
-				button.Background:SetVertexColor(0.5, 0.5, 0.5);	-- greyed out
-				button.key = character
-				
+				button.Background:SetVertexColor(1, 1, 1)	-- Full color
+
 				if count >= 100000 then
 					count = format("%2.1fM", count/1000000)
 				elseif count >= 10000 then
@@ -145,15 +147,14 @@ local callbacks = {
 				elseif count >= 1000 then
 					count = format("%2.1fk", count/1000)
 				end
-				
-				button.Name:SetText(GREEN..count)
-				button:SetID(dataRowID)
-				button:Show()
+
+				--button.Name:SetText(format("%s%s", colors.green, count))
+				button.Name:SetText(format("%s%s", GREEN, count))
 			else
-				button.key = nil
-				button:SetID(0)
-				button:Hide()
+				button.Background:SetVertexColor(0.5, 0.5, 0.5)	-- greyed out
+				button.Name:SetText(button.count)
 			end
+			button:Show()
 		end,
 	OnEnter = function(frame) 
 			local character = frame.key
@@ -163,7 +164,11 @@ local callbacks = {
 			AltoTooltip:ClearLines()
 			AltoTooltip:AddLine(DataStore:GetColoredCharacterName(character))
 			AltoTooltip:AddLine(view[frame:GetID()], 1, 1, 1)
-			AltoTooltip:AddLine(GREEN..frame.count)
+			if frame.count and frame.count >= 0 then
+				AltoTooltip:AddLine(format("%s%s", GREEN, frame.count))
+			else
+				AltoTooltip:AddLine(format("%s%s", GREEN, L["Not encountered"] or "Not encountered"))
+			end
 			AltoTooltip:Show()
 		end,
 	OnClick = nil,
