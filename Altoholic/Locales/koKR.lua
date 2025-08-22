@@ -1,5 +1,5 @@
 local addonName = ...
-local L = DataStore:SetLocale(addonName,  "koKR")
+local L = AddonFactory:SetLocale(addonName,  "koKR")
 if not L then return end
 
 L[" (Heroic)"] = " (영웅)"
@@ -84,7 +84,7 @@ L["All cooldowns are up"] = "대기시간(cooldown)이 남아있는 제조법 �
 L["All realms"] = "모든 서버"
 L["Alliance Forces"] = "얼라이언스 연합"
 L["All-in-one"] = "한꺼번에"
-L["Already known by "] = "이미 배움"
+L["Already known by"] = "이미 배움"
 L["Altoholic:|r Usage = /altoholic search <item name>"] = "Altoholic:|r 사용법 = /altoholic search <아이템 이름>"
 L["Ancient Lichen"] = "고대 이끼"
 L["and above"] = "이상"
@@ -273,7 +273,7 @@ L["Conquest"] = "정복"
 L["Conspicuous Urn"] = "눈에 확 들어오는 단지"
 L["Containers"] = "보관함"
 L["Copper Vein"] = "구리 광맥"
-L["Could be learned by "] = "배울 수 있음 "
+L["Could be learned by"] = "배울 수 있음 "
 L["Counters"] = "개수"
 L["Crafted Weapons"] = "제작된 무기"
 L["Crimson Templar (Fire)"] = "진홍 기사단 (불)"
@@ -803,7 +803,7 @@ L["Wild Steelbloom"] = "야생 철쭉"
 L["Wildvine"] = "야생덩굴"
 L["Will be %sdeleted|r in"] = "%s가 삭제될 것입니다.|n 다음 시간 내에"
 L["Will be %sreturned|r in"] = "%s가 반송될 것입니다.|r  다음 시간 내에"
-L["Will be learnable by "] = "향 후 배움 가능"
+L["Will be learnable by"] = "향 후 배움 가능"
 L["Windhawk Armor"] = "바람매 갑옷"
 L["Winter Veil Gift"] = "겨울맞이 축제 선물"
 L["Wintersbite"] = "겨울서리풀"

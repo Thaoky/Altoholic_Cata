@@ -1,7 +1,7 @@
 local addonName, addon = ...
-local colors = addon.Colors
+local colors = AddonFactory.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 addon:Service("AltoholicUI.EventsList", { "AltoholicUI.Formatter", function(Formatter) 
 

@@ -1,6 +1,7 @@
-## Interface: 40400
-## Title: Altoholic Cataclysm Classic by |cFF69CCF0Thaoky|r
+## Interface: 50500
+## Title: Altoholic Mists of Pandaria Classic by |cFF69CCF0Thaoky|r
 ## Title-zhCN: |cffeedd99 [物品] |r: 全角色统计 Altoholic
+## IconTexture: Interface\Icons\inv_drink_13
 
 ## Notes: Provides information about your alts
 ## Notes-ruRU: Предоставляет информацию о вашем персонажах
@@ -9,8 +10,8 @@
 ## Notes-koKR: 부캐들(alts)의 정보들을 제공해 줍니다.
 
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 4.4.005
-## Dependencies: DataStore, DataStore_Achievements, DataStore_Agenda, DataStore_Auctions, DataStore_Characters, DataStore_Containers, DataStore_Crafts, DataStore_Currencies, DataStore_Inventory, DataStore_Mails, DataStore_Quests, DataStore_Reputations, DataStore_Spells, DataStore_Talents
+## Version: 5.5.002
+## Dependencies: AddonFactory, DataStore, DataStore_Achievements, DataStore_Agenda, DataStore_Auctions, DataStore_Characters, DataStore_Containers, DataStore_Crafts, DataStore_Currencies, DataStore_Inventory, DataStore_Mails, DataStore_Quests, DataStore_Reputations, DataStore_Spells, DataStore_Talents
 ## SavedVariables: Altoholic_UI_Options, Altoholic_Tooltip_Options, Altoholic_Sharing_Options, Altoholic_Calendar_Options
 
 Embeds.xml

@@ -1,5 +1,5 @@
 local addonName = ...
-local L = DataStore:SetLocale(addonName,  "itIT")
+local L = AddonFactory:SetLocale(addonName,  "itIT")
 if not L then return end
 
 L[" (Heroic)"] = "(Eroico)"
@@ -79,7 +79,7 @@ L["All cooldowns are up"] = "Tutti i periodi di recupero sono terminati"
 L["All realms"] = "Tutti i reami"
 L["Alliance Forces"] = "Forze dell'Alleanza"
 L["All-in-one"] = "Tutto-in-uno"
-L["Already known by "] = "Già appreso da"
+L["Already known by"] = "Già appreso da"
 L["Altoholic:|r Usage = /altoholic search <item name>"] = "Altoholic:|r Utilizzo = /altoholic search <nome oggetto>"
 L["Ancient Lichen"] = "Lichene Antico"
 L["and above"] = "e oltre"
@@ -200,7 +200,7 @@ L["COLUMN_PROFESSION_2_TITLE_SHORT"] = "Prof. 2"
 L["Conspicuous Urn"] = "Urna Cospicua"
 L["Containers"] = "Contenitori"
 L["Copper Vein"] = "Vena di Rame"
-L["Could be learned by "] = "Può essere appreso da"
+L["Could be learned by"] = "Può essere appreso da"
 L["Crafted Weapons"] = "Armi manufatte"
 L["Crimson Templar (Fire)"] = "Templare Cremisi (Fuoco)"
 L["Currencies received !"] = "Valute ricevute !"
@@ -598,7 +598,7 @@ L["Wild Steelbloom"] = "Fiordiferro Selvatico"
 L["Wildvine"] = "Vite Selvaggia"
 L["Will be %sdeleted|r in"] = "Verrà %seliminato|r fra"
 L["Will be %sreturned|r in"] = "Verrà %srispedito|r fra"
-L["Will be learnable by "] = "Potrà essere appreso da"
+L["Will be learnable by"] = "Potrà essere appreso da"
 L["Windhawk Armor"] = "Armatura Falco del Vento"
 L["Winter Veil Gift"] = "Regalo di Grande Inverno"
 L["WoW Collector Edition"] = "WoW Collector's Edition"

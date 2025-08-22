@@ -1,5 +1,5 @@
 local addonName = ...
-local L = DataStore:SetLocale(addonName,  "esMX")
+local L = AddonFactory:SetLocale(addonName,  "esMX")
 if not L then return end
 
 L[" (Heroic)"] = " (Heroico)"
@@ -88,7 +88,7 @@ L["All cooldowns are up"] = "No hay habilidades recargándose"
 L["All realms"] = "Todos los reinos"
 L["Alliance Forces"] = "Ejercitos de la Alianza"
 L["All-in-one"] = "Todo en uno"
-L["Already known by "] = "Conocido actualmente por  "
+L["Already known by"] = "Conocido actualmente por  "
 L["Altoholic:|r Usage = /altoholic search <item name>"] = "Altoholic:|r Uso = /altoholic buscar <objeto>"
 L["Ancient Lichen"] = "Liquen Antiguo"
 L["and above"] = "y por encima"
@@ -223,7 +223,7 @@ L["COLUMN_PROFESSION_2_TITLE_SHORT"] = "Prof. 2"
 L["Conspicuous Urn"] = "Urna Llamativa"
 L["Containers"] = "Almacenes"
 L["Copper Vein"] = "Filón de Cobre"
-L["Could be learned by "] = "Puede aprenderlo "
+L["Could be learned by"] = "Puede aprenderlo "
 L["Crafted Weapons"] = "Armas Construidas"
 L["Crimson Templar (Fire)"] = "Templario Carmesí (Fuego)"
 L["Currencies received !"] = "¡ Economía recibida !"
@@ -706,7 +706,7 @@ L["Whitemend Wisdom"] = "Sabiduría con Remiendos Blancos"
 L["Wild Draenish Armor"] = "Armadura Draenei Salvage"
 L["Wild Steelbloom"] = "Acerita Salvaje"
 L["Wildvine"] = "Atriplex Salvaje"
-L["Will be learnable by "] = "Podría aprenderlo "
+L["Will be learnable by"] = "Podría aprenderlo"
 L["Windhawk Armor"] = "Armadura de Halcón del Viento"
 L["Winter Veil Gift"] = "Regalo del Festival de Invierno"
 L["Wintersbite"] = "Ivernalia"

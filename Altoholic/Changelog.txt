@@ -1,6 +1,16 @@
-Altoholic Cataclysm Classic Changelog (dates in dd/mm/yyyy)
-=======================================
+Altoholic Mists of Pandaria Classic Changelog (dates in dd/mm/yyyy)
+=============================================
 
+
+5.5.002 (22/08/2025)
+
+- Added dependency on AddonFactory, to match the code structure used in the retail version.
+- Updated all datastore modules to realign with the ones used in the retail version.
+- Minor adjustments in the UI to account for the changes above. If you notice anything wrong, let me know.
+
+5.5.001 (20/07/2025)
+
+- Mists of Pandaria compatible version : put together by GovtGeek, huge thanks to him for his work in my absence !
 
 4.4.005 (27/06/2024)
 

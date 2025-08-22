@@ -10,7 +10,7 @@
 		</Scripts>
 	</Frame>
 	
-	<CheckButton name="AltoToggleableOptionTemplate" inherits="InterfaceOptionsCheckButtonTemplate" virtual="true">
+	<CheckButton name="AltoToggleableOptionTemplate" inherits="UICheckButtonTemplate" virtual="true">
 		<Size x="20" y="20" />
 		<Scripts>
 			<OnClick>
@@ -86,10 +86,10 @@
 				<Scripts>
 					<OnClick>
 						if self:GetChecked() then 
-							Altoholic_UI_Options.ShowIcon = true
+							Altoholic_UI_Options.Minimap.ShowIcon = true
 							Minimap.AltoholicButton:Show()
 						else
-							Altoholic_UI_Options.ShowIcon = false
+							Altoholic_UI_Options.Minimap.ShowIcon = false
 							Minimap.AltoholicButton:Hide()
 						end
 					</OnClick>
@@ -105,7 +105,7 @@
 						-- exit if called to early
 						if not Altoholic_UI_Options then return end
 					
-						local L = DataStore:GetLocale("Altoholic")
+						local L = AddonFactory:GetLocale("Altoholic")
 						local value = self:GetValue()
 						
 						Altoholic_UI_Options.Minimap.IconAngle = value
@@ -123,7 +123,7 @@
 						-- exit if called to early
 						if not Altoholic_UI_Options then return end
 						
-						local L = DataStore:GetLocale("Altoholic")
+						local L = AddonFactory:GetLocale("Altoholic")
 						local value = self:GetValue()
 						
 						Altoholic_UI_Options.Minimap.IconRadius = value
@@ -189,7 +189,7 @@
 						-- exit if called to early
 						if not Altoholic_UI_Options then return end
 					
-						local L = DataStore:GetLocale("Altoholic")
+						local L = AddonFactory:GetLocale("Altoholic")
 						
 						local value = self:GetValue()
 						_G[self:GetName() .. "Text"]:SetText(format("%s (%1.2f)", L["Transparency"], value));
@@ -606,7 +606,7 @@
 				<NormalTexture name="$parentIcon" file="Interface\Buttons\UI-MinusButton-UP" />
 				<HighlightTexture file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD" />
 			</Button>
-			<CheckButton name="$parent_CheckAll" inherits="InterfaceOptionsSmallCheckButtonTemplate">
+			<CheckButton name="$parent_CheckAll" inherits="UICheckButtonTemplate">
 				<Size x="20" y="20" />
 				<Anchors> 
 					<Anchor point="LEFT" relativeTo="$parent_ToggleAll" relativePoint="RIGHT" x="5" y="0" />

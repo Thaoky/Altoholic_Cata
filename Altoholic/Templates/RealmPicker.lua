@@ -1,7 +1,7 @@
 local addonName, addon = ...
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 local THIS_ACCOUNT = "Default"
 
 local function OnRealmChange(frame, dropDownFrame)

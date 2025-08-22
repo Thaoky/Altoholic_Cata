@@ -199,7 +199,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						if IsAddOnLoaded("Altoholic_Search") then
+						if C_AddOns.IsAddOnLoaded("Altoholic_Search") then
 							Altoholic.Tabs.Search:Reset()
 						end
 					</OnClick>

@@ -1,7 +1,7 @@
 local addonName, addon = ...
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 local MVC = LibStub("LibMVC-1.0")
 local Options = MVC:GetService("AltoholicUI.ColumnOptions")
 
@@ -12,8 +12,11 @@ local function OnCharacterChange(frame, owner)
 	local parent = owner:GetParent()
 	local classIcons = parent.ClassIcons
 	local account, realm = parent.SelectRealm:GetCurrentRealm()
+	local character = DataStore:GetCharacter(frame.value, realm, account)
 
-	Options.SetColumnKey(_G[owner.storage], account, realm, id, frame.value)
+	-- We can have a nil character (account.realm.None), but that produces an odd state (and some bugs down the line)
+	Options.SetColumnKey(_G[owner.storage], account, realm, id, character and frame.value or nil)
+	--Options.SetColumnKey(_G[owner.storage], account, realm, id, frame.value)
 
 	if classIcons.OnCharacterChanged then
 		classIcons:OnCharacterChanged()		-- callback method in the container
@@ -143,7 +146,7 @@ addon:Controller("AltoholicUI.ClassIcon", {
 		
 		tt:AddLine(format("Average iLevel: %s%.1f", colors.green, DataStore:GetAverageItemLevel(character)),1,1,1)
 
-		if IsAddOnLoaded("DataStore_Achievements") then
+		if C_AddOns.IsAddOnLoaded("DataStore_Achievements") then
 			local numAchievements = DataStore:GetNumCompletedAchievements(character) or 0
 			if numAchievements > 0 then
 				tt:AddLine(format("%s: %s%s/%s", 

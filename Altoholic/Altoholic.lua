@@ -5,7 +5,7 @@ Written by : Thaoky, EU-Marécages de Zangar
 local addonName, addon = ...
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 local LCI = LibStub("LibCraftInfo-1.0")
 local MVC = LibStub("LibMVC-1.0")
 
@@ -51,7 +51,7 @@ local function BuildUnsafeItemList()
 	local unsafeItems = Altoholic_UI_Options.unsafeItems
 	
 	for _, itemID in pairs(unsafeItems) do
-		local itemName = GetItemInfo(itemID)
+		local itemName = C_Item.GetItemInfo(itemID)
 		if not itemName then							-- if the item is really unsafe .. save it
 			table.insert(TmpUnsafe, itemID)
 		end
@@ -104,7 +104,7 @@ local Orig_ChatEdit_InsertLink = ChatEdit_InsertLink
 function ChatEdit_InsertLink(text, ...)
 	if text and AltoholicFrame_SearchEditBox:IsVisible() then
 		if not DataStore:IsTradeSkillWindowOpen() then
-			AltoholicFrame_SearchEditBox:Insert(GetItemInfo(text))
+			AltoholicFrame_SearchEditBox:Insert(C_Item.GetItemInfo(text))
 			return true
 		end
 	end
@@ -169,7 +169,7 @@ function AuctionFrameBrowse_UpdateHook()
 		link = GetAuctionItemLink("list", trueID)
 		if link and not link:match("battlepet:(%d+)") then		-- if there's a valid item link in this slot ..
 			local itemID = addon:GetIDFromLink(link)
-			local _, _, _, _, _, itemType, itemSubType = GetItemInfo(itemID)
+			local _, _, _, _, _, itemType, itemSubType = C_Item.GetItemInfo(itemID)
 			if itemType == L["ITEM_TYPE_RECIPE"] and itemSubType ~= L["ITEM_SUBTYPE_BOOK"] then		-- is it a recipe ?
 				
 				local _, couldLearn, willLearn = addon:GetRecipeOwners(itemSubType, link, addon:GetRecipeLevel(link))
@@ -203,7 +203,7 @@ end
 
 local function IsBOPItemKnown(itemID)
 	-- Check if a given item is BOP and known by the current player
-	local _, link = GetItemInfo(itemID)
+	local _, link = C_Item.GetItemInfo(itemID)
 	if not link then return end
 
 	-- ITEM_BIND_ON_EQUIP = "Binds when equipped";
@@ -252,7 +252,7 @@ local function MerchantFrame_UpdateMerchantInfoHook()
 			if link then		-- if there's a valid item link in this slot ..
 				local itemID = addon:GetIDFromLink(link)
 				if itemID and itemID ~= 0 then		-- if there's a valid item link 
-					local _, _, _, _, _, itemType, itemSubType = GetItemInfo(itemID)
+					local _, _, _, _, _, itemType, itemSubType = C_Item.GetItemInfo(itemID)
 					
 					local r, g, b = 1, 1, 1
 					
@@ -304,7 +304,7 @@ local function OnChatMsgLoot(event, arg)
 	addon:RefreshTooltip()		-- any loot message should cause a refresh
 end
 
-DataStore:OnPlayerLogin(function() 
+AddonFactory:OnPlayerLogin(function() 
 	InitLocalization()
 	addon:SetupOptions()
 	MVC:GetService("AltoholicUI.Events"):Initialize()
@@ -318,7 +318,7 @@ DataStore:OnPlayerLogin(function()
 	Orig_MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfo
 	MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfoHook
 	
-	AltoholicFrameName:SetText(format("Altoholic |cFFFF7F00Cataclysm|r Classic %s%s by %sThaoky", colors.white, addon.Version, colors.classMage))
+	AltoholicFrameName:SetText(format("Altoholic |cFF00FF98Mists of Pandaria|r Classic %s%s|r by %sThaoky", colors.white, addon.Version, colors.classMage))
 
 	-- local realm = GetRealmName()
 	-- local player = UnitName("player")
@@ -392,7 +392,7 @@ function addon:Item_OnEnter(frame)
 	if not frame.id then return end
 	
 	GameTooltip:SetOwner(frame, "ANCHOR_LEFT")
-	frame.link = frame.link or select(2, GetItemInfo(frame.id) )
+	frame.link = frame.link or select(2, C_Item.GetItemInfo(frame.id) )
 	
 	if frame.link then
 		GameTooltip:SetHyperlink(frame.link)
@@ -409,7 +409,7 @@ function addon:Item_OnClick(frame, button)
 	local link = frame.link
 	
 	if not link then
-		link = select(2, GetItemInfo(frame.id) )
+		link = select(2, C_Item.GetItemInfo(frame.id) )
 	end
 	if not link then return end		-- still not valid ? exit
 	
@@ -421,7 +421,7 @@ function addon:Item_OnClick(frame, button)
 		if chat:IsShown() then
 			chat:Insert(link)
 		else
-			AltoholicFrame_SearchEditBox:SetText(GetItemInfo(link))
+			AltoholicFrame_SearchEditBox:SetText(C_Item.GetItemInfo(link))
 		end
 	end
 end
@@ -458,9 +458,12 @@ local equipmentSlotIcons = {
 	"Chest",
 	"MainHand",
 	"SecondaryHand",
-	"Ranged",
+	--"Ranged",
 	"Tabard"
 }
+if LE_EXPANSION_LEVEL_CURRENT <= LE_EXPANSION_CATACLYSM then
+	table.insert(equipmentSlotIcons, #equipmentSlotIcons, "Ranged")
+end
 
 function addon:GetEquipmentSlotIcon(index)
 	if index and equipmentSlotIcons[index] then
@@ -795,7 +798,7 @@ local slotNames = {
 	[15] = INVTYPE_WEAPONMAINHAND,
 	[16] = INVTYPE_WEAPONOFFHAND,
 	[17] = INVTYPE_SHIELD,
-	[18] = INVTYPE_RANGED
+	[18] = INVTYPE_RANGED,
 }
 
 local slotTypeInfo = {
@@ -819,6 +822,13 @@ local slotTypeInfo = {
 	{ color = colors.classHunter, name = INVTYPE_RANGED },
 	{ color = colors.white, name = INVTYPE_TABARD }
 }
+
+--[[ Handle the removal of INVTYPE_RANGED in Mists
+if LE_EXPANSION_LEVEL_CURRENT <= LE_EXPANSION_CATACLYSM then
+	table.insert(slotNames, INVTYPE_RANGED)
+	table.insert(slotTypeInfo, #slotNames-1, { color = colors.classHunter, name = INVTYPE_RANGED })
+end
+--]]
 
 function ns:GetSlotName(slot)
 	return slotNames[slot]

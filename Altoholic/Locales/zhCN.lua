@@ -1,5 +1,5 @@
 local addonName = ...
-local L = DataStore:SetLocale(addonName, "zhCN")
+local L = AddonFactory:SetLocale(addonName, "zhCN")
 if not L then return end
 
 L[" (Heroic)"] = "(英雄模式)"
@@ -88,7 +88,7 @@ L["All cooldowns are up"] = "所有冷却已完成"
 L["All realms"] = "搜索所有服务器"
 L["Alliance Forces"] = "联盟部队"
 L["All-in-one"] = "整合"
-L["Already known by "] = "已学会："
+L["Already known by"] = "已学会："
 L["Altoholic:|r Usage = /altoholic search <item name>"] = "Altoholic:|r 用法 = /altoholic search <物品名字>"
 L["Ancient Lichen"] = "远古苔"
 L["and above"] = "及以上"
@@ -215,7 +215,7 @@ L["Conquest"] = "征服点数"
 L["Conspicuous Urn"] = "明显的墓碑"
 L["Containers"] = "容器"
 L["Copper Vein"] = "铜矿"
-L["Could be learned by "] = "可学习："
+L["Could be learned by"] = "可学习："
 L["Counters"] = "反制"
 L["Crafted Weapons"] = "制作的武器"
 L["Crimson Templar (Fire)"] = "赤红圣殿骑士(火)"
@@ -746,7 +746,7 @@ L["Wild Steelbloom"] = "野钢花"
 L["Wildvine"] = "野葡萄藤"
 L["Will be %sdeleted|r in"] = "將在%s後刪除"
 L["Will be %sreturned|r in"] = "將在%s後返回"
-L["Will be learnable by "] = "将学习："
+L["Will be learnable by"] = "将学习："
 L["Windhawk Armor"] = "风鹰"
 L["Winter Veil Gift"] = "冬幕节的礼物"
 L["Wintersbite"] = "冬刺草"
