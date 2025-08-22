@@ -8,7 +8,7 @@ addon:Controller("AltoholicUI.ItemIcon", {
 		local itemID = frame.itemID
 		if not itemID then return end
 		
-		local itemLink = frame.itemLink or select(2, GetItemInfo(itemID))
+		local itemLink = frame.itemLink or select(2, C_Item.GetItemInfo(itemID))
 		if not itemLink then return end		-- still not valid ? exit
 		
 		GameTooltip:SetOwner(frame, "ANCHOR_LEFT")
@@ -28,7 +28,7 @@ addon:Controller("AltoholicUI.ItemIcon", {
 		local itemID = frame.itemID
 		if button ~= "LeftButton" or not itemID then return end
 		
-		local itemLink = frame.itemLink or select(2, GetItemInfo(itemID))
+		local itemLink = frame.itemLink or select(2, C_Item.GetItemInfo(itemID))
 		if not itemLink then return end		-- still not valid ? exit
 		
 		if IsControlKeyDown() then
@@ -55,7 +55,7 @@ addon:Controller("AltoholicUI.ItemIcon", {
 		frame.Icon:SetDesaturated(false)
 		
 		if itemID then
-			frame:SetIcon(GetItemIcon(itemID))
+			frame:SetIcon(C_Item.GetItemIconByID(itemID))
 			frame:SetRarityMatch(rarityToMatch)
 		else
 			frame:SetIcon("Interface\\PaperDoll\\UI-Backpack-EmptySlot")
@@ -63,7 +63,7 @@ addon:Controller("AltoholicUI.ItemIcon", {
 	end,
 	SetRarity = function(frame, rarity)
 		-- Set the right border colour depending on the item's rarity
-		local r, g, b = GetItemQualityColor(rarity)
+		local r, g, b = C_Item.GetItemQualityColor(rarity)
 		
 		frame.IconBorder:SetVertexColor(r, g, b, 0.5)
 		frame.IconBorder:Show()
@@ -72,7 +72,7 @@ addon:Controller("AltoholicUI.ItemIcon", {
 		-- the item is set to the right rarity if it matches the one passed as parameter, otherwise it is greyed out
 		if not rarityToMatch or rarityToMatch == 0 then	return end
 
-		local _, _, itemRarity = GetItemInfo(frame.itemID)
+		local _, _, itemRarity = C_Item.GetItemInfo(frame.itemID)
 		if itemRarity and itemRarity == rarityToMatch then
 			frame:SetRarity(itemRarity)
 		else

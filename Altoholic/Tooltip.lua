@@ -2,7 +2,7 @@ local addonName = ...
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local THIS_ACCOUNT = "Default"
 local THIS_REALM = GetRealmName()
@@ -332,7 +332,7 @@ function addon:GetRecipeOwners(professionName, link, recipeLevel)
 			if spellID then			-- if spell id is known, just find its equivalent in the professions
 				isKnownByChar = DataStore:IsCraftKnown(profession, spellID)
 			else
-				DataStore:IterateRecipes(profession, 0, function(color, itemID)
+				DataStore:IterateRecipes(profession, 0, 0, function(color, itemID)
 					--local _, recipeID, _ = DataStore:GetRecipeInfo_NonRetail(character, profession, itemID) -- retail has the COMPLETE recipe list for a tradeskill added tothe database.. dont enable till that is part of the wrath API -- TechnoHunter
 					local skillName = GetSpellInfo(itemID) or ""
 
@@ -370,22 +370,22 @@ local function GetRecipeOwnersText(professionName, link, recipeLevel)
 	
 	local lines = {}
 	if #know > 0 then
-		table.insert(lines, format("%s%s|r : %s%s\n", colors.teal, L["Already known by "], colors.white, table.concat(know, ", ")))
+		table.insert(lines, format("%s%s|r : %s%s\n", colors.teal, L["Already known by"], colors.white, table.concat(know, ", ")))
 	end
 	
 	if #couldLearn > 0 then
-		table.insert(lines, format("%s%s|r : %s%s\n", colors.yellow, L["Could be learned by "], colors.white, table.concat(couldLearn, ", ")))
+		table.insert(lines, format("%s%s|r : %s%s\n", colors.yellow, L["Could be learned by"], colors.white, table.concat(couldLearn, ", ")))
 	end
 	
 	if #willLearn > 0 then
-		table.insert(lines, format("%s%s|r : %s%s", colors.red, L["Will be learnable by "], colors.white, table.concat(willLearn, ", ")))
+		table.insert(lines, format("%s%s|r : %s%s", colors.red, L["Will be learnable by"], colors.white, table.concat(willLearn, ", ")))
 	end
 	
 	return table.concat(lines, "\n")
 end
 
 local function AddGlyphOwners(itemID, tooltip)
-	local know = {}				-- list of alts who know this glyoh
+	local know = {}				-- list of alts who know this glyph
 	local couldLearn = {}		-- list of alts who could learn it
 
 	local knows, could
@@ -400,12 +400,12 @@ local function AddGlyphOwners(itemID, tooltip)
 	
 	if #know > 0 then
 		tooltip:AddLine(" ",1,1,1)
-		tooltip:AddLine(format("%s%s|r : %s%s", colors.teal, L["Already known by "], colors.white, table.concat(know, ", ")), 1, 1, 1, 1)
+		tooltip:AddLine(format("%s%s|r: %s%s", colors.teal, L["Already known by"], colors.white, table.concat(know, ", ")), 1, 1, 1, 1)
 	end
 	
 	if #couldLearn > 0 then
 		tooltip:AddLine(" ",1,1,1)
-		tooltip:AddLine(format("%s%s|r : %s%s", colors.yellow, L["Could be learned by "], colors.white, table.concat(couldLearn, ", ")), 1, 1, 1, 1)
+		tooltip:AddLine(format("%s%s|r: %s%s", colors.yellow, L["Could be learned by"], colors.white, table.concat(couldLearn, ", ")), 1, 1, 1, 1)
 	end
 end
 
@@ -464,7 +464,7 @@ local function ProcessTooltip(tooltip, link)
 			end
 		end
 	end
-	 
+
 	if (itemID == 0) then return end
 	-- if there's no cached item id OR if it's different from the previous one ..
 	if (not cachedItemID) or 
@@ -513,7 +513,7 @@ local function ProcessTooltip(tooltip, link)
 	-- addon:CheckMaterialUtility(itemID)
 	
 	if options.ShowItemID then
-		local iLevel = select(4, GetItemInfo(itemID))
+		local iLevel = select(4, C_Item.GetItemInfo(itemID))
 		
 		if iLevel then
 			tooltip:AddLine(" ",1,1,1);
@@ -521,15 +521,18 @@ local function ProcessTooltip(tooltip, link)
 		end
 	end
 	
-	local _, _, _, _, _, itemType, itemSubType, _, _, _, sellPrice = GetItemInfo(itemID)
+	local _, _, _, _, _, itemType, itemSubType, _, _, _, sellPrice = C_Item.GetItemInfo(itemID)
 	
 	if (sellPrice and sellPrice > 0) and (options.ShowSellPrice == true) then	-- 0 = cannot be sold
 		tooltip:AddLine(" ",1,1,1)
 		tooltip:AddLine("Sells for " .. addon:GetMoneyStringShort(sellPrice, colors.white) .. " per unit",1,1,1)
 	end
-	
+
+	if itemType == "Glyph" and options.ShowKnownRecipes then
+		AddGlyphOwners(itemID, tooltip)
+	end
+
 	if options.ShowKnownRecipes == false then return end -- exit if recipe information is not wanted
-	
 	if itemType ~= L["ITEM_TYPE_RECIPE"] then return end		-- exit if not a recipe
 	if itemSubType == L["ITEM_SUBTYPE_BOOK"] then return end		-- exit if it's a book
 
@@ -601,7 +604,7 @@ local function Hook_SetCurrencyToken(self,index,...)
 			total = total + count
 		end
 	end
-	
+
 	if total > 0 then
 		GameTooltip:AddLine(" ",1,1,1);
 	end

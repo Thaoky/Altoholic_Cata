@@ -121,7 +121,7 @@
 				<Scripts>
 					<OnClick>
 						Altoholic:ToggleUI()
-						InterfaceOptionsFrame_OpenToCategory("DataStore")
+						Settings.OpenToCategory("DataStore")
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -135,7 +135,7 @@
 				<Scripts>
 					<OnClick>
 						Altoholic:ToggleUI()
-						InterfaceOptionsFrame_OpenToCategory("Altoholic")
+						Settings.OpenToCategory("Altoholic")
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -196,7 +196,7 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				local L = DataStore:GetLocale("Altoholic")
+				local L = AddonFactory:GetLocale("Altoholic")
 				
 				self.MenuItem1:SetText(L["Account Summary"])
 				self.MenuItem2:SetText(L["Bag Usage"])

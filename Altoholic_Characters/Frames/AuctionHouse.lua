@@ -3,7 +3,7 @@ local addon = _G[addonName]
 local colors = addon.Colors
 
 local DataStore = DataStore
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local view
 local viewSortField = "name"

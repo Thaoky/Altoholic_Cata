@@ -106,7 +106,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						local L = DataStore:GetLocale("Altoholic")
+						local L = AddonFactory:GetLocale("Altoholic")
 						
 						UIDropDownMenu_SetWidth(self, 80) 
 						UIDropDownMenu_SetButtonWidth(self, 20)
@@ -122,7 +122,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						local L = DataStore:GetLocale("Altoholic")
+						local L = AddonFactory:GetLocale("Altoholic")
 						
 						UIDropDownMenu_SetWidth(self, 150) 
 						UIDropDownMenu_SetButtonWidth(self, 20)

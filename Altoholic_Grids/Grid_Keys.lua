@@ -63,7 +63,7 @@ local callbacks = {
 			local dungeon = dungeonKeys[dataRowID]
 			local color = (dungeon.isBC) and colors.felGreen or colors.white
 			
-			rowFrame.Name.Text:SetText(format("%s%s\n%s%s%s (%s%s%s)", color, GetItemInfo(dungeon.itemID) or "",
+			rowFrame.Name.Text:SetText(format("%s%s\n%s%s%s (%s%s%s)", color, C_Item.GetItemInfo(dungeon.itemID) or "",
 				colors.gold, dungeon.area, colors.white,
 				colors.green, dungeon.level, colors.white
 				))
@@ -80,6 +80,8 @@ local callbacks = {
 			button.Background:SetTexture(format("Interface\\ICONS\\%s", dungeon.icon))
 			
 			local bagCount, bankCount = DataStore:GetContainerItemCount(character, dungeon.itemID)
+			if not bagCount then bagCount = 0 end
+			if not bankCount then bankCount = 0 end
 			
 			if bagCount > 0 or bankCount > 0 then
 				button.Background:SetVertexColor(1.0, 1.0, 1.0)
@@ -95,7 +97,7 @@ local callbacks = {
 			local dungeon = dungeonKeys[frame.id]
 			if not dungeon then return end
 
-			local _, link = GetItemInfo(dungeon.itemID)
+			local _, link = C_Item.GetItemInfo(dungeon.itemID)
 			if not link then return end
 			
 			GameTooltip:SetOwner(frame, "ANCHOR_LEFT")

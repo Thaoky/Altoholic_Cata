@@ -3,7 +3,7 @@ local addon = _G[addonName]
 local colors = addon.Colors
 local icons = addon.Icons
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 local MVC = LibStub("LibMVC-1.0")
 local Formatter = MVC:GetService("AltoholicUI.Formatter")
 
@@ -13,7 +13,16 @@ local MODE_SKILLS = 3
 local MODE_ACTIVITY = 4
 local MODE_MISCELLANEOUS = 5
 
-local SKILL_CAP = 525
+local skillCapsClassic = {
+	[LE_EXPANSION_CLASSIC] = 300,
+	[LE_EXPANSION_BURNING_CRUSADE] = 350,
+	[LE_EXPANSION_WRATH_OF_THE_LICH_KING] = 450,
+	[LE_EXPANSION_CATACLYSM] = 525,
+	[LE_EXPANSION_MISTS_OF_PANDARIA] = 600,
+	[LE_EXPANSION_WARLORDS_OF_DRAENOR] = 750,
+	[LE_EXPANSION_LEGION] = 900,
+}
+local SKILL_CAP = skillCapsClassic[LE_EXPANSION_LEVEL_CURRENT]
 
 local INFO_REALM_LINE = 0
 local INFO_CHARACTER_LINE = 1
@@ -126,9 +135,11 @@ local function TradeskillHeader_OnEnter(frame, tooltip)
 	tooltip:AddLine(" ")
 	tooltip:AddLine(format("%s%s|r %s %s", colors.recipeGrey, L["COLOR_GREY"], L["up to"], (floor(SKILL_CAP*0.25)-1)),1,1,1)
 	tooltip:AddLine(format("%s%s|r %s %s", colors.red, RED_GEM, L["up to"], (floor(SKILL_CAP*0.50)-1)),1,1,1)
-	tooltip:AddLine(format("%s%s|r %s %s", colors.orange, L["COLOR_ORANGE"], L["up to"], (floor(SKILL_CAP*0.75)-1)),1,1,1)
+	--tooltip:AddLine(format("%s%s|r %s %s", colors.orange, L["COLOR_ORANGE"], L["up to"], (floor(SKILL_CAP*0.75)-1)),1,1,1)
+	tooltip:AddLine(format("%s%s|r %s %s", colors.green, L["COLOR_GREEN"], L["up to"], (floor(SKILL_CAP*0.75)-1)),1,1,1)
 	tooltip:AddLine(format("%s%s|r %s %s", colors.yellow, YELLOW_GEM, L["up to"], (SKILL_CAP-1)),1,1,1)
-	tooltip:AddLine(format("%s%s|r %s %s %s", colors.green, L["COLOR_GREEN"], L["at"], SKILL_CAP, L["and above"]),1,1,1)
+	--tooltip:AddLine(format("%s%s|r %s %s %s", colors.green, L["COLOR_GREEN"], L["at"], SKILL_CAP, L["and above"]),1,1,1)
+	tooltip:AddLine(format("%s%s|r %s %s %s", colors.orange, L["COLOR_ORANGE"], L["at"], SKILL_CAP, L["and above"]),1,1,1)
 end
 
 local function Tradeskill_OnEnter(frame, professionIndex, showRecipeStats)
@@ -790,12 +801,12 @@ columns["BagSlots"] = {
 			tt:AddDoubleLine(DataStore:GetColoredCharacterName(character), L["COLUMN_BAGS_TITLE"])
 			tt:AddLine(" ")
 			
-			local _, link, size, free, bagType = DataStore:GetContainerInfo(character, 0)
+			local link, size, free, bagType = DataStore:GetContainerInfo(character, 0)
 			tt:AddDoubleLine(format("%s[%s]", colors.white, BACKPACK_TOOLTIP), FormatBagSlots(size, free))
 			
 			for i = 1, 4 do
-				_, link, size, free, bagType = DataStore:GetContainerInfo(character, i)
-
+				link, size, free, bagType = DataStore:GetContainerInfo(character, i)
+				
 				if size ~= 0 then
 					tt:AddDoubleLine(FormatBagType(link, bagType), FormatBagSlots(size, free))
 				end
@@ -897,11 +908,11 @@ columns["BankSlots"] = {
 				return
 			end
 			
-			local _, link, size, free, bagType = DataStore:GetContainerInfo(character, 100)
+			local link, size, free, bagType = DataStore:GetContainerInfo(character, 100)
 			tt:AddDoubleLine(format("%s[%s]", colors.white, L["Bank"]), FormatBagSlots(size, free))
 				
 			for i = 5, 11 do
-				_, link, size, free, bagType = DataStore:GetContainerInfo(character, i)
+				link, size, free, bagType = DataStore:GetContainerInfo(character, i)
 				
 				if size ~= 0 then
 					tt:AddDoubleLine(FormatBagType(link, bagType), FormatBagSlots(size, free))
@@ -1068,6 +1079,26 @@ columns["ProfFishing"] = {
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Fishing, true) end,
+}
+
+columns["ProfArchaeology"] = {
+	-- Header
+	headerWidth = 60,
+	headerLabel = format("   %s", Formatter.Texture18(addon:GetSpellIcon(78670))),
+	tooltipTitle = GetSpellInfo(78670),
+	tooltipSubTitle = nil,
+	headerOnEnter = TradeskillHeader_OnEnter,
+	headerOnClick = function() SortView("ProfArchaeology") end,
+	headerSort = DataStore.GetArchaeologyRank,
+	
+	-- Content
+	Width = 60,
+	JustifyH = "CENTER",
+	GetText = function(character)
+			local rank = DataStore:GetArchaeologyRank(character)
+			return format("%s%s", GetSkillRankColor(rank), rank)
+		end,
+	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Archaeology, true) end,
 }
 
 -- ** Activity **
@@ -1332,7 +1363,8 @@ columns["GuildName"] = {
 	Width = 120,
 	JustifyH = "CENTER",
 	GetText = function(character) 
-		local guildName, guildRank = DataStore:GetGuildInfo(character)
+		local guildName = DataStore:GetGuildName(character)
+		local guildRank = DataStore:GetGuildInfo(character, DataStore:GetCharacterGuildID(character))
 		
 		if Altoholic_SummaryTab_Options.ShowGuildRank then
 			return FormatGreyIfEmpty(guildRank)
@@ -1430,7 +1462,7 @@ end
 local modes = {
 	[MODE_SUMMARY] = { "Name", "Level", "RestXP", "Money", "Played", "AiL", "LastOnline" },
 	[MODE_BAGS] = { "Name", "Level", "BagSlots", "FreeBagSlots", "BankSlots", "FreeBankSlots" },
-	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing" },
+	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing", "ProfArchaeology" },
 	[MODE_ACTIVITY] = { "Name", "Level", "Mails", "LastMailCheck", "Auctions", "Bids", "AHLastVisit" },
 	[MODE_MISCELLANEOUS] = { "Name", "Level", "GuildName", "Hearthstone", "ClassAndSpec" },
 }
@@ -1471,7 +1503,7 @@ function ns:Update()
 	-- rebuild and get the view, then sort it
 	Characters:InvalidateView()
 	local view = Characters:GetView()
-	if columns[currentColumn] then	-- an old column name might still be in the DB.
+	if columns[currentColumn] and columns[currentColumn].headerSort then	-- an old column name might still be in the DB.
 		Characters:Sort(sortOrder, columns[currentColumn].headerSort)
 	end
 

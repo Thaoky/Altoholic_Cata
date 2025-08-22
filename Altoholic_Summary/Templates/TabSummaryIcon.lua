@@ -1,7 +1,7 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local OPTION_REALMS = "CurrentRealms"
 local OPTION_FACTIONS = "CurrentFactions"
@@ -109,13 +109,14 @@ local function LevelIcon_Initialize(frame, level)
 	frame:AddTitle(L["FILTER_LEVELS"])
 	frame:AddButtonWithArgs(ALL, 1, OnLevelFilterChange, 1, 85, (option == 1))
 	frame:AddTitle()
-	frame:AddButtonWithArgs("1-59", 2, OnLevelFilterChange, 1, 59, (option == 2))
-	frame:AddButtonWithArgs("1-39", 3, OnLevelFilterChange, 1, 39, (option == 3))
+	frame:AddButtonWithArgs("1-19", 2, OnLevelFilterChange, 1, 19, (option == 2))
+	frame:AddButtonWithArgs("20-39", 3, OnLevelFilterChange, 20, 39, (option == 3))
 	frame:AddButtonWithArgs("40-59", 4, OnLevelFilterChange, 40, 59, (option == 4))
 	frame:AddButtonWithArgs("60-69", 5, OnLevelFilterChange, 60, 69, (option == 5))
 	frame:AddButtonWithArgs("70-79", 6, OnLevelFilterChange, 70, 79, (option == 6))
 	frame:AddButtonWithArgs("80-84", 7, OnLevelFilterChange, 80, 84, (option == 7))
-	frame:AddButtonWithArgs("85", 8, OnLevelFilterChange, 85, 85, (option == 8))
+	frame:AddButtonWithArgs("85-89", 8, OnLevelFilterChange, 85, 89, (option == 8))
+	frame:AddButtonWithArgs("90", 9, OnLevelFilterChange, 90, 90, (option == 9))
 	frame:AddCloseMenu()
 end
 
@@ -234,7 +235,7 @@ addon:Controller("AltoholicUI.TabSummaryIcon", {
 })
 
 -- This should be in TabSummary, not here, move later
-DataStore:OnAddonLoaded("Altoholic_Summary", function() 
+AddonFactory:OnAddonLoaded("Altoholic_Summary", function() 
 	Altoholic_SummaryTab_Options = Altoholic_SummaryTab_Options or {
 		["ShowRestXP150pc"] = false,					-- display max rest xp in normal 100% mode or in level equivalent 150% mode ?
 		["CurrentMode"] = 1,								-- current mode (1 = account summary, 2 = bags, ...)
@@ -244,7 +245,7 @@ DataStore:OnAddonLoaded("Altoholic_Summary", function()
 		["CurrentFactions"] = 3,						-- 1 = Alliance, 2 = Horde, 3 = Both
 		["CurrentLevels"] = 1,							-- 1 = All
 		["CurrentLevelsMin"] = 1,							
-		["CurrentLevelsMax"] = 70,					
+		["CurrentLevelsMax"] = GetMaxLevelForExpansionLevel(GetExpansionLevel()),
 		["CurrentBankType"] = 0,						-- 0 = All
 		["CurrentClasses"] = 0,							-- 0 = All
 		["CurrentTradeSkill"] = 0,						-- 0 = All
@@ -257,4 +258,8 @@ DataStore:OnAddonLoaded("Altoholic_Summary", function()
 	}
 	options = Altoholic_SummaryTab_Options
 
+	-- Fix for expansion max level change (stops the need for changing filter from all to something and back)
+	if options[OPTION_LEVELS] == 1 then 
+		options["CurrentLevelsMax"] = GetMaxLevelForExpansionLevel(GetExpansionLevel())
+	end
 end)

@@ -1,5 +1,5 @@
 local addonName = ...
-local L = DataStore:SetLocale(addonName, "deDE")
+local L = AddonFactory:SetLocale(addonName, "deDE")
 if not L then return end
 
 L[" (Heroic)"] = " (Heroisch)"
@@ -83,7 +83,7 @@ L["All cooldowns are up"] = "Alle Abklingzeiten abgelaufen"
 L["All realms"] = "Alle Realms"
 L["Alliance Forces"] = "Streitkräfte der Allianz"
 L["All-in-one"] = "Alle zusammen"
-L["Already known by "] = "Schon bekannt durch"
+L["Already known by"] = "Schon bekannt durch"
 L["Altoholic:|r Usage = /altoholic search <item name>"] = "Altoholic:|r-Verwendung = /altoholic search <gegenstands-name>"
 L["Ancient Lichen"] = "Urflechte"
 L["and above"] = "und höher"
@@ -281,7 +281,7 @@ L["Conquest"] = "Eroberungspunkte"
 L["Conspicuous Urn"] = "Verdächtige Urne"
 L["Containers"] = "Behälter"
 L["Copper Vein"] = "Kupfervorkommen"
-L["Could be learned by "] = "Kann erlernt werden von"
+L["Could be learned by"] = "Kann erlernt werden von"
 L["Counters"] = "Zähler"
 L["Crafted Weapons"] = "Herstellbare Waffen"
 L["Crimson Templar (Fire)"] = "Purpurroter Templer (Feuer)"
@@ -822,7 +822,7 @@ L["Wild Steelbloom"] = "Wildstahlblume"
 L["Wildvine"] = "Wildranke"
 L["Will be %sdeleted|r in"] = "%sVerfällt in"
 L["Will be %sreturned|r in"] = "Wird %szurückgesendet in"
-L["Will be learnable by "] = "Wird demnächst erlernbar sein von"
+L["Will be learnable by"] = "Wird demnächst erlernbar sein von"
 L["Windhawk Armor"] = "Rüstung des Windfalken"
 L["Winter Veil Gift"] = "Winterhauchgeschenk"
 L["Wintersbite"] = "Winterbiss"

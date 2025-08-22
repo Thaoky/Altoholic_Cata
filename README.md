@@ -1,2 +1,2 @@
 # Altoholic_Cata
-WoW Altoholic Addon (WoW Cataclysm version)
+WoW Altoholic Addon (WoW Cataclysm version) => now Mists of Pandaria 5.5

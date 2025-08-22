@@ -1,5 +1,5 @@
 local addonName = ...
-local L = DataStore:SetDefaultLocale(addonName, "enUS")
+local L = AddonFactory:SetDefaultLocale(addonName, "enUS")
  
 L[" (Heroic)"] = true
 L[" days"] = true
@@ -26,6 +26,8 @@ L["%s will be unlocked in %d minutes (%s on %s)"] = true
 L[ [=[%s%s|r has requested the bank tab %s%s|r
 Send this information ?]=] ] = true
 L["%s|r has received a mail from %s"] = true
+L["AUCTION_HOUSE_NOT_VISITED_WARNING"] = "Auctions have not been checked on %s|r since %d days, check the auction house and your mailbox !"
+
 L[ [=[%sWarning:|r if you accept, %sALL|r information known
 by Altoholic will be sent to %s%s|r (bags, money, etc..)]=] ] = true
 L["%sWarning:|r make sure this user may view this information before accepting"] = true
@@ -73,7 +75,7 @@ L["All cooldowns are up"] = true
 L["All realms"] = true
 L["Alliance Forces"] = true
 L["All-in-one"] = true
-L["Already known by "] = true
+L["Already known by"] = true
 L["Altoholic:|r Usage = /altoholic search <item name>"] = true
 L["Ancient Lichen"] = true
 L["and above"] = true
@@ -163,6 +165,7 @@ L["Class Skills"] = true
 L["Classes: Death Knight"] = true
 L["Classes: Hunter"] = true
 L["Classes: Mage"] = true
+L["Classes: Monk"] = true
 L["Classes: Paladin"] = true
 L["Classes: Priest"] = true
 L["Classes: Rogue"] = true
@@ -266,7 +269,7 @@ L["Conquest"] = true
 L["Conspicuous Urn"] = true
 L["Containers"] = true
 L["Copper Vein"] = true
-L["Could be learned by "] = true
+L["Could be learned by"] = true
 L["Counters"] = true
 L["Crafted Weapons"] = true
 L["Crimson Templar (Fire)"] = true
@@ -799,7 +802,7 @@ L["Wild Steelbloom"] = true
 L["Wildvine"] = true
 L["Will be %sdeleted|r in"] = true
 L["Will be %sreturned|r in"] = true
-L["Will be learnable by "] = true
+L["Will be learnable by"] = true
 L["Windhawk Armor"] = true
 L["Winter Veil Gift"] = true
 L["Wintersbite"] = true

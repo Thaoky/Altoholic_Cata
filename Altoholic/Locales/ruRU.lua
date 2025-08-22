@@ -4,7 +4,7 @@
 --
 
 local addonName = ...
-local L = DataStore:SetLocale(addonName, "ruRU")
+local L = AddonFactory:SetLocale(addonName, "ruRU")
 if not L then return end
 
 L[" (Heroic)"] = " (Героическая сложность)"
@@ -33,6 +33,7 @@ L[ [=[%s%s|r has requested the bank tab %s%s|r
 Send this information ?]=] ] = [=[%s%s|r запросил информацию по закладкам банка %s%s|r
 Отослать информацию ?]=]
 L["%s|r has received a mail from %s"] = "%s|r получил(а) письмо от %s"
+L["AUCTION_HOUSE_NOT_VISITED_WARNING"] = "Аукцион не проверялся персонажем %s|r уже %d дн. Посетите аукционный дом и проверьте почту!"
 L[ [=[%sWarning:|r if you accept, %sALL|r information known
 by Altoholic will be sent to %s%s|r (bags, money, etc..)]=] ] = [=[%sВнимание:|r Если вы согласитесь то, %sВСЯ|r известная информация 
 Altoholic'ом будет отослана к %s%s|r (сумки, валюта, и т.д..)]=]
@@ -93,7 +94,7 @@ L["All cooldowns are up"] = "Все восстановления готовы"
 L["All realms"] = "Все миры"
 L["Alliance Forces"] = "Силы Альянса"
 L["All-in-one"] = "объединить"
-L["Already known by "] = "Изучено: "
+L["Already known by"] = "Изучено: "
 L["Altoholic:|r Usage = /altoholic search <item name>"] = "Altoholic:|r Используйте = /altoholic search <название предмета>"
 L["Ancient Lichen"] = "Древний лишайник"
 L["and above"] = "и выше"
@@ -289,7 +290,7 @@ L["COLUMN_RESTXP_TITLE_SHORT"] = "Отдых"
 L["Conspicuous Urn"] = "Подозрительная урна"
 L["Containers"] = "Сумки"
 L["Copper Vein"] = "Медная Жила"
-L["Could be learned by "] = "Может быть изучено: "
+L["Could be learned by"] = "Может быть изучено: "
 L["Crafted Weapons"] = "Оружие (Кузнечное дело)"
 L["Crimson Templar (Fire)"] = "Багровый храмовник (Огненный)"
 L["Currencies received !"] = "Получена валюта!"
@@ -821,7 +822,7 @@ L["Wild Steelbloom"] = "Дикий сталецвет"
 L["Wildvine"] = "Дикий виноград"
 L["Will be %sdeleted|r in"] = "%s будет удалён через"
 L["Will be %sreturned|r in"] = "%s будет возвращён через"
-L["Will be learnable by "] = "Будет изучено: "
+L["Will be learnable by"] = "Будет изучено"
 L["Windhawk Armor"] = "Доспехи Ветроястреба"
 L["Winter Veil Gift"] = "Подарок на Зимний покров"
 L["Wintersbite"] = "Зимник"

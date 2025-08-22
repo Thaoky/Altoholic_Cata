@@ -3,7 +3,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local ICON_NOT_STARTED = "Interface\\RaidFrame\\ReadyCheck-NotReady" 
 local ICON_PARTIAL = "Interface\\RaidFrame\\ReadyCheck-Waiting"
@@ -193,6 +193,6 @@ addon:Controller("AltoholicUI.TabAchievements", {
 	end,
 })
 
-DataStore:OnAddonLoaded(addonTabName, function() 
+AddonFactory:OnAddonLoaded(addonTabName, function() 
 	Altoholic_AchievementsTab_Columns = Altoholic_AchievementsTab_Columns or {}
 end)

@@ -1,12 +1,15 @@
 local addonName, addon = ...
 _G[addonName] = addon
 
-addon.Version = "v4.4.005"
-addon.VersionNum = 404005
+-- ex: 5.5.001-beta-05
+local addonVersion = C_AddOns.GetAddOnMetadata(addonName, "Version")
+local v1, v2, v3, vBeta = string.match(addonVersion, "(%d+).(%d+).(%d+)-*(.*)")
+addon.Version = "v"..addonVersion
+addon.VersionNum = string.format("%d%02d%03d", v1, v2, v3, vBeta or "")
 
 LibStub("LibMVC-1.0"):Embed(addon)
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 local LibSerialize = LibStub:GetLibrary("LibSerialize")
 local commPrefix = addonName
 
@@ -176,9 +179,9 @@ local GuildCommCallbacks = {
 }
 
 
-DataStore:OnAddonLoaded(addonName, function() 
-	addon.ListenTo = function(self, ...) DataStore:ListenToEvent(self, ...)	end
-	addon.StopListeningTo = function(self, ...) DataStore:StopListeningToEvent(self, ...)	end
+AddonFactory:OnAddonLoaded(addonName, function() 
+	addon.ListenTo = function(self, ...) AddonFactory:ListenToEvent(self, ...)	end
+	addon.StopListeningTo = function(self, ...) AddonFactory:StopListeningToEvent(self, ...)	end
 	
 	Altoholic_UI_Options = Altoholic_UI_Options or {
 		Mail = {
@@ -296,11 +299,11 @@ DataStore:OnAddonLoaded(addonName, function()
 		local lastWarning = Altoholic_UI_Options.Mail.LastExpiryWarning
 		local timeToNext = Altoholic_UI_Options.Mail.TimeToNextWarning
 		local now = time()
-		
+
 		if (now - lastWarning) < (timeToNext * 3600) then	-- has enough time passed ?
 			return		-- no ? exit !
 		end
-		
+
 		AltoMessageBox:SetHeight(130)
 		AltoMessageBox.Text:SetHeight(60)
 		AltoMessageBox:Ask(format("%sAltoholic: %s\n%s\n%s\n\n%s", colors.teal, colors.white, 
@@ -311,12 +314,14 @@ DataStore:OnAddonLoaded(addonName, function()
 			-- On Yes
 			function()
 				AltoholicFrame:Show()
+				--[[ Disable switching to a tab for now
 				AltoholicFrame:SwitchToTab("Summary")
 				
 				-- Show the activity panel
 				local tab = AltoholicFrame.TabSummary
 				tab.CategoriesList:ClickCategory("profile", 9)
 				tab:Update()
+				--]]
 			end)
 		
 		Altoholic_UI_Options.Mail.LastExpiryWarning = now
@@ -420,8 +425,8 @@ for index, name in ipairs(tabList) do
 end
 
 local function SafeLoadAddOn(name)
-	if not IsAddOnLoaded(name) then
-		LoadAddOn(name)
+	if not C_AddOns.IsAddOnLoaded(name) then
+		C_AddOns.LoadAddOn(name)
 	end
 end
 

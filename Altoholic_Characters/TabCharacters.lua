@@ -3,7 +3,7 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local parentName = "AltoholicTabCharacters"
 local parent
@@ -460,7 +460,7 @@ local function BagsIcon_Initialize(self, level)
 	DDM_Add(L["Any"], 0, OnRarityChange, nil, (rarity == 0))
 	
 	for i = LE_ITEM_QUALITY_UNCOMMON, LE_ITEM_QUALITY_HEIRLOOM do		-- Quality: 0 = poor .. 5 = legendary
-		DDM_Add(format("|c%s%s", select(4, GetItemQualityColor(i)), _G["ITEM_QUALITY"..i.."_DESC"]), i, OnRarityChange, nil, (rarity == i))
+		DDM_Add(format("|c%s%s", select(4, C_Item.GetItemQualityColor(i)), _G["ITEM_QUALITY"..i.."_DESC"]), i, OnRarityChange, nil, (rarity == i))
 	end
 	
 	DDM_AddCloseMenu()
@@ -557,11 +557,13 @@ local function MailIcon_Initialize(self, level)
 
 	DDM_Add(colors.white .. L["Clear all entries"], nil, OnClearMailboxEntries)
 	DDM_AddTitle("|r ")
+	--[[ Commented out because the InterfaceOptions calls should be changed to Settings
 	DDM_AddTitle(GAMEOPTIONS_MENU)
 	DDM_Add(MAIL_LABEL, nil, function() Altoholic:ToggleUI(); InterfaceOptionsFrame_OpenToCategory(AltoholicMailOptions) end)
 	if DataStore_Mails then
 		DDM_Add("DataStore Mails", nil, function() Altoholic:ToggleUI(); InterfaceOptionsFrame_OpenToCategory(DataStoreMailOptions) end)
 	end
+	--]]
 	
 	DDM_AddCloseMenu()
 end
@@ -841,7 +843,7 @@ function ns:OnLoad()
 end
 
 
-DataStore:OnAddonLoaded(addonTabName, function() 
+AddonFactory:OnAddonLoaded(addonTabName, function() 
 	Altoholic_CharactersTab_Options = Altoholic_CharactersTab_Options or {
 		["ViewBags"] = true,
 		["ViewBank"] = true,

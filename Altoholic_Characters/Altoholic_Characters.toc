@@ -1,10 +1,10 @@
-## Interface: 40400
+## Interface: 50500
 ## Title: Altoholic_Characters
 ## IconTexture: Interface\Icons\inv_drink_13
 
 ## Notes: Altoholic's Characters UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 4.4.004
+## Version: 5.5.002
 ## Dependencies: Altoholic, DataStore, DataStore_Characters
 ## SavedVariables: Altoholic_CharactersTab_Options
 ## LoadOnDemand: 1
