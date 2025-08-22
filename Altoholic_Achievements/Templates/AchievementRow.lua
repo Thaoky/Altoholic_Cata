@@ -1,26 +1,27 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 addon:Controller("AltoholicUI.AchievementRow", { "AltoholicUI.ColumnOptions", function(Options)
 
 	local function IsAccountBound(flags)
-		return bit.band(flags, ACHIEVEMENT_FLAGS_ACCOUNT) == ACHIEVEMENT_FLAGS_ACCOUNT
+		return bit.band(flags or 0, ACHIEVEMENT_FLAGS_ACCOUNT) == ACHIEVEMENT_FLAGS_ACCOUNT
 	end
 
 	return {
 		Update = function(frame, account, realm, allianceID, hordeID)
 			local _, achName, _, isComplete, _, _, _, _, flags = GetAchievementInfo(allianceID)
-			
-			-- if not achName then 
+
+			-- Get past odd bugs where achievements acquired don't exist?
+			if not achName then 
 				-- DEFAULT_CHAT_FRAME:AddMessage(allianceID)
-				-- achName = allianceID
-			-- end
+				achName = allianceID
+			end
 			
 			local isAccountBound = IsAccountBound(flags)
 			
-			frame.Name.Text:SetText(format("%s%s", (isAccountBound and colors.cyan or colors.white), achName))
+			frame.Name.Text:SetText(format("%s%s", (isAccountBound and colors.cyan or colors.white), achName or ""))
 			frame.Name.Text:SetJustifyH("LEFT")
 			frame.id = allianceID
 			
@@ -58,6 +59,12 @@ addon:Controller("AltoholicUI.AchievementRow", { "AltoholicUI.ColumnOptions", fu
 		Name_OnEnter = function(frame)
 			local achievementID = frame.id
 			local _, achName, points, _, _, _, _, description, flags, image, rewardText = GetAchievementInfo(achievementID)
+			if not achName then
+				achName = ""
+				points = 0
+				flags = 0
+				rewardText = ""
+			end
 
 			local tooltip = AltoTooltip
 			tooltip:ClearLines()
@@ -65,7 +72,7 @@ addon:Controller("AltoholicUI.AchievementRow", { "AltoholicUI.ColumnOptions", fu
 			tooltip:AddLine(achName)
 			tooltip:AddLine(description, 1, 1, 1, 1, 1)
 			tooltip:AddLine(" ")
-			tooltip:AddLine(format("%s%s: %s%s", colors.white, ACHIEVEMENT_TITLE, colors.green, points))
+			tooltip:AddLine(format("%s%s: %s%s", colors.white, ACHIEVEMENT_TITLE or "", colors.green, points))
 
 			-- Add the reward text, if any
 			if strlen(rewardText) > 0 then		-- not nil if empty, so test the length of the string

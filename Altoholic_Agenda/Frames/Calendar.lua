@@ -78,7 +78,7 @@ addon:Controller("AltoholicUI.Calendar", function()
 			-- The event list must be updated at the beginning !
 			frame.EventList:Update()
 			
-			local DateInfo = C_DateAndTime.GetTodaysDate()
+			local DateInfo = C_DateAndTime.GetCurrentCalendarTime()
 			local presentWeekday = DateInfo.weekday
 			local presentMonth = DateInfo.month
 			local presentDay = DateInfo.monthDay

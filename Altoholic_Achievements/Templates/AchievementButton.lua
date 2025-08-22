@@ -3,7 +3,7 @@ local addon = _G[addonName]
 local colors = addon.Colors
 local icons = addon.Icons
 
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local CRITERIA_COMPLETE_ICON = "\124TInterface\\AchievementFrame\\UI-Achievement-Criteria-Check:14\124t"
 
@@ -15,11 +15,17 @@ addon:Controller("AltoholicUI.AchievementButton", { "AltoholicUI.Formatter", fun
 			
 			local achievementID = frame.id
 			local _, achName, points, _, _, _, _, description, flags, image, rewardText = GetAchievementInfo(achievementID)
+			if not achName then
+				achName = ""
+				description = ""
+				flags = 0
+				rewardText = ""
+			end
 
 		-- debug
 			-- DEFAULT_CHAT_FRAME:AddMessage("id: " .. achievementID .. " name: " .. achName .. " icon: " .. image)
 			
-			local isAccountBound = ( bit.band(flags, ACHIEVEMENT_FLAGS_ACCOUNT) == ACHIEVEMENT_FLAGS_ACCOUNT ) 
+			local isAccountBound = ( bit.band(flags, ACHIEVEMENT_FLAGS_ACCOUNT) == ACHIEVEMENT_FLAGS_ACCOUNT )
 			
 			local tooltip = AltoTooltip
 			tooltip:SetOwner(frame, "ANCHOR_LEFT")
