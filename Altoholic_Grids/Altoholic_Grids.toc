@@ -1,4 +1,4 @@
-## Interface: 50500
+## Interface: 50502
 ## Title: Altoholic_Grids
 ## IconTexture: Interface\Icons\inv_drink_13
 
@@ -13,3 +13,4 @@
 Templates\UITemplates.xml
 TabGrids.xml
 Grids.xml
+
