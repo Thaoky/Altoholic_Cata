@@ -1,4 +1,4 @@
-## Interface: 50500
+## Interface: 50502
 ## Title: Altoholic_Achievements
 ## IconTexture: Interface\Icons\inv_drink_13
 
@@ -16,3 +16,4 @@ Templates\UITemplates.xml
 TabAchievements.xml
 
 Frames\Achievements.xml
+
