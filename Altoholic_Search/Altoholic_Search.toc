@@ -1,4 +1,4 @@
-## Interface: 50500
+## Interface: 50502
 ## Title: Altoholic_Search
 ## Notes: Altoholic's Search UI
 ## Author: Thaoky (EU-Marécages de Zangar)
@@ -10,3 +10,4 @@
 
 TabSearch.xml
 Search.xml
+
