@@ -1,4 +1,4 @@
-﻿## Interface: 50502
+﻿## Interface: 50503
 ## Title: Altoholic_Options
 ## Notes: Altoholic's Options UI
 ## Author: Thaoky (EU-Marécages de Zangar)
