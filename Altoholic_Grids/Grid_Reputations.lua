@@ -9,11 +9,13 @@ local PARAGON_LABEL = "Paragon"
 local TEXTURE_PATH = "Interface\\Icons\\"
 local LOCAL_TEXTURE_PATH = "Interface\\Addons\\Altoholic_Grids\\Textures\\"
 
+local FriendshipStandingLabels = DataStore.Enum.FriendshipStandingLabels
+
 local function Texture(texture)
 	return format("%s%s", TEXTURE_PATH, texture)
 end
 
-local function LocatTexture(texture)
+local function LocalTexture(texture)
 	return format("%s%s.tga", LOCAL_TEXTURE_PATH, texture)
 end
 
@@ -58,7 +60,7 @@ local Factions = {
 			{ name = DataStore:GetFactionName(470), icon = Texture("inv_helmet_66") },		-- "Ratchet" 
 		},
 		{	-- [6]
-			name = OTHER,
+			name = EXPANSION_NAME0,
 			{ name = DataStore:GetFactionName(529), icon = Texture("INV_Jewelry_Talisman_07") },		-- "Argent Dawn" 
 			{ name = DataStore:GetFactionName(87), icon = Texture("INV_Helmet_66") },		-- "Bloodsail Buccaneers" 
 			{ name = DataStore:GetFactionName(910), icon = Texture("INV_Misc_Head_Dragon_Bronze") },		-- "Brood of Nozdormu" 
@@ -82,29 +84,29 @@ local Factions = {
 		name = EXPANSION_NAME1,	-- "The Burning Crusade"
 		{	-- [1]
 			name = C_Map.GetAreaInfo(676),	-- Outland
-			{ name = DataStore:GetFactionName(1012), icon = LocatTexture("Achievement_Reputation_AshtongueDeathsworn") },	-- "Ashtongue Deathsworn" 
+			{ name = DataStore:GetFactionName(1012), icon = LocalTexture("Achievement_Reputation_AshtongueDeathsworn") },	-- "Ashtongue Deathsworn" 
 			{ name = DataStore:GetFactionName(942), icon = Texture("ability_racial_ultravision") },	-- "Cenarion Expedition" 
 			{ name = DataStore:GetFactionName(933), icon = Texture("INV_Enchant_ShardPrismaticLarge") },		-- "The Consortium" 
 			{ name = DataStore:GetFactionName(946), icon = Texture("Spell_Misc_HellifrePVPHonorHoldFavor") },	-- "Honor Hold" 
 			{ name = DataStore:GetFactionName(978), icon = Texture("INV_Misc_Foot_Centaur") },		-- "Kurenai" 
-			{ name = DataStore:GetFactionName(941), icon = LocatTexture("Achievement_Zone_Nagrand_01") },	-- "The Mag'har" 
+			{ name = DataStore:GetFactionName(941), icon = LocalTexture("Achievement_Zone_Nagrand_01") },	-- "The Mag'har" 
 			{ name = DataStore:GetFactionName(1015), icon = Texture("Ability_Mount_NetherdrakePurple") },		-- "Netherwing" 
-			{ name = DataStore:GetFactionName(1038), icon = LocatTexture("Achievement_Reputation_Ogre") },		-- "Ogri'la" 
+			{ name = DataStore:GetFactionName(1038), icon = LocalTexture("Achievement_Reputation_Ogre") },		-- "Ogri'la" 
 			{ name = DataStore:GetFactionName(970), icon = Texture("INV_Mushroom_11") },	-- "Sporeggar" 
 			{ name = DataStore:GetFactionName(947), icon = Texture("Spell_Misc_HellifrePVPThrallmarFavor") },	-- "Thrallmar" 
 		},
 		{	-- [2]
 			name = C_Map.GetAreaInfo(3703),	-- "Shattrath City"
-			{ name = DataStore:GetFactionName(1011), icon = LocatTexture("Achievement_Zone_Terrokar") },		-- "Lower City" 
+			{ name = DataStore:GetFactionName(1011), icon = LocalTexture("Achievement_Zone_Terrokar") },		-- "Lower City" 
 			{ name = DataStore:GetFactionName(1031), icon = Texture("Ability_Hunter_Pet_NetherRay") },		-- "Sha'tari Skyguard" 
 			{ name = DataStore:GetFactionName(1077), icon = Texture("INV_Shield_48") },		-- "Shattered Sun Offensive" 
-			{ name = DataStore:GetFactionName(932), icon = LocatTexture("Achievement_Character_Draenei_Female") },	-- "The Aldor" 
-			{ name = DataStore:GetFactionName(934), icon = LocatTexture("Achievement_Character_Bloodelf_Female") },		-- "The Scryers" 
-			{ name = DataStore:GetFactionName(935), icon = LocatTexture("Achievement_Zone_Netherstorm_01") },		-- "The Sha'tar" 
+			{ name = DataStore:GetFactionName(932), icon = LocalTexture("Achievement_Character_Draenei_Female") },	-- "The Aldor" 
+			{ name = DataStore:GetFactionName(934), icon = LocalTexture("Achievement_Character_Bloodelf_Female") },		-- "The Scryers" 
+			{ name = DataStore:GetFactionName(935), icon = LocalTexture("Achievement_Zone_Netherstorm_01") },		-- "The Sha'tar" 
 		},
 		{	-- [3]
-			name = OTHER,
-			{ name = DataStore:GetFactionName(989), icon = LocatTexture("Achievement_Zone_HillsbradFoothills") },		-- "Keepers of Time" 
+			name = EXPANSION_NAME1,
+			{ name = DataStore:GetFactionName(989), icon = LocalTexture("Achievement_Zone_HillsbradFoothills") },		-- "Keepers of Time" 
 			{ name = DataStore:GetFactionName(990), icon = Texture("INV_Enchant_DustIllusion") },	-- "The Scale of the Sands" 
 			{ name = DataStore:GetFactionName(967), icon = Texture("Spell_Holy_MindSooth") },		-- "The Violet Eye" 
 		}
@@ -146,7 +148,7 @@ local Factions = {
 	{	-- [4]
 		name = EXPANSION_NAME3,	-- "Cataclysm"
 		{	-- [1]
-			name = OTHER,
+			name = EXPANSION_NAME3,
 			{ name = DataStore:GetFactionName(1158), icon = Texture("Achievement_Zone_mount hyjal") },		-- "Guardians of Hyjal" 
 			{ name = DataStore:GetFactionName(1135), icon = Texture("Spell_Nature_EarthElemental_Totem") },		-- "The Earthen Ring" 
 			{ name = DataStore:GetFactionName(1171), icon = Texture("inv_misc_tabard_therazane") },		-- "Therazane" 
@@ -158,7 +160,53 @@ local Factions = {
 			{ name = DataStore:GetFactionName(1204), icon = Texture("inv_neck_hyjaldaily_04") },		-- "Avengers of Hyjal" 
 		}
 	},
+	{	-- [5]
+		name = EXPANSION_NAME4,	-- "Mists of Pandaria"
+		{	-- [1]
+			name = DataStore:GetFactionName(1302), 	-- "The Anglers"
+			{ name = DataStore:GetFactionName(1358), icon = Texture("achievement_faction_anglers") },		-- "Nat Pagle" 
+		},
+		{	-- [2]
+			name = DataStore:GetFactionName(1272), 	-- "The Tillers"
+			{ name = DataStore:GetFactionName(1277), icon = Texture("achievement_faction_tillers") },		-- "Chee Chee" 
+			{ name = DataStore:GetFactionName(1275), icon = Texture("achievement_faction_tillers") },		-- "Ella" 
+			{ name = DataStore:GetFactionName(1283), icon = Texture("achievement_faction_tillers") },		-- "Farmer Fung" 
+			{ name = DataStore:GetFactionName(1282), icon = Texture("achievement_faction_tillers") },		-- "Fish Fellreed" 
+			{ name = DataStore:GetFactionName(1281), icon = Texture("achievement_faction_tillers") },		-- "Gina Mudclaw" 
+			{ name = DataStore:GetFactionName(1279), icon = Texture("achievement_faction_tillers") },		-- "Haohan Mudclaw" 
+			{ name = DataStore:GetFactionName(1273), icon = Texture("achievement_faction_tillers") },		-- "Jogu the Drunk" 
+			{ name = DataStore:GetFactionName(1276), icon = Texture("achievement_faction_tillers") },		-- "Old Hillpaw" 
+			{ name = DataStore:GetFactionName(1278), icon = Texture("achievement_faction_tillers") },		-- "Sho" 
+			{ name = DataStore:GetFactionName(1280), icon = Texture("achievement_faction_tillers") },		-- "Tina Mudclaw" 
+		},
+		{	-- [3]
+			name = EXPANSION_NAME4,
+			{ name = DataStore:GetFactionName(1375), icon = Texture("achievement_general_hordeslayer") },		-- "Dominance Offensive" 
+			{ name = DataStore:GetFactionName(1228), icon = Texture("inv_misc_fish_58") },		-- "Forest Hozen" 
+			{ name = DataStore:GetFactionName(1269), icon = Texture("achievement_faction_goldenlotus") },		-- "Golden Lotus" 
+			{ name = DataStore:GetFactionName(1387), icon = Texture("achievement_reputation_kirintor_offensive") },		-- "Kirin Tor Offensive" 
+			{ name = DataStore:GetFactionName(1376), icon = Texture("achievement_general_allianceslayer") },		-- "Operation: Shieldwall" 
+			{ name = DataStore:GetFactionName(1271), icon = Texture("achievement_faction_serpentriders") },		-- "Order of the Cloud Serpent" 
+			{ name = DataStore:GetFactionName(1242), icon = Texture("inv_misc_fish_58") },		-- "Pearlfin Jinyu" 
+			{ name = DataStore:GetFactionName(1270), icon = Texture("achievement_faction_shadopan") },		-- "Shado-Pan" 
+			{ name = DataStore:GetFactionName(1435), icon = Texture("achievement_faction_shadopan") },		-- "Shado-Pan Assault" 
+			{ name = DataStore:GetFactionName(1216), icon = Texture("inv_misc_book_07") },		-- "Shang Xi's Academy" 
+			{ name = DataStore:GetFactionName(1388), icon = Texture("achievement_faction_sunreaveronslaught") },		-- "Sunreaver Onslaught" 
+			{ name = DataStore:GetFactionName(1302), icon = Texture("achievement_faction_anglers") },		-- "The Anglers" 
+			{ name = DataStore:GetFactionName(1341), icon = Texture("achievement_faction_celestials") },		-- "The August Celestials" 
+			{ name = DataStore:GetFactionName(1359), icon = Texture("inv_misc_head_dragon_black") },		-- "The Black Prince" 
+			{ name = DataStore:GetFactionName(1351), icon = Texture("inv_cask_02") },		-- "The Brewmasters" 
+			{ name = DataStore:GetFactionName(1337), icon = Texture("achievement_faction_klaxxi") },		-- "The Klaxxi" 
+			{ name = DataStore:GetFactionName(1345), icon = Texture("achievement_faction_lorewalkers") },		-- "The Lorewalkers" 
+			{ name = DataStore:GetFactionName(1272), icon = Texture("achievement_faction_tillers") },		-- "The Tillers" 
+			{ name = DataStore:GetFactionName(1492), icon = Texture("ability_monk_quipunch") },		-- "Emperor Shaohao"
+		}
+	},
 }
+-- Remove the Classic Wildhammer Clan after the expansion
+if LE_EXPANSION_LEVEL_CURRENT ~= LE_EXPANSION_CLASSIC then
+	table.remove(Factions[1][6], 14)
+end
 
 local CAT_ALLINONE = #Factions + 1
 
@@ -312,7 +360,7 @@ local callbacks = {
 	RowSetup = function(self, rowFrame, dataRowID)
 			currentFaction = view[dataRowID]
 
-			rowFrame.Name.Text:SetText(format("%s%s", colors.white, currentFaction.name))
+			rowFrame.Name.Text:SetText(format("%s%s", colors.white, currentFaction.name or "<unknown>"))
 			rowFrame.Name.Text:SetJustifyH("LEFT")
 		end,
 	RowOnEnter = function()	end,
@@ -336,9 +384,11 @@ local callbacks = {
 			button.Name:SetPoint("BOTTOMRIGHT", 5, 0)
 			button.Background:SetDesaturated(false)
 			
-			local status, _, _, rate = DataStore:GetReputationInfo(character, faction.name)
-			
+			local status, _, _, rate, _, isFriendshipFaction, _, standing = DataStore:GetReputationInfo(character, faction.name)
 			if status and rate then 
+				-- Standing is displayed differently with friendships
+				if isFriendshipFaction then standing = standing + 3 end
+
 				local text
 				if status == FACTION_STANDING_LABEL8 then	-- If exalted .. 
 					text = icons.ready						-- .. just show the green check
@@ -359,7 +409,11 @@ local callbacks = {
 					text = format("%2d%%", floor(rate))
 				end
 
-				local vc = VertexColors[status]
+				--local vc = VertexColors[status] or { r = 1, g = 0, b = 0 }
+				local vc = FACTION_BAR_COLORS[standing]
+				if not vc then
+					vc = { r = .3, g = .3, b = .3 }
+				end
 				button.Background:SetVertexColor(vc.r, vc.g, vc.b);
 				
 				local color = colors.white
@@ -373,42 +427,57 @@ local callbacks = {
 			else
 				button.Background:SetVertexColor(0.3, 0.3, 0.3)	-- greyed out
 				button.Name:SetText(icons.notReady)
-				button:SetID(0)
-				button.key = nil
+				-- Originally SetID(0) and key = nil to prevent tooltip info
+				button:SetID(dataRowID)
+				button.key = character
 			end
 		end,
 		
 	OnEnter = function(frame) 
 			local character = frame.key
-			if not character then return end
+			if not character then print(frame:GetID()) return end
 
 			local faction = view[ frame:GetID() ].name
-			local status, currentLevel, maxLevel, rate = DataStore:GetReputationInfo(character, faction)
-			if not status then return end
+			local status, currentLevel, maxLevel, rate, _, isFriendshipFaction, factionID, standing = DataStore:GetReputationInfo(character, faction)
 			
 			AltoTooltip:SetOwner(frame, "ANCHOR_LEFT");
 			AltoTooltip:ClearLines()
 			AltoTooltip:AddLine(format("%s %s@ %s%s",
 				DataStore:GetColoredCharacterName(character), colors.white, colors.teal, faction),1,1,1)
 
-			rate = format("%d%%", floor(rate))
-			AltoTooltip:AddLine(format("%s: %d/%d (%s)", status, currentLevel, maxLevel, rate),1,1,1 )
+			if status then
+				rate = format("%d%%", floor(rate))
+				AltoTooltip:AddLine(format("%s: %d/%d (%s)", status, currentLevel, maxLevel, rate),1,1,1 )
+			end
 						
 			local bottom = DataStore:GetRawReputationInfo(character, faction)
-			
-			AltoTooltip:AddLine(" ",1,1,1)
-			AltoTooltip:AddLine(format("%s = %s", icons.notReady, UNKNOWN), 0.8, 0.13, 0.13)
-			AltoTooltip:AddLine(FACTION_STANDING_LABEL1, 0.8, 0.13, 0.13)
-			AltoTooltip:AddLine(FACTION_STANDING_LABEL2, 1.0, 0.0, 0.0)
-			AltoTooltip:AddLine(FACTION_STANDING_LABEL3, 0.93, 0.4, 0.13)
-			AltoTooltip:AddLine(FACTION_STANDING_LABEL4, 1.0, 1.0, 0.0)
-			AltoTooltip:AddLine(FACTION_STANDING_LABEL5, 0.0, 1.0, 0.0)
-			AltoTooltip:AddLine(FACTION_STANDING_LABEL6, 0.0, 1.0, 0.8)
-			AltoTooltip:AddLine(FACTION_STANDING_LABEL7, 1.0, 0.4, 1.0)
-			AltoTooltip:AddLine(format("%s = %s", icons.ready, FACTION_STANDING_LABEL8), 1, 1, 1)
-			AltoTooltip:AddLine(" ",1,1,1)
-			AltoTooltip:AddLine(format("%s%s", colors.green, L["Shift+Left click to link"]))
-			AltoTooltip:Show()
+
+			if not isFriendshipFaction then
+				AltoTooltip:AddLine(" ",1,1,1)
+				AltoTooltip:AddLine(format("%s = %s", icons.notReady, UNKNOWN), 0.8, 0.13, 0.13)
+				AltoTooltip:AddLine(FACTION_STANDING_LABEL1, 0.8, 0.13, 0.13)
+				AltoTooltip:AddLine(FACTION_STANDING_LABEL2, 1.0, 0.0, 0.0)
+				AltoTooltip:AddLine(FACTION_STANDING_LABEL3, 0.93, 0.4, 0.13)
+				AltoTooltip:AddLine(FACTION_STANDING_LABEL4, 1.0, 1.0, 0.0)
+				AltoTooltip:AddLine(FACTION_STANDING_LABEL5, 0.0, 1.0, 0.0)
+				AltoTooltip:AddLine(FACTION_STANDING_LABEL6, 0.0, 1.0, 0.8)
+				AltoTooltip:AddLine(FACTION_STANDING_LABEL7, 1.0, 0.4, 1.0)
+				AltoTooltip:AddLine(format("%s = %s", icons.ready, FACTION_STANDING_LABEL8), 1, 1, 1)
+				AltoTooltip:AddLine(" ",1,1,1)
+				AltoTooltip:AddLine(format("%s%s", colors.green, L["Shift+Left click to link"]))
+			else
+				AltoTooltip:AddLine(" ",1,1,1)
+				AltoTooltip:AddLine(format("%s = %s", icons.notReady, UNKNOWN), 0.8, 0.13, 0.13)
+				AltoTooltip:AddLine(FriendshipStandingLabels[0], 0.93, 0.4, 0.13)
+				AltoTooltip:AddLine(FriendshipStandingLabels[8400], 1.0, 1.0, 0.0)
+				AltoTooltip:AddLine(FriendshipStandingLabels[16800], 0.0, 1.0, 0.0)
+				AltoTooltip:AddLine(FriendshipStandingLabels[25200], 0.0, 1.0, 0.8)
+				AltoTooltip:AddLine(FriendshipStandingLabels[33600], 1.0, 0.4, 1.0)
+				AltoTooltip:AddLine(format("%s = %s", icons.ready, FriendshipStandingLabels[42000]), 1, 1, 1)
+				AltoTooltip:AddLine(" ",1,1,1)
+				AltoTooltip:AddLine(format("%s%s", colors.green, L["Shift+Left click to link"]))
+			end
+				AltoTooltip:Show()
 		end,
 	OnClick = function(frame, button)
 			local character = frame.key
