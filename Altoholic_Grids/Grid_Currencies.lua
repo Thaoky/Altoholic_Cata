@@ -42,9 +42,8 @@ local function GetUsedTokens(header)
 
 	for _, character in pairs(DataStore:GetCharacters(realm, account)) do	-- all alts on this realm
 		for i = 1, (DataStore:GetNumCurrencies(character) or 0) do
-		
 			local name, _, _, category = DataStore:GetCurrencyInfo(character, i)
-			
+
 			if not header or (category == header) then
 				tokens[name] = true
 			end		
@@ -180,7 +179,8 @@ local callbacks = {
 			frame:Show()
 			title:Show()
 
-			currentDDMText = currentDDMText or currentTokenType
+			OnTokensAllInOne()
+			--currentDDMText = currentDDMText or currentTokenType
 			
 			frame:SetMenuWidth(100) 
 			frame:SetButtonWidth(20)
