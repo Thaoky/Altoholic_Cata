@@ -1081,6 +1081,7 @@ columns["ProfFishing"] = {
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Fishing, true) end,
 }
 
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_BURNING_CRUSADE then
 columns["ProfArchaeology"] = {
 	-- Header
 	headerWidth = 60,
@@ -1100,6 +1101,7 @@ columns["ProfArchaeology"] = {
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Archaeology, true) end,
 }
+end
 
 -- ** Activity **
 columns["Mails"] = {
@@ -1462,10 +1464,14 @@ end
 local modes = {
 	[MODE_SUMMARY] = { "Name", "Level", "RestXP", "Money", "Played", "AiL", "LastOnline" },
 	[MODE_BAGS] = { "Name", "Level", "BagSlots", "FreeBagSlots", "BankSlots", "FreeBankSlots" },
-	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing", "ProfArchaeology" },
+	--[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing", "ProfArchaeology" },
+	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing" },
 	[MODE_ACTIVITY] = { "Name", "Level", "Mails", "LastMailCheck", "Auctions", "Bids", "AHLastVisit" },
 	[MODE_MISCELLANEOUS] = { "Name", "Level", "GuildName", "Hearthstone", "ClassAndSpec" },
 }
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_BURNING_CRUSADE then
+	table.insert(modes[MODE_SKILLS], "ProfArchaeology")
+end
 
 function ns:SetMode(mode)
 	Altoholic_SummaryTab_Options.CurrentMode = mode
