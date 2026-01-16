@@ -1,4 +1,4 @@
-## Interface: 50503
+## Interface: 50503, 20505
 ## Title: Altoholic_Characters
 ## IconTexture: Interface\Icons\inv_drink_13
 
@@ -21,4 +21,3 @@ Frames\Quests.xml
 Frames\Recipes.xml
 Frames\Spellbook.xml
 Frames\Talents.xml
-
