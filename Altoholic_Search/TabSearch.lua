@@ -16,7 +16,12 @@ local ns = addon.Tabs.Search		-- ns = namespace
 
 local currentClass
 local currentSubClass
-
+local function _GetAuctionItemSubClasses(itemClass)
+	if type(C_AuctionHouse) ~= type({}) then
+		return {GetAuctionItemSubClasses(itemClass)}
+	end
+	return C_AuctionHouse.GetAuctionItemSubClasses(itemClass)
+end
 -- from Blizzard_AuctionData.lua & LuaEnum.lua
 -- Note : review this later on, I suspect Blizzard will change this again
 local categories = {
@@ -33,7 +38,7 @@ local categories = {
 			LE_ITEM_WEAPON_FISHINGPOLE,
 		},
 		--]]
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_WEAPON or Enum.ItemClass.Weapon),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_WEAPON or Enum.ItemClass.Weapon),
 		isCollapsed = true,
 	},
 	{
@@ -45,67 +50,71 @@ local categories = {
 			LE_ITEM_ARMOR_GENERIC, LE_ITEM_ARMOR_SHIELD, LE_ITEM_ARMOR_COSMETIC,
 		},
 		--]]
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_ARMOR or Enum.ItemClass.Armor),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_ARMOR or Enum.ItemClass.Armor),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_CONTAINERS,
 		class = LE_ITEM_CLASS_CONTAINER or Enum.ItemClass.Container,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_CONTAINER or Enum.ItemClass.Container),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_CONTAINER or Enum.ItemClass.Container),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_GEMS,
 		class = LE_ITEM_CLASS_GEM or Enum.ItemClass.Gem,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_GEM or Enum.ItemClass.Gem),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_GEM or Enum.ItemClass.Gem),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_ITEM_ENHANCEMENT,
 		class = LE_ITEM_CLASS_ITEM_ENHANCEMENT or Enum.ItemClass.ItemEnhancement,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_ITEM_ENHANCEMENT or Enum.ItemClass.ItemEnhancement),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_ITEM_ENHANCEMENT or Enum.ItemClass.ItemEnhancement),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_CONSUMABLES,
 		class = LE_ITEM_CLASS_CONSUMABLE or Enum.ItemClass.Consumable,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_CONSUMABLE or Enum.ItemClass.Consumable),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_CONSUMABLE or Enum.ItemClass.Consumable),
 		isCollapsed = true,
 	},
+	--[[
 	{
 		name = AUCTION_CATEGORY_GLYPHS,
 		class = LE_ITEM_CLASS_GLYPH or Enum.ItemClass.Glyph,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_GLYPH or Enum.ItemClass.Glyph),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_GLYPH or Enum.ItemClass.Glyph),
 		isCollapsed = true,
 	},
+	]]
 	{
 		name = AUCTION_CATEGORY_TRADE_GOODS,
 		class = LE_ITEM_CLASS_TRADEGOODS or Enum.ItemClass.Tradegoods,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_TRADEGOODS or Enum.ItemClass.Tradegoods) or {},
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_TRADEGOODS or Enum.ItemClass.Tradegoods) or {},
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_RECIPES,
 		class = LE_ITEM_CLASS_RECIPE or Enum.ItemClass.Recipe,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_RECIPE or Enum.ItemClass.Recipe),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_RECIPE or Enum.ItemClass.Recipe),
 		isCollapsed = true,
 	},
+	--[[
 	{
 		name = AUCTION_CATEGORY_BATTLE_PETS,
 		class = LE_ITEM_CLASS_BATTLEPET or Enum.ItemClass.Battlepet,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_BATTLEPET or Enum.ItemClass.Battlepet),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_BATTLEPET or Enum.ItemClass.Battlepet),
 		isCollapsed = true,
 	},
+	--]]
 	{
 		name = AUCTION_CATEGORY_QUEST_ITEMS,
 		class = LE_ITEM_CLASS_QUESTITEM or Enum.ItemClass.Questitem,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_QUESTITEM or Enum.ItemClass.Questitem),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_QUESTITEM or Enum.ItemClass.Questitem),
 		isCollapsed = true,
 	},
 	{
 		name = AUCTION_CATEGORY_MISCELLANEOUS,
 		class = LE_ITEM_CLASS_MISCELLANEOUS or Enum.ItemClass.Miscellaneous,
-		subClasses = C_AuctionHouse.GetAuctionItemSubClasses(LE_ITEM_CLASS_MISCELLANEOUS or Enum.ItemClass.Miscellaneous),
+		subClasses = _GetAuctionItemSubClasses(LE_ITEM_CLASS_MISCELLANEOUS or Enum.ItemClass.Miscellaneous),
 		isCollapsed = true,
 	},
 }
