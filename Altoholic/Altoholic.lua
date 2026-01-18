@@ -48,7 +48,7 @@ local function BuildUnsafeItemList()
 	-- In the previous game session, the list has been populated with items id's that were originally unsafe and for which a query was sent to the server.
 	-- In this session, a getiteminfo on these id's will keep returning a nil if the item is really unsafe, so this method will get rid of the id's that are now valid.
 	local TmpUnsafe = {}		-- create a temporary table with confirmed unsafe id's
-	local unsafeItems = Altoholic_UI_Options.unsafeItems
+	local unsafeItems = Altoholic_UI_Options.unsafeItems or {}
 	
 	for _, itemID in pairs(unsafeItems) do
 		local itemName = C_Item.GetItemInfo(itemID)
@@ -317,8 +317,14 @@ AddonFactory:OnPlayerLogin(function()
 	-- hook the Merchant update function
 	Orig_MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfo
 	MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfoHook
-	
-	AltoholicFrameName:SetText(format("Altoholic |cFF00FF98Mists of Pandaria|r Classic %s%s|r by %sThaoky", colors.white, addon.Version, colors.classMage))
+	local expansionRelease = {
+		[LE_EXPANSION_CLASSIC] = "Classic",
+		[LE_EXPANSION_BURNING_CRUSADE] = "|cFFD6EB00The Burning Crusade|r Anniversary",
+		[LE_EXPANSION_CATACLYSM] = "|cFFFF7F00Cataclysm|r Classic",
+		[LE_EXPANSION_MISTS_OF_PANDARIA] = "|cFF00FF98Mists of Pandaria|r Classic",
+	}
+	--AltoholicFrameName:SetText(format("Altoholic |cFFD6EB00The Burning Crusade|r Anniversary %s%s|r by %sThaoky", colors.white, addon.Version, colors.classMage))
+	AltoholicFrameName:SetText(format("Altoholic %s %s%s|r by %sThaoky", expansionRelease[LE_EXPANSION_LEVEL_CURRENT], colors.white, addon.Version, colors.classMage))
 
 	-- local realm = GetRealmName()
 	-- local player = UnitName("player")
