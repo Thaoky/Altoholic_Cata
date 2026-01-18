@@ -7,16 +7,21 @@ local LCI = LibStub("LibCraftInfo-1.0")
 local LCL = LibStub("LibCraftLevels-1.0")
 
 local ICON_QUESTIONMARK = "Interface\\RaidFrame\\ReadyCheck-Waiting"
-local isMists = LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MISTS_OF_PANDARIA
 
 local xPacks = {
 	EXPANSION_NAME0,	-- "Classic"
 	EXPANSION_NAME1,	-- "The Burning Crusade"
 	EXPANSION_NAME2,	-- "Wrath of the Lich King"
 	EXPANSION_NAME3,	-- "Cataclysm"
-	--EXPANSION_NAME4,	-- "Mists of Pandaria"
+	EXPANSION_NAME4,	-- "Mists of Pandaria"
 }
-if isMists then table.insert(xPacks, EXPANSION_NAME4) end
+
+-- Remove expansions that aren't valid
+for i = 1, #xPacks do
+	if i-1 > LE_EXPANSION_LEVEL_CURRENT then
+		xPacks[i] = nil
+	end
+end
 
 local OPTION_XPACK = "Tradeskills.CurrentXPack"
 local OPTION_TRADESKILL = "Tradeskills.CurrentTradeSkill"
