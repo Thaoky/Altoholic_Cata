@@ -27,7 +27,7 @@ local Factions = {
 		{	-- [1]
 			name = FACTION_ALLIANCE,	-- 469
 			{ name = DataStore:GetFactionName(69), icon = Texture("Achievement_Character_Nightelf_Female") },	-- "Darnassus"
-			{ name = DataStore:GetFactionName(930), icon = Texture("Achievement_Character_Draenei_Male") },	--  name = "Exodar"
+			--{ name = DataStore:GetFactionName(930), icon = Texture("Achievement_Character_Draenei_Male") },	--  name = "Exodar"
 			{ name = DataStore:GetFactionName(54), icon = Texture("INV_Misc_Head_Gnome_02") },	-- "Gnomeregan"
 			{ name = DataStore:GetFactionName(47), icon = Texture("Achievement_Character_Dwarf_Male") },		-- "Ironforge"
 			{ name = DataStore:GetFactionName(72), icon = Texture("INV_Misc_Head_Human_01") },		-- "Stormwind"
@@ -203,8 +203,15 @@ local Factions = {
 		}
 	},
 }
--- Remove the Classic Wildhammer Clan after the expansion
-if LE_EXPANSION_LEVEL_CURRENT ~= LE_EXPANSION_CLASSIC then
+-- Reduce the reputations down to the current expansion
+for i = 1, #Factions do
+	if i > LE_EXPANSION_LEVEL_CURRENT+1 then
+		Factions[i] = nil
+	end
+end
+-- Special handling for two factions
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_CLASSIC then
+	table.insert(Factions[1][1], 2, { name = DataStore:GetFactionName(930), icon = Texture("Achievement_Character_Draenei_Male") })	--  name = "Exodar"
 	table.remove(Factions[1][6], 14)
 end
 
@@ -503,7 +510,13 @@ local callbacks = {
 			title:Show()
 
 			local currentXPack, currentFactionGroup = GetOptions()
-			
+
+			-- Default to 1,1 if the XPack is past the current one (copied options?)
+			if currentXPack > LE_EXPANSION_LEVEL_CURRENT then
+				SetOptions(1, 1)
+				currentXPack, currentFactionGroup = GetOptions()
+			end
+
 			if (currentXPack ~= CAT_ALLINONE) then
 				currentDDMText = Factions[currentXPack][currentFactionGroup].name
 			else
@@ -518,3 +531,4 @@ local callbacks = {
 }
 
 AltoholicTabGrids:RegisterGrid(2, callbacks)
+
