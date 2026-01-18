@@ -382,8 +382,10 @@ local SPELL_ID_FISHING = 7732			-- do not use 7733, it's "Artisan Fishing", not 
 addon.TradeSkills = {
 	Recipes = {},
 	-- spell IDs in alphabetical order (english), primary then secondary
-	spellIDs = { 2259, 3100, 7411, 4036, 45357, 25229, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
-	firstSecondarySkillIndex = 12, -- index of the first secondary profession in the table
+	--spellIDs = { 2259, 3100, 7411, 4036, 45357, 25229, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
+	--firstSecondarySkillIndex = 12, -- index of the first secondary profession in the table
+	spellIDs = { 2259, 3100, 7411, 4036, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
+	firstSecondarySkillIndex = 10, -- index of the first secondary profession in the table
 	
 	--AccountSummaryFiltersSpellIDs = { 2259, 3100, 7411, 4036, 45357, 25229, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
 	AccountSummaryFiltersSpellIDs = { 2259, 3100, 7411, 4036, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
@@ -408,11 +410,15 @@ addon.TradeSkills = {
 	},
 }
 if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_CLASSIC then
+	table.insert(addon.TradeSkills.spellIDs, 5, 25229)
 	table.insert(addon.TradeSkills.AccountSummaryFiltersSpellIDs, 5, 25229)
 	addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex = addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex + 1
+	addon.TradeSkills.firstSecondarySkillIndex = addon.TradeSkills.firstSecondarySkillIndex + 1
 	if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_BURNING_CRUSADE then
+		table.insert(addon.TradeSkills.spellIDs, 5, 45357)
 		table.insert(addon.TradeSkills.AccountSummaryFiltersSpellIDs, 5, 45357)
 		addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex = addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex + 1
+		addon.TradeSkills.firstSecondarySkillIndex = addon.TradeSkills.firstSecondarySkillIndex + 1
 	end
 end
 
