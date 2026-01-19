@@ -97,10 +97,14 @@ addon:Controller("AltoholicUI.TabGrids", { "AltoholicUI.ColumnOptions", function
 		UpdateMenuIcons = function(frame)
 			frame.Equipment:EnableIcon()
 			frame.Factions:EnableIcon()
-			frame.Tokens:EnableIcon()
 			frame.Attunements:EnableIcon()
 			frame.Dailies:EnableIcon()
 			frame.Dungeons:EnableIcon()
+			if DataStore:IsModuleEnabled("DataStore_Currencies") then
+				frame.Tokens:EnableIcon()
+			else
+				frame.Tokens:DisableIcon()
+			end
 		end,
 		SetStatus = function(frame, text)
 			frame.Status:SetText(text or "")
