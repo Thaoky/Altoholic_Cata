@@ -105,18 +105,24 @@ end
 
 local function LevelIcon_Initialize(frame, level)
 	local option = options[OPTION_LEVELS]
-	
+	local maxLevel = GetMaxLevelForExpansionLevel(GetExpansionLevel())
 	frame:AddTitle(L["FILTER_LEVELS"])
-	frame:AddButtonWithArgs(ALL, 1, OnLevelFilterChange, 1, 85, (option == 1))
+	frame:AddButtonWithArgs(ALL, 1, OnLevelFilterChange, 1, maxLevel, (option == 1))
 	frame:AddTitle()
 	frame:AddButtonWithArgs("1-19", 2, OnLevelFilterChange, 1, 19, (option == 2))
 	frame:AddButtonWithArgs("20-39", 3, OnLevelFilterChange, 20, 39, (option == 3))
 	frame:AddButtonWithArgs("40-59", 4, OnLevelFilterChange, 40, 59, (option == 4))
 	frame:AddButtonWithArgs("60-69", 5, OnLevelFilterChange, 60, 69, (option == 5))
-	frame:AddButtonWithArgs("70-79", 6, OnLevelFilterChange, 70, 79, (option == 6))
-	frame:AddButtonWithArgs("80-84", 7, OnLevelFilterChange, 80, 84, (option == 7))
-	frame:AddButtonWithArgs("85-89", 8, OnLevelFilterChange, 85, 89, (option == 8))
-	frame:AddButtonWithArgs("90", 9, OnLevelFilterChange, 90, 90, (option == 9))
+	if maxLevel > 70 then
+		frame:AddButtonWithArgs("70-79", 6, OnLevelFilterChange, 70, 79, (option == 6))
+	end
+	if maxLevel > 80 then
+		frame:AddButtonWithArgs("80-84", 7, OnLevelFilterChange, 80, 84, (option == 7))
+	end
+	if maxLevel > 85 then
+		frame:AddButtonWithArgs("85-89", 8, OnLevelFilterChange, 85, 89, (option == 8))
+	end
+	frame:AddButtonWithArgs(maxLevel, 10, OnLevelFilterChange, maxLevel, maxLevel, (option == 10))
 	frame:AddCloseMenu()
 end
 
