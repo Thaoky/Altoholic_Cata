@@ -140,7 +140,7 @@ local Factions = {
 			{ name = DataStore:GetFactionName(1085), icon = Texture("Achievement_Zone_BoreanTundra_03") },		-- "Warsong Offensive" 
 		},
 		{	-- [4]
-			name = C_Map.GetMapInfo(119).name,	-- "Sholazar Basin"
+			name = C_Map.GetMapInfo(119) and C_Map.GetMapInfo(119).name or "",	-- "Sholazar Basin"
 			{ name = DataStore:GetFactionName(1104), icon = Texture("Ability_Mount_WhiteDireWolf") },		-- "Frenzyheart Tribe" 
 			{ name = DataStore:GetFactionName(1105), icon = Texture("Achievement_Reputation_MurlocOracle") },	-- "The Oracles" 
 		},		
@@ -531,4 +531,5 @@ local callbacks = {
 }
 
 AltoholicTabGrids:RegisterGrid(2, callbacks)
+
 
