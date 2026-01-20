@@ -1,0 +1,167 @@
+name: Local Build
+
+on:
+  #push:
+    #branches: [ "main", "latest" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      LOCAL_BUILD:
+        description: 'Local build'
+        type: boolean
+        required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      ADDON_VERSION: ${{ steps.extract_version.outputs.ADDON_VERSION }}
+      ZIP_FILE_NAME: ${{ steps.generate_zip_file.outputs.ZIP_FILE_NAME}}
+    # specify the environment variables used by the packager, matching the secrets from the project on GitHub
+    env:
+      DISPLAY_NAME: ""
+      ZIP_FILE_NAME: ""
+      ADDON_VERSION: ""
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      - name: Get branch name
+        run: |
+          echo "Branch name: ${GITHUB_REF##*/} (${{ github.ref_name }})"
+
+      - name: Copy subfolders from DataStore repositories
+        run: |
+          echo "Current directory: ${PWD}"
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/AddonFactory.git temp
+          mv temp/AddonFactory .
+          rm -rf temp
+
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore.git temp
+          mv temp/DataStore .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Achievements.git temp
+          mv temp/DataStore_Achievements .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Agenda.git temp
+          mv temp/DataStore_Agenda .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Auctions.git temp
+          mv temp/DataStore_Auctions .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Characters.git temp
+          mv temp/DataStore_Characters .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Containers.git temp
+          mv temp/DataStore_Containers .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Crafts.git temp
+          mv temp/DataStore_Crafts .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Currencies.git temp
+          mv temp/DataStore_Currencies .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Inventory.git temp
+          mv temp/DataStore_Inventory .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Mails.git temp
+          mv temp/DataStore_Mails .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Quests.git temp
+          mv temp/DataStore_Quests .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Reputations.git temp
+          mv temp/DataStore_Reputations .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Spells.git temp
+          mv temp/DataStore_Spells .
+          rm -rf temp
+          
+          git clone -b ${{ github.ref_name }} https://github.com/${{ github.repository_owner }}/DataStore_Talents.git temp
+          mv temp/DataStore_Talents .
+          rm -rf temp
+          
+      - name: Extract Version
+        id: extract_version
+        run: |
+          ADDON_VERSION=$(grep -oP "## Version: \K[^\r ]+" Altoholic/Altoholic.toc)
+          echo "Version found: $ADDON_VERSION"
+          echo "ADDON_VERSION=$ADDON_VERSION" >> $GITHUB_ENV
+          echo "ADDON_VERSION=$ADDON_VERSION" >> $GITHUB_OUTPUT
+
+      # Runs a single command using the runners shell
+      - name: Generate Zip file
+        id: generate_zip_file
+        run: |
+          # Combine date and value to form the zip file name
+          DISPLAY_NAME="Altoholic_v$ADDON_VERSION" 
+          ZIP_FILE_NAME="$DISPLAY_NAME.zip"
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_OUTPUT
+
+          echo "Current directory: ${PWD}"
+          echo "$(ls)"
+          zip -q -r -9 "$ZIP_FILE_NAME" * -x README.md -x .github
+          echo "File name: $ZIP_FILE_NAME"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ZIP_FILE_NAME }}
+          path: ./${{ env.ZIP_FILE_NAME }}
+
+  build_local:
+    if: ${{ github.event.inputs.LOCAL_BUILD == 'true' }}
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      #image: ubuntu:latest
+      image: node
+      volumes:
+        # Bind directory to allow saving of output
+        - /tmp/altoholic:/tmp/altoholic
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ needs.build.outputs.ZIP_FILE_NAME }}
+      - name: Copy zip to local container space
+        run: cp "${{ needs.build.outputs.ZIP_FILE_NAME }}" /tmp/altoholic/
+
+  release:
+    if: ${{ github.event.inputs.LOCAL_BUILD == 'false' }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.ZIP_FILE_NAME }}
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          files: Altoholic*.zip
+          tag_name: ${{ needs.build.outputs.ADDON_VERSION }}
+          draft: false
+          prerelease: true
+      
