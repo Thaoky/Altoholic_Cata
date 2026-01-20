@@ -6,6 +6,7 @@ local L = AddonFactory:GetLocale(addonName)
 
 local CHARS_PER_FRAME = 12
 local gridCallbacks = {}
+local hasCurrencies = LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_BURNING_CRUSADE
 
 addon:Controller("AltoholicUI.TabGrids", { "AltoholicUI.ColumnOptions", function(Options)
 	return {
@@ -100,7 +101,7 @@ addon:Controller("AltoholicUI.TabGrids", { "AltoholicUI.ColumnOptions", function
 			frame.Attunements:EnableIcon()
 			frame.Dailies:EnableIcon()
 			frame.Dungeons:EnableIcon()
-			if DataStore:IsModuleEnabled("DataStore_Currencies") then
+			if hasCurrencies then
 				frame.Tokens:EnableIcon()
 			else
 				frame.Tokens:DisableIcon()
