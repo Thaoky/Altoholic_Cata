@@ -1,4 +1,4 @@
-## Interface: 50503, 20505
+## Interface: 50503, 20505, 11508
 ## Title: Altoholic Mists of Pandaria Classic by |cFF69CCF0Thaoky|r
 ## Title-zhCN: |cffeedd99 [物品] |r: 全角色统计 Altoholic
 ## IconTexture: Interface\Icons\inv_drink_13

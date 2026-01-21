@@ -1,4 +1,4 @@
-## Interface: 50503, 20505
+## Interface: 50503, 20505, 11508
 ## Title: Altoholic_Search
 ## Notes: Altoholic's Search UI
 ## Author: Thaoky (EU-Marécages de Zangar)
