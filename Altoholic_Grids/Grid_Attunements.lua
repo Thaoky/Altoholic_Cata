@@ -17,18 +17,24 @@ local raidDungeons = {
 	{ name = C_Map.GetAreaInfo(3456), icon = "INV_Armor_Shield_Naxxramas_D_01", questIDs = "9121,9122,9123" },
 	
 	-- Karazhan 
-	{ name = C_Map.GetAreaInfo(2562), icon = "inv_staff_13", questIDs = "9837" },
+	--{ name = C_Map.GetAreaInfo(2562), icon = "inv_staff_13", questIDs = "9837" },
 	
 	-- Serpentshrine Cavern 
-	{ name = C_Map.GetAreaInfo(3607), icon = "spell_nature_poisoncleansingtotem", questIDs = "13431" },
+	--{ name = C_Map.GetAreaInfo(3607), icon = "spell_nature_poisoncleansingtotem", questIDs = "13431" },
 	
 	-- CoT Mount Hyjal
-	{ name = C_Map.GetAreaInfo(3606), icon = "ability_mount_whitetiger", questIDs = "10445" },
+	--{ name = C_Map.GetAreaInfo(3606), icon = "ability_mount_whitetiger", questIDs = "10445" },
 	
 	-- The Black Temple
-	{ name = C_Map.GetAreaInfo(3840), icon = "inv_weapon_halberd16", questIDs = "10985" },
-	
+	--{ name = C_Map.GetAreaInfo(3840), icon = "inv_weapon_halberd16", questIDs = "10985" },
 }
+
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_CLASSIC then
+	table.insert(raidDungeons, { name = C_Map.GetAreaInfo(2562), icon = "inv_staff_13", questIDs = "9837" }) -- Karazhan
+	table.insert(raidDungeons, { name = C_Map.GetAreaInfo(3607), icon = "spell_nature_poisoncleansingtotem", questIDs = "13431" }) -- Serpentshrine Cavern
+	table.insert(raidDungeons, { name = C_Map.GetAreaInfo(3606), icon = "ability_mount_whitetiger", questIDs = "10445" }) -- CoT Mount Hyjal
+	table.insert(raidDungeons, { name = C_Map.GetAreaInfo(3840), icon = "inv_weapon_halberd16", questIDs = "10985" }) -- The Black Temple
+end
 
 local callbacks = {
 	OnUpdate = function() end,
