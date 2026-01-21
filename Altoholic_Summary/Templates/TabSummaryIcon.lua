@@ -112,7 +112,9 @@ local function LevelIcon_Initialize(frame, level)
 	frame:AddButtonWithArgs("1-19", 2, OnLevelFilterChange, 1, 19, (option == 2))
 	frame:AddButtonWithArgs("20-39", 3, OnLevelFilterChange, 20, 39, (option == 3))
 	frame:AddButtonWithArgs("40-59", 4, OnLevelFilterChange, 40, 59, (option == 4))
-	frame:AddButtonWithArgs("60-69", 5, OnLevelFilterChange, 60, 69, (option == 5))
+	if maxLevel > 60 then
+		frame:AddButtonWithArgs("60-69", 5, OnLevelFilterChange, 60, 69, (option == 5))
+	end
 	if maxLevel > 70 then
 		frame:AddButtonWithArgs("70-79", 6, OnLevelFilterChange, 70, 79, (option == 6))
 	end
