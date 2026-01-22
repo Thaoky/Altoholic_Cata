@@ -36,6 +36,7 @@ local dungeonKeys = {
 	-- Crescent Key, Dire Maul
 	{ itemID = 18249, area = C_Map.GetAreaInfo(2557), level = "58-60", icon = "inv_misc_key_10" },
 	
+	--[[
 	-- *** Burning Crusade ***
 	-- Flamewrought Key, Hellfire Citadel (Alliance)
 	{ itemID = 30622, area = C_Map.GetAreaInfo(3545), level = "70", icon = "inv_misc_key_13", isBC = true },
@@ -53,8 +54,16 @@ local dungeonKeys = {
 
 	-- Key of Time, Caverns of Time
 	{ itemID = 30635, area = C_Map.GetAreaInfo(1941), level = "70", icon = "inv_misc_key_04", isBC = true },
-
+	]]
 }
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_CLASSIC then
+	table.insert(dungeonKeys, { itemID = 30622, area = C_Map.GetAreaInfo(3545), level = "70", icon = "inv_misc_key_13", isBC = true }) -- Flamewrought Key, Hellfire Citadel (Alliance)
+	table.insert(dungeonKeys, { itemID = 30637, area = C_Map.GetAreaInfo(3545), level = "70", icon = "inv_misc_key_13", isBC = true }) -- Flamewrought Key, Hellfire Citadel (Horde)
+	table.insert(dungeonKeys, { itemID = 30623, area = C_Map.GetAreaInfo(3905), level = "70", icon = "inv_misc_key_13", isBC = true }) -- Reservoir Key, Coilfang Reservoir
+	table.insert(dungeonKeys, { itemID = 30633, area = C_Map.GetAreaInfo(3688), level = "70", icon = "inv_misc_key_11", isBC = true }) -- Auchenai Key, Auchindoun
+	table.insert(dungeonKeys, { itemID = 30634, area = C_Map.GetAreaInfo(3842), level = "70", icon = "inv_misc_key_09", isBC = true }) -- Warpforged Key, Tempest Keep
+	table.insert(dungeonKeys, { itemID = 30635, area = C_Map.GetAreaInfo(1941), level = "70", icon = "inv_misc_key_04", isBC = true }) -- Key of Time, Caverns of Time
+end
 
 local callbacks = {
 	OnUpdate = function() end,
