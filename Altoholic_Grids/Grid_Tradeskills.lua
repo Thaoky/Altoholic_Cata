@@ -25,7 +25,7 @@ end
 
 local OPTION_XPACK = "Tradeskills.CurrentXPack"
 local OPTION_TRADESKILL = "Tradeskills.CurrentTradeSkill"
-
+local usesItemID = LE_EXPANSION_LEVEL_CURRENT <= LE_EXPANSION_BURNING_CRUSADE
 local currentDDMText
 local currentItemID
 local currentList
@@ -134,7 +134,7 @@ local callbacks = {
 			local currentXPack = options[OPTION_XPACK]
 			local currentTradeSkill = options[OPTION_TRADESKILL]
 			local tradeskills = addon.TradeSkills.spellIDs
-			
+
 			currentList = LCI:GetProfessionCraftList(tradeskills[currentTradeSkill], currentXPack)
 			if not currentList.isSorted then
 				table.sort(currentList, SortByCraftLevel)
@@ -207,11 +207,13 @@ local callbacks = {
 					-- button.IconBorder:Show()
 				-- end
 				
-				-- if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then
-				-- Search on the item ID, not the spellID, it's not available when scanning professions !
-				--if DataStore:IsCraftKnown(profession, currentItemID) then
 				--if DataStore:IsCraftKnown(profession, LCI:GetCraftResultItem(currentList[dataRowID])) then
-				if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then
+				--if DataStore:IsCraftKnown(profession, LCI:GetCraftSourceItem(currentList[dataRowID])) then
+				--if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then -- original that works for everything except for Vanilla
+
+				-- Fix the spellID vs itemID issue between versions
+				local craftItem = usesItemID and LCI:GetCraftResultItem(currentList[dataRowID]) or currentList[dataRowID]
+				if DataStore:IsCraftKnown(profession, craftItem) then
 					vc = 1.0
 					text = icons.ready
 				else
