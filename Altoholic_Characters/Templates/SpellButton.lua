@@ -5,10 +5,14 @@ addon:Controller("AltoholicUI.SpellButton", {
 	EnableIcon = function(frame)
 		-- frame:Enable()
 		frame.Icon:SetDesaturated(false)
+		frame.SpellName:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+		frame.SubSpellName:SetTextColor(0.50, 0.25, 0)
 	end,
 	DisableIcon = function(frame)
 		-- frame:Disable()
 		frame.Icon:SetDesaturated(true)
+		frame.SpellName:SetTextColor(0.6, 0.6, 0.6)
+		frame.SubSpellName:SetTextColor(0.6, 0.6, 0.6)
 	end,
 	SetSpell = function(frame, spellID, rank)
 		if not spellID then return end
