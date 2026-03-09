@@ -1,13 +1,27 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local L = AddonFactory:GetLocale(addonName)
+local recipeIsSpell = (LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_WRATH_OF_THE_LICH_KING)
+
+-- *** Utility functions ***
+local function IsEnchanting(profession)
+	return (profession == GetSpellInfo(7411))
+end
 
 addon:Controller("AltoholicUI.RecipeRow", {
 	Update = function(frame, profession, recipeID, color)
+		local maxMade, craftedItemID, itemName, itemLink, itemRarity, spellLink, spellIcon
+		maxMade = 0
 
 		-- ** set the crafted item **
-		local maxMade, craftedItemID = DataStore:GetCraftResultItem(recipeID)
-		local itemName, itemLink, itemRarity, spellLink, spellIcon
+		if recipeIsSpell then
+			maxMade, craftedItemID = DataStore:GetCraftResultItem(recipeID)
+		else
+			-- Handle pre-Lich King crafting database
+			if not IsEnchanting(profession) then
+				craftedItemID = C_Item.GetItemInfoInstant(recipeID)
+			end
+		end
 
 		if craftedItemID then
 			frame.CraftedItem:SetIcon(C_Item.GetItemIconByID(craftedItemID))
@@ -39,8 +53,14 @@ addon:Controller("AltoholicUI.RecipeRow", {
 
 		-- ** set the recipe link **
 		if recipeID then
+			local recipeText, spellInfo
 			local link = addon:GetRecipeLink(recipeID, profession, nil)
-			local recipeText =  GetSpellInfo(recipeID) or L["N/A"]
+			if recipeIsSpell or IsEnchanting(profession) then
+				spellInfo = C_Spell.GetSpellInfo(recipeID)
+				recipeText = spellInfo and spellInfo.name or L["N/A"]
+			else
+				recipeText = itemName or L["N/A"]
+			end
 
 			-- Set the resulting item color IF it makes an item (Enchanting mostly?)
 			if itemName then
@@ -49,7 +69,9 @@ addon:Controller("AltoholicUI.RecipeRow", {
 			end
 
 			frame.RecipeLink.Text:SetText(recipeText)
-			frame.RecipeLink.link = link
+			if spellInfo then
+				frame.RecipeLink.link = link
+			end
 		else
 			-- this should NEVER happen, like NEVER-EVER-ER !!
 			frame.RecipeLink.Text:SetText(L["N/A"])
