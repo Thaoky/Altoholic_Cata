@@ -498,7 +498,9 @@ end
 
 function addon:GetRecipeLink(spellID, profession, color)
 	color = color or "|cffffd000"
-	local name = GetSpellInfo(spellID) or ""
+	local spellInfo = C_Spell.GetSpellInfo(spellID)
+	local name = spellInfo and spellInfo.name or ""
+	--local name = GetSpellInfo(spellID) or ""
 	-- addon:Print(format("%s|Henchant:%s|h[%s: %s]|h|r", color, spellID, profession, name)) --debug
 
 	return format("%s|Henchant:%s|h[%s: %s]|h|r", color, spellID, profession, name)
