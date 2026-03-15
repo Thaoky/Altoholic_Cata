@@ -983,11 +983,11 @@ columns["Prof1"] = {
 	Width = 70,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetProfession1Rank(character)
+			local rank = DataStore:GetProfession1Rank(character) or 0
 			local name = DataStore:GetProfession1Name(character)
 			local spellID = DataStore:GetProfessionSpellID(name)
 			local icon = spellID and Formatter.Texture18(addon:GetSpellIcon(spellID)) .. " " or ""
-			
+
 			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Profession1, true) end,
@@ -1008,7 +1008,7 @@ columns["Prof2"] = {
 	Width = 70,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetProfession2Rank(character)
+			local rank = DataStore:GetProfession2Rank(character) or 0
 			local name = DataStore:GetProfession2Name(character)
 			local spellID = DataStore:GetProfessionSpellID(name)
 			local icon = spellID and Formatter.Texture18(addon:GetSpellIcon(spellID)) .. " " or ""
@@ -1033,7 +1033,7 @@ columns["ProfCooking"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetCookingRank(character)
+			local rank = DataStore:GetCookingRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Cooking, true) end,
@@ -1054,7 +1054,7 @@ columns["ProfFirstAid"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetFirstAidRank(character)
+			local rank = DataStore:GetFirstAidRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.FirstAid, true) end,
@@ -1075,7 +1075,7 @@ columns["ProfFishing"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetFishingRank(character)
+			local rank = DataStore:GetFishingRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Fishing, true) end,
@@ -1096,7 +1096,7 @@ columns["ProfArchaeology"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetArchaeologyRank(character)
+			local rank = DataStore:GetArchaeologyRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Archaeology, true) end,
