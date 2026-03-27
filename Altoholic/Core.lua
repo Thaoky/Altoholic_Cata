@@ -300,9 +300,11 @@ AddonFactory:OnAddonLoaded(addonName, function()
 		local timeToNext = Altoholic_UI_Options.Mail.TimeToNextWarning
 		local now = time()
 
+		----[[ Disable when debugging
 		if (now - lastWarning) < (timeToNext * 3600) then	-- has enough time passed ?
 			return		-- no ? exit !
 		end
+		--]]
 
 		AltoMessageBox:SetHeight(130)
 		AltoMessageBox.Text:SetHeight(60)
@@ -314,6 +316,11 @@ AddonFactory:OnAddonLoaded(addonName, function()
 			-- On Yes
 			function()
 				AltoholicFrame:Show()
+
+				-- This is not the optimal way to do this. It should move to using AddonFactory controller eventually
+				PanelTemplates_SetTab(AltoholicFrame, 1)
+				AltoholicTabSummary.MenuItem4:Click()
+
 				--[[ Disable switching to a tab for now
 				AltoholicFrame:SwitchToTab("Summary")
 				
