@@ -1,7 +1,7 @@
 local addonName = "Altoholic"
 local addon = _G[addonName]
 local L = AddonFactory:GetLocale(addonName)
-local recipeIsSpell = (LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_WRATH_OF_THE_LICH_KING)
+local recipeIsSpell = (LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_BURNING_CRUSADE)
 
 -- *** Utility functions ***
 local function IsEnchanting(profession)
