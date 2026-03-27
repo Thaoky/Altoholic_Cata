@@ -335,9 +335,15 @@ AddonFactory:OnAddonLoaded(addonName, function()
 	end)
 	
 	addon:ListenTo("DATASTORE_AUCTIONS_NOT_CHECKED_SINCE", function(event, character, charID, days, threshold)
+		local maxAuctionDays, maxMailboxDays = 2, 30
+		local maxDayToWarn = maxAuctionDays + maxMailboxDays -- 2 for longest auction plus 30 for mail
 		if days >= threshold then
+		--if days >= threshold and days <= (maxDayToWarn) then -- Above the check threshold and below the max time to be able to retrieve from mail
 			local key = DataStore:GetCharacterKey(charID)
-			addon:Print(format(L["AUCTION_HOUSE_NOT_VISITED_WARNING"], DataStore:GetColoredCharacterName(key), days))
+			local characterLastMailVisitDays = (time() - DataStore:GetMailboxLastVisit(key)) / (60 * 60 * 24)
+			if characterLastMailVisitDays >= maxDayToWarn then -- the character checked the mailbox, no need to warn about AH/Mail
+				addon:Print(format(L["AUCTION_HOUSE_NOT_VISITED_WARNING"], DataStore:GetColoredCharacterName(key), days))
+			end
 		end
 	end)
 	
