@@ -822,3 +822,5 @@ L[ [=[Your confirmation will still be required any time someone requests your in
 L["Zelemar the Wrathful"] = "진노의 젤레마르"
 L["Zone"] = "지역"
 
+-- ** Settings / Altoholic / Calendar **
+L["Week starts on Monday"] = "한 주 시작을 월요일부터"

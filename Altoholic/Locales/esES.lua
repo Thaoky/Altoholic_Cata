@@ -749,3 +749,11 @@ L[ [=[Your confirmation will still be required any time someone requests your in
 L["Zelemar the Wrathful"] = "Zelemar El Colérico"
 L["Zone"] = "Zona"
 
+-- ** Settings / Altoholic / Calendar **
+L["Calendar Options"] = "Opciones de calendario"
+L["Profession Cooldowns"] = "Reutilización de profesión"
+L["Dungeon Resets"] = "Reinicios de mazmorras"
+L["Calendar Events"] = "Eventos del calendario"
+L["Item Timers"] = "Temporizadores de items"
+L["Week starts on Monday"] = "La semana empieza el Lunes"
+L["Enable warnings"] = "Activar advertencias"
