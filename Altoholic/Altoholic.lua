@@ -634,7 +634,8 @@ function addon:GetRecipeLevel(link, tooltip)
 	
 	local tooltipName = tooltip:GetName()
 	
-	for i = (tooltip:NumLines() - 1), 2, -1 do			-- parse all tooltip lines, from last to second
+	--for i = (tooltip:NumLines() - 1), 2, -1 do			-- parse all tooltip lines, from last to second
+	for i = 2, tooltip:NumLines() do	-- parse starting at the second line, counting up (so we don't accidentally get Set Bonus information)
 		local tooltipText = _G[format("%sTextLeft%d", tooltipName, i)]:GetText()
 		
 		if tooltipText then
