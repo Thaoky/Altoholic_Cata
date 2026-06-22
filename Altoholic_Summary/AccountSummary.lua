@@ -569,12 +569,12 @@ columns["RestXP"] = {
 		end,
 	headerOnClick = function() SortView("RestXP") end,
 	headerSort = DataStore.GetRestXPRate,
-	
+
 	-- Content
 	Width = 65,
 	JustifyH = "CENTER",
 	GetText = function(character) 
-		if DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel] then
+		if DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] then
 			return colors.white .. "0%"	-- show 0% at max level
 		end
 
@@ -588,7 +588,7 @@ columns["RestXP"] = {
 
 			local restXP = DataStore:GetRestXP(character)
 			-- if not restXP or restXP == 0 then return end
-			if not restXP or DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel] then return end
+			if not restXP or DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] then return end
 
 			local tt = AltoTooltip
 			tt:ClearLines()
