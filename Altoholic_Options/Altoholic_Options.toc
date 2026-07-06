@@ -1,4 +1,4 @@
-﻿## Interface: 50502
+﻿## Interface: 50504, 20505, 11508
 ## Title: Altoholic_Options
 ## Notes: Altoholic's Options UI
 ## Author: Thaoky (EU-Marécages de Zangar)
@@ -9,4 +9,5 @@
 
 Templates\UITemplates.xml
 TabOptions.xml
+
 

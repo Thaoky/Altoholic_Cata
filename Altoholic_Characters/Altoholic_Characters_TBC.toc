@@ -1,4 +1,4 @@
-## Interface: 50504, 20505, 11508
+## Interface: 20505
 ## Title: Altoholic_Characters
 ## IconTexture: Interface\Icons\inv_drink_13
 
@@ -9,6 +9,9 @@
 ## SavedVariables: Altoholic_CharactersTab_Options
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
+
+# When the SpellBookFrame is fixed by Blizzard, this file can be deleted
+Templates\Blizzard\SpellBookFrame.xml
 
 Templates\UITemplates.xml
 TabCharacters.xml

@@ -17,7 +17,7 @@ local THIS_ACCOUNT = "Default"
 local currentAccount = THIS_ACCOUNT
 local currentRealm = GetRealmName()
 local currentAlt = UnitName("player")
-
+local questsIconAdjust = LE_EXPANSION_LEVEL_CURRENT <= LE_EXPANSION_BURNING_CRUSADE
 local SKILL_ANY = 0
 
 -- ** Icons Menus **
@@ -836,7 +836,9 @@ function ns:OnLoad()
 	local menuIcons = parent.MenuIcons
 	menuIcons.CharactersIcon.Icon:SetTexture(addon:GetCharacterIcon())
 	menuIcons.BagsIcon.Icon:SetTexture(bagIcon)
-	-- menuIcons.QuestsIcon.Icon:SetTexCoord(0, 0.75, 0, 0.75)
+	if questsIconAdjust then
+		menuIcons.QuestsIcon.Icon:SetTexCoord(0, 0.8, 0, 0.72)
+	end
 		
 	DataStore:ListenTo("DATASTORE_RECIPES_SCANNED", OnRecipesScanned)
 	DataStore:ListenTo("DATASTORE_QUESTLOG_SCANNED", OnQuestLogScanned)

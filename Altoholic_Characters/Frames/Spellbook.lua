@@ -16,13 +16,16 @@ addon:Controller("AltoholicUI.SpellbookPanel", {
 		local maxSpells = DataStore:GetNumSpells(character, currentSchool)
 		local offset = (currentPage-1) * SPELLS_PER_PAGE
 		local spellIndex = offset + 1
-		
+
 		local index = 1
 		while index <= SPELLS_PER_PAGE do
-			local spellID, rank = DataStore:GetSpellInfo(character, currentSchool, spellIndex)
+			local spellID, rank, spellType, offspecID = DataStore:GetSpellInfo(character, currentSchool, spellIndex)
 			
 			if spellID then
 				frame["SpellIcon" .. index]:SetSpell(spellID, rank)
+				if spellType == "FUTURESPELL" or (offspecID ~= 0 and offspecID ~= DataStore:GetSpecIndex(character)) then
+					frame["SpellIcon" .. index]:DisableIcon()
+				end
 				frame["SpellIcon" .. index]:Show()
 				index = index + 1
 			end

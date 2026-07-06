@@ -93,10 +93,252 @@
 			</Button>
 		</Frames>
 	</Frame>	
-	
-	
-	<Frame parentKey="Talents" parent="AltoholicTabCharacters" inherits="AltoDataPanelTemplate">
+
+	<Button name="AltoPlayerTalentButtonTemplate" virtual="true">
+		<Size x="190" y="50"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIconTexture" parentKey="icon">
+					<Size x="40" y="40"/>
+					<Anchors>
+						<Anchor point="LEFT" x="35" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK" textureSubLevel="1">
+				<Texture name="$parentSlot" inherits="Talent-SingleBorder" parentKey="Slot">
+					<Size x="41" y="40"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentIconTexture" x="-1" y="0"/>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT" parentKey="name">
+					<Size x="90" y="35"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIconTexture" relativePoint="RIGHT" x="10" y="0"/>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parentSelection" file="Interface\TalentFrame\talent-main" alphaMode="ADD" parentKey="knownSelection" hidden="true">
+					<Size x="190" y="51"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<TexCoords left="0.00390625" right="0.74609375" top="0.37304688" bottom="0.47265625"/>
+				</Texture>
+				<Texture file="Interface\TalentFrame\talent-main" alphaMode="ADD" parentKey="learnSelection" hidden="true">
+					<Size x="200" y="61"/>
+					<TexCoords left="0.00390625" right="0.78515625" top="0.25000000" bottom="0.36914063"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<!--
+		<HighlightTexture file="Interface\TalentFrame\talent-main" alphaMode="ADD" parentKey="highlight">
+			<Size x="200" y="61"/>
+			<TexCoords left="0.00390625" right="0.78515625" top="0.25000000" bottom="0.36914063"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</HighlightTexture>
+		-->
+		<Scripts>
+			<OnLoad>
+				--self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				--self:RegisterEvent("PREVIEW_TALENT_POINTS_CHANGED");
+				--self:RegisterEvent("PLAYER_TALENT_UPDATE");
+				--self:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnClick>
+				--PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+				--PlayerTalentFrameTalent_OnClick(self, button);
+			</OnClick>
+			<OnEvent>
+				--PlayerTalentFrameTalent_OnEvent(self);
+			</OnEvent>
+			<OnEnter>
+				if self.talentID then
+					GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+					GameTooltip:SetTalent(self.talentID)
+					GameTooltip:Show()
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip_Hide()
+			</OnLeave>
+			<OnDragStart>
+				--PlayerTalentFrameTalent_OnDrag(self);
+			</OnDragStart>
+			<OnReceiveDrag>
+				--PlayerTalentFrameTalent_OnDrag(self);
+			</OnReceiveDrag>
+		</Scripts>
+	</Button>
+
+	<Frame name="AltoTalentRowTemplate" virtual="true">
+		<Size x="627" y="50"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBg" file="Interface\TalentFrame\talent-horiz">
+					<Size x="0" y="49"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<TexCoords left="0.00000000" right="1.00000000" top="0.15625000" bottom="0.53906250"/>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture name="$parentLeftCap" file="Interface\TalentFrame\talent-main">
+					<Size x="34" y="56"/>
+					<Anchors>
+						<Anchor point="LEFT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0.140625" right="0.26953125" top="0.47656250" bottom="0.58593750"/>
+				</Texture>
+				<Texture name="$parentRightCap" file="Interface\TalentFrame\talent-main">
+					<Size x="34" y="56"/>
+					<Anchors>
+						<Anchor point="RIGHT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0.00390625" right="0.140625" top="0.47656250" bottom="0.58593750"/>
+				</Texture>
+				<Texture name="$parentSeparator1" file="Interface\TalentFrame\talent-main">
+					<Size x="68" y="56"/>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT" x="57" y="0"/>
+					</Anchors>
+					<TexCoords left="0.00390625" right="0.26953125" top="0.47656250" bottom="0.58593750"/>
+				</Texture>
+				<Texture name="$parentSeparator2" file="Interface\TalentFrame\talent-main">
+					<Size x="68" y="56"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentSeparator1" x="190" y="0"/>
+					</Anchors>
+					<TexCoords left="0.00390625" right="0.26953125" top="0.47656250" bottom="0.58593750"/>
+				</Texture>
+				<Texture name="$parentSeparator3" file="Interface\TalentFrame\talent-main">
+					<Size x="68" y="56"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentSeparator2" x="190" y="0"/>
+					</Anchors>
+					<TexCoords left="0.00390625" right="0.26953125" top="0.47656250" bottom="0.58593750"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLevel" inherits="GameFontNormalHuge" parentKey="level">
+					<Size x="0" y="0"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentLeftCap" relativePoint="RIGHT" x="-5" y="0"/>
+					</Anchors>
+				</FontString>
+				<Texture parentKey="TopLine" file="Interface\Common\talent-blue-glow" horizTile="true" hidden="true">					
+					<Size x="627" y = "16"/>
+					<Anchors>
+						<Anchor point="TOP" x="0" y="16"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.5"/>
+				</Texture>
+				<Texture parentKey="BottomLine" file="Interface\Common\talent-blue-glow" horizTile="true" hidden="true">					
+					<Size x="627" y = "16"/>
+					<Anchors>
+						<Anchor point="BOTTOM" x="0" y="-16"/>
+					</Anchors>
+					<TexCoords left="0" right="1" top="1" bottom="0"/>
+					<Color r="1" g="1" b="1" a="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
 		<Frames>
+		<Button name="$parentTalent1" inherits="AltoPlayerTalentButtonTemplate" parentKey="talent1">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentSeparator1" relativePoint="CENTER" x="0" y="0"/>
+			</Anchors>
+		</Button>
+		<Button name="$parentTalent2" inherits="AltoPlayerTalentButtonTemplate" parentKey="talent2">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentSeparator2" relativePoint="CENTER" x="0" y="0"/>
+			</Anchors>
+		</Button>
+		<Button name="$parentTalent3" inherits="AltoPlayerTalentButtonTemplate" parentKey="talent3">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentSeparator3" relativePoint="CENTER" x="0" y="0"/>
+			</Anchors>
+		</Button>
+	</Frames>
+
+	</Frame>
+
+	<!-- Template for talent rows (one of three options per row)-->
+	<!--<ScrollFrame name="AltoTalentRowsTemplate" inherits="AltoUIPanelScrollFrameTemplate" virtual="true">-->
+	<Frame name="AltoTalentRowsTemplate" virtual="true">
+		<Size x="607" y="306" />
+		<Layers>
+			<Layer level="ARTWORK">
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Rows">
+				<Size>
+					<AbsDimension x="200" y="300"/>
+				</Size>
+				<Frames>
+					<Frame name="$parentTalentRow1" parentKey="TalentRow1" inherits="AltoTalentRowTemplate" >
+						<Anchors>
+							<!--<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">-->
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentTalentRow2" parentKey="TalentRow2" inherits="AltoTalentRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTalentRow1" relativePoint="BOTTOMLEFT">
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentTalentRow3" parentKey="TalentRow3" inherits="AltoTalentRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTalentRow2" relativePoint="BOTTOMLEFT">
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentTalentRow4" parentKey="TalentRow4" inherits="AltoTalentRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTalentRow3" relativePoint="BOTTOMLEFT">
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentTalentRow5" parentKey="TalentRow5" inherits="AltoTalentRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTalentRow4" relativePoint="BOTTOMLEFT">
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentTalentRow6" parentKey="TalentRow6" inherits="AltoTalentRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTalentRow5" relativePoint="BOTTOMLEFT">
+							</Anchor>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>	
+
+	<Frame name="AltoTalents" parentKey="Talents" parent="AltoholicTabCharacters" inherits="AltoDataPanelTemplate">
+		<Frames>
+			<!-- Talent Rows -->
+			<Frame parentKey="CharacterSpec" inherits="AltoTalentRowsTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="-50" />
+					<!--<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" x="0" y="-50" />-->
+				</Anchors>
+			</Frame>
+
 			<!-- Tree 1 : left pane, is the player pane -->
 			<ScrollFrame parentKey="PlayerSpec" inherits="AltoTalentSpecializationTemplate">
 				<Anchors>

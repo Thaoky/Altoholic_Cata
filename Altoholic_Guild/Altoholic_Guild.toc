@@ -1,4 +1,4 @@
-## Interface: 50502
+## Interface: 50504, 20505, 11508
 ## Title: Altoholic_Guild
 ## IconTexture: Interface\Icons\inv_drink_13
 
@@ -15,4 +15,5 @@ TabGuild.xml
 
 Frames\GuildMembers.xml
 Frames\GuildBank.xml
+
 

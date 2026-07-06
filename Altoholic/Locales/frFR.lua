@@ -856,3 +856,9 @@ L[ [=[Your confirmation will still be required any time someone requests your in
 L["Zelemar the Wrathful"] = "Zelemar le Courroucé"
 L["Zone"] = true
 
+-- ** Settings / Altoholic / Calendar **
+L["Calendar Options"] = "Options du Calendrier"
+L["Profession Cooldowns"] = "Temps de recharge des professions"
+L["Dungeon Resets"] = "Réinitialisations des donjons"
+L["Calendar Events"] = "Evènements calendrier"
+L["Week starts on Monday"] = "La semaine commence le lundi"

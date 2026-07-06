@@ -1,4 +1,4 @@
-## Interface: 50502
+## Interface: 50504, 20505, 11508
 ## Title: Altoholic_Summary
 ## Notes: Altoholic's Summary Tab
 ## Author: Thaoky (EU-Marécages de Zangar)
@@ -21,4 +21,3 @@ Data\Suggestions_koKR.lua
 Data\Suggestions_ruRU.lua
 Data\Suggestions_zhCN.lua
 Data\Suggestions_zhTW.lua
-

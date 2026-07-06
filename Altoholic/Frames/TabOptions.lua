@@ -144,6 +144,57 @@ function addon:ToggleOption(frame, option)
 	
 end
 
+-- ** Ripped from **
+-- Altoholic Retail Options
+local timerThresholds = { 30, 15, 10, 5, 4, 3, 2, 1 }
+
+local function IsNumberInString(number, str)
+	-- ex: with str = "15,10,3" returns true if value is in this string
+	for v in str:gmatch("(%d+)") do
+		if tonumber(v) == number then
+			return true
+		end
+	end
+end
+
+local function ToggleWarningThreshold(self)
+	local id = self.arg1
+	local warnings = Altoholic_Calendar_Options[format("WarningType%d", id)]		-- Gets something like "15,5,1"
+
+	local checkedValues = AddonFactory:GetTable()
+	
+	for v in warnings:gmatch("(%d+)") do
+		v = tonumber(v)
+		if v ~= self.value then		-- add all values except the one that was clicked
+			table.insert(checkedValues, v)
+		end
+	end
+	
+	if not IsNumberInString(self.value, warnings) then		-- if number is not yet in the string, save it (we're checking it, otherwise we're unchecking)
+		table.insert(checkedValues, self.value)
+	end
+	
+	Altoholic_Calendar_Options[format("WarningType%d", id)] = table.concat(checkedValues, ",")		-- Sets something like "15,5,10,1"
+	AddonFactory:ReleaseTable(checkedValues)
+end
+
+local function WarningType_Initialize(self)
+	local info = self:CreateInfo()
+	local id = self:GetID()
+	local warnings = Altoholic_Calendar_Options[format("WarningType%d", id)]		-- Gets something like "15,5,1"
+
+	for _, threshold in pairs(timerThresholds) do
+		info.text = format(D_MINUTES, threshold)
+		info.value = threshold
+		info.func = ToggleWarningThreshold
+		info.checked = IsNumberInString(threshold, warnings)
+		info.arg1 = id		-- save the id of the current option
+
+		self:AddButtonInfo(info, 1)
+	end
+end
+-- ** End Altoholic Retail Options
+
 function addon:SetupOptions()
 	-- create categories in Blizzard's options panel
 	
@@ -327,14 +378,28 @@ function addon:SetupOptions()
 	f = AltoholicCalendarOptions
 	f.WeekStartsOnMonday.Text:SetText(L["Week starts on Monday"])
 	f.UseDialogBoxForWarnings.Text:SetText(L["Display warnings in a dialog box"])
-	f.WarningsEnabled.Text:SetText(L["Disable warnings"])
+	f.WarningsEnabled.Text:SetText(L["Enable warnings"])
 	L["Week starts on Monday"] = nil
 	L["Warn %d minutes before an event starts"] = nil
 	L["Display warnings in a dialog box"] = nil
-	
-	-- for i = 1, 4 do 
-		-- addon:DDM_Initialize(_G["AltoholicCalendarOptions_WarningType"..i], Altoholic.Events.WarningType_Initialize)
-	-- end
+
+
+	-- ** Calendar warning dropdowns **
+	local warningTypes = {
+		L["Profession Cooldowns"],
+		L["Dungeon Resets"],
+		L["Calendar Events"],
+		L["Item Timers"]
+	}
+
+	for i = 1, 4 do
+		--addon:DDM_Initialize(_G["AltoholicCalendarOptions_WarningType"..i], WarningType_Initialize)
+		local f = AltoholicCalendarOptions[format("WarningType%d", i)]
+		f:SetMenuWidth(160)
+		f:SetButtonWidth(20)
+		f:SetText(warningTypes[i])
+		f:Initialize(WarningType_Initialize)
+	end
 	-- UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType1, "Profession Cooldowns")
 	-- UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType2, "Dungeon Resets")
 	-- UIDropDownMenu_SetText(AltoholicCalendarOptions_WarningType3, "Calendar Events")

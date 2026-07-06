@@ -3,10 +3,11 @@ local addon = _G[addonName]
 local colors = addon.Colors
 
 local L = AddonFactory:GetLocale(addonName)
+local LCI = LibStub("LibCraftInfo-1.0")
 
 local THIS_ACCOUNT = "Default"
 local THIS_REALM = GetRealmName()
-
+local isClassic = (LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_CLASSIC)
 local storedLink = nil
 local options
 
@@ -177,12 +178,12 @@ end
 local function GetCharacterItemCount(character, searchedID)
 	itemCounts[1], itemCounts[2] = DataStore:GetContainerItemCount(character, searchedID)
 	itemCounts[2] = itemCounts[2] + DataStore:GetPlayerBankItemCount(character, searchedID)
-	itemCounts[3] = DataStore:GetVoidStorageItemCount(character, searchedID)
-	itemCounts[4] = DataStore:GetReagentBankItemCount(character, searchedID)
+	itemCounts[3] = DataStore.GetVoidStorageItemCount and DataStore:GetVoidStorageItemCount(character, searchedID) or 0
+	itemCounts[4] = DataStore.GetReagentBankItemCount and DataStore:GetReagentBankItemCount(character, searchedID) or 0
 	itemCounts[5] = DataStore:GetAuctionHouseItemCount(character, searchedID)
 	itemCounts[6] = DataStore:GetInventoryItemCount(character, searchedID)
 	itemCounts[7] = DataStore:GetMailItemCount(character, searchedID)
-	itemCounts[8] = DataStore:GetCurrencyItemCount(character, searchedID)
+	itemCounts[8] = DataStore:IsModuleEnabled("DataStore_Currencies") and DataStore:GetCurrencyItemCount(character, searchedID) or 0
 	
 	local charCount = 0
 	for _, v in pairs(itemCounts) do
@@ -304,6 +305,11 @@ function addon:GetRecipeOwners(professionName, link, recipeLevel)
 	local craftName
 	local spellID = addon:GetSpellIDFromRecipeLink(link)
 
+	if isClassic then
+		spellID = LCI:GetCraftResultItem(LCI:GetRecipeLearnedSpell(addon:GetIDFromLink(link)))
+		--print("search spellID", spellID) --DAC
+	end
+
 	-- April 2021 : removed processing with the spell ID.
 	-- In classic, the spell ID of a craft is actually not known
 	-- So force the add-on to compare the recipe header with the item name
@@ -331,11 +337,11 @@ function addon:GetRecipeOwners(professionName, link, recipeLevel)
 		if profession then
 			if spellID then			-- if spell id is known, just find its equivalent in the professions
 				isKnownByChar = DataStore:IsCraftKnown(profession, spellID)
+				--print("spellID", spellID, "recipeID", recipeID, characterName, isKnownByChar)
 			else
 				DataStore:IterateRecipes(profession, 0, 0, function(color, itemID)
 					--local _, recipeID, _ = DataStore:GetRecipeInfo_NonRetail(character, profession, itemID) -- retail has the COMPLETE recipe list for a tradeskill added tothe database.. dont enable till that is part of the wrath API -- TechnoHunter
 					local skillName = GetSpellInfo(itemID) or ""
-
 					if string.lower(skillName) == string.lower(craftName) then
 						isKnownByChar = true
 						return true	-- stop iteration

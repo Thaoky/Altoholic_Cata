@@ -842,3 +842,6 @@ L[ [=[Your confirmation will still be required any time someone requests your in
 L["Zelemar the Wrathful"] = "Zelemar der Hasserfüllte"
 L["Zone"] = true
 
+-- ** Settings / Altoholic / Calendar **
+L["Calendar Options"] = "Kalenderoptionen"
+L["Week starts on Monday"] = "Woche beginnt Montags"

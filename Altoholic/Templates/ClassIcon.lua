@@ -144,7 +144,7 @@ addon:Controller("AltoholicUI.ClassIcon", {
 			tt:AddLine(format("%s: %s%s", L["Rest XP"], colors.green, restXP),1,1,1)
 		end
 		
-		tt:AddLine(format("Average iLevel: %s%.1f", colors.green, DataStore:GetAverageItemLevel(character)),1,1,1)
+		tt:AddLine(format("Average iLevel: %s%.1f", colors.green, DataStore:GetAverageItemLevel(character) or 0),1,1,1)
 
 		if C_AddOns.IsAddOnLoaded("DataStore_Achievements") then
 			local numAchievements = DataStore:GetNumCompletedAchievements(character) or 0

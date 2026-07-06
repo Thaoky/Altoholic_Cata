@@ -48,7 +48,7 @@ local function BuildUnsafeItemList()
 	-- In the previous game session, the list has been populated with items id's that were originally unsafe and for which a query was sent to the server.
 	-- In this session, a getiteminfo on these id's will keep returning a nil if the item is really unsafe, so this method will get rid of the id's that are now valid.
 	local TmpUnsafe = {}		-- create a temporary table with confirmed unsafe id's
-	local unsafeItems = Altoholic_UI_Options.unsafeItems
+	local unsafeItems = Altoholic_UI_Options.unsafeItems or {}
 	
 	for _, itemID in pairs(unsafeItems) do
 		local itemName = C_Item.GetItemInfo(itemID)
@@ -146,9 +146,9 @@ function AuctionFrameBrowse_UpdateHook()
 	
 	if Altoholic_UI_Options.AHColorCoding == false then return end
 	
-	if IsAddOnLoaded("Auctioneer") and Auctioneer.ScanManager.IsScanning() then return end
+	if C_AddOns.IsAddOnLoaded("Auctioneer") and Auctioneer.ScanManager.IsScanning() then return end
 
-	if IsAddOnLoaded("Auc-Advanced") then
+	if C_AddOns.IsAddOnLoaded("Auc-Advanced") then
 		if AucAdvanced.Scan.IsScanning() then return end;
 		if AucAdvanced.Settings.GetSetting("util.compactui.activated") then
 			AuctioneerCompactUI = true
@@ -317,8 +317,14 @@ AddonFactory:OnPlayerLogin(function()
 	-- hook the Merchant update function
 	Orig_MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfo
 	MerchantFrame_UpdateMerchantInfo = MerchantFrame_UpdateMerchantInfoHook
-	
-	AltoholicFrameName:SetText(format("Altoholic |cFF00FF98Mists of Pandaria|r Classic %s%s|r by %sThaoky", colors.white, addon.Version, colors.classMage))
+	local expansionRelease = {
+		[LE_EXPANSION_CLASSIC] = "Classic",
+		[LE_EXPANSION_BURNING_CRUSADE] = "|cFFD6EB00The Burning Crusade|r Anniversary",
+		[LE_EXPANSION_CATACLYSM] = "|cFFFF7F00Cataclysm|r Classic",
+		[LE_EXPANSION_MISTS_OF_PANDARIA] = "|cFF00FF98Mists of Pandaria|r Classic",
+	}
+	--AltoholicFrameName:SetText(format("Altoholic |cFFD6EB00The Burning Crusade|r Anniversary %s%s|r by %sThaoky", colors.white, addon.Version, colors.classMage))
+	AltoholicFrameName:SetText(format("Altoholic %s %s%s|r by %sThaoky", expansionRelease[LE_EXPANSION_LEVEL_CURRENT], colors.white, addon.Version, colors.classMage))
 
 	-- local realm = GetRealmName()
 	-- local player = UnitName("player")
@@ -492,7 +498,9 @@ end
 
 function addon:GetRecipeLink(spellID, profession, color)
 	color = color or "|cffffd000"
-	local name = GetSpellInfo(spellID) or ""
+	local spellInfo = C_Spell.GetSpellInfo(spellID)
+	local name = spellInfo and spellInfo.name or ""
+	--local name = GetSpellInfo(spellID) or ""
 	-- addon:Print(format("%s|Henchant:%s|h[%s: %s]|h|r", color, spellID, profession, name)) --debug
 
 	return format("%s|Henchant:%s|h[%s: %s]|h|r", color, spellID, profession, name)
@@ -626,7 +634,8 @@ function addon:GetRecipeLevel(link, tooltip)
 	
 	local tooltipName = tooltip:GetName()
 	
-	for i = (tooltip:NumLines() - 1), 2, -1 do			-- parse all tooltip lines, from last to second
+	--for i = (tooltip:NumLines() - 1), 2, -1 do			-- parse all tooltip lines, from last to second
+	for i = 2, tooltip:NumLines() do	-- parse starting at the second line, counting up (so we don't accidentally get Set Bonus information)
 		local tooltipText = _G[format("%sTextLeft%d", tooltipName, i)]:GetText()
 		
 		if tooltipText then

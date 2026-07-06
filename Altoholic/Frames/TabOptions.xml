@@ -678,22 +678,22 @@
 					<KeyValue key="option" value="WarningsEnabled" />
 				</KeyValues>
 			</CheckButton>
-			<Frame name="$parent_WarningType1" inherits="AltoWarningTypeTemplate" id="1">
+			<Frame name="$parent_WarningType1" parentKey="WarningType1" inherits="AddonFactory_DropDownMenuTemplate" id="1">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeKey="$parent.WarningsEnabled" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 			</Frame>
-			<Frame name="$parent_WarningType2" inherits="AltoWarningTypeTemplate" id="2">
+			<Frame name="$parent_WarningType2" parentKey="WarningType2" inherits="AddonFactory_DropDownMenuTemplate" id="2">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parent_WarningType1" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 			</Frame>
-			<Frame name="$parent_WarningType3" inherits="AltoWarningTypeTemplate" id="3">
+			<Frame name="$parent_WarningType3" parentKey="WarningType3" inherits="AddonFactory_DropDownMenuTemplate" id="3">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parent_WarningType2" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>
 			</Frame>
-			<Frame name="$parent_WarningType4" inherits="AltoWarningTypeTemplate" id="4">
+			<Frame name="$parent_WarningType4" parentKey="WarningType4" inherits="AddonFactory_DropDownMenuTemplate" id="4">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parent_WarningType3" relativePoint="BOTTOMLEFT" x="0" y="-10" />
 				</Anchors>

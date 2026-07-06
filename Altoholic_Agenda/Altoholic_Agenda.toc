@@ -1,4 +1,4 @@
-## Interface: 50502
+## Interface: 50504, 20505, 11508
 ## Title: Altoholic_Agenda
 ## IconTexture: Interface\Icons\inv_drink_13
 
@@ -14,4 +14,3 @@ TabAgenda.xml
 
 Frames\Calendar.xml
 #Frames\Contacts.xml
-
