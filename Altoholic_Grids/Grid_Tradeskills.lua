@@ -7,20 +7,25 @@ local LCI = LibStub("LibCraftInfo-1.0")
 local LCL = LibStub("LibCraftLevels-1.0")
 
 local ICON_QUESTIONMARK = "Interface\\RaidFrame\\ReadyCheck-Waiting"
-local isMists = LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MISTS_OF_PANDARIA
 
 local xPacks = {
 	EXPANSION_NAME0,	-- "Classic"
 	EXPANSION_NAME1,	-- "The Burning Crusade"
 	EXPANSION_NAME2,	-- "Wrath of the Lich King"
 	EXPANSION_NAME3,	-- "Cataclysm"
-	--EXPANSION_NAME4,	-- "Mists of Pandaria"
+	EXPANSION_NAME4,	-- "Mists of Pandaria"
 }
-if isMists then table.insert(xPacks, EXPANSION_NAME4) end
+
+-- Remove expansions that aren't valid
+for i = 1, #xPacks do
+	if i-1 > LE_EXPANSION_LEVEL_CURRENT then
+		xPacks[i] = nil
+	end
+end
 
 local OPTION_XPACK = "Tradeskills.CurrentXPack"
 local OPTION_TRADESKILL = "Tradeskills.CurrentTradeSkill"
-
+local usesItemID = LE_EXPANSION_LEVEL_CURRENT <= LE_EXPANSION_BURNING_CRUSADE
 local currentDDMText
 local currentItemID
 local currentList
@@ -129,7 +134,7 @@ local callbacks = {
 			local currentXPack = options[OPTION_XPACK]
 			local currentTradeSkill = options[OPTION_TRADESKILL]
 			local tradeskills = addon.TradeSkills.spellIDs
-			
+
 			currentList = LCI:GetProfessionCraftList(tradeskills[currentTradeSkill], currentXPack)
 			if not currentList.isSorted then
 				table.sort(currentList, SortByCraftLevel)
@@ -202,11 +207,13 @@ local callbacks = {
 					-- button.IconBorder:Show()
 				-- end
 				
-				-- if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then
-				-- Search on the item ID, not the spellID, it's not available when scanning professions !
-				--if DataStore:IsCraftKnown(profession, currentItemID) then
 				--if DataStore:IsCraftKnown(profession, LCI:GetCraftResultItem(currentList[dataRowID])) then
-				if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then
+				--if DataStore:IsCraftKnown(profession, LCI:GetCraftSourceItem(currentList[dataRowID])) then
+				--if DataStore:IsCraftKnown(profession, currentList[dataRowID]) then -- original that works for everything except for Vanilla
+
+				-- Fix the spellID vs itemID issue between versions
+				local craftItem = usesItemID and LCI:GetCraftResultItem(currentList[dataRowID]) or currentList[dataRowID]
+				if DataStore:IsCraftKnown(profession, craftItem) then
 					vc = 1.0
 					text = icons.ready
 				else

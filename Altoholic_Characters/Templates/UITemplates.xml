@@ -3,6 +3,5 @@
 	<Include file="RecipeRow.xml"/>
 	<Include file="SpellButton.xml"/>
 	<Include file="TalentButton.xml"/>
-	<Include file="TalentRow.xml"/>
 	<Include file="TalentSpecialization.xml"/>
 </Ui>

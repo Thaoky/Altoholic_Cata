@@ -847,3 +847,5 @@ L[ [=[Your confirmation will still be required any time someone requests your in
 L["Zelemar the Wrathful"] = "憤怒者塞雷瑪爾"
 L["Zone"] = "地區"
 
+-- ** Settings / Altoholic / Calendar **
+L["Week starts on Monday"] = "每周從周一開始"

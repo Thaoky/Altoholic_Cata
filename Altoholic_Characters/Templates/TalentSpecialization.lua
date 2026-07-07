@@ -114,14 +114,18 @@ addon:Controller("AltoholicUI.TalentSpecialization", {
 			y = -2
 		end
 		
+		-- Adjustment for new frame design
+		local _, offsetY = select(4, frame:GetPoint(1))
+		y = y - (offsetY or 0)
+
 		x = x + INITIAL_OFFSET_X + ((column-1) * TALENT_OFFSET_X)
 		y = y - (INITIAL_OFFSET_Y + ((tier-1) * TALENT_OFFSET_Y)) - 8
-		
+
 		local arrow = frame.Tree.ArrowsFrame[format("Arrow%d", frame.numArrows)]
 		local tc = TALENT_ARROW_TEXTURECOORDS[arrowType][1]
 		
 		arrow:SetTexCoord(tc[1], tc[2], tc[3], tc[4])
-		arrow:SetPoint("TOPLEFT", frame:GetParent(), "TOPLEFT", x, y)
+		arrow:SetPoint("TOPLEFT", frame.Tree, "TOPLEFT", x, y) -- Keep the textures anchored to the tree (WAS: frame:GetParent(), not frame.Tree)
 		arrow:Show()
 		
 		frame.numArrows = frame.numArrows + 1
@@ -251,7 +255,7 @@ addon:Controller("AltoholicUI.TalentSpecialization", {
 		local tc = TALENT_BRANCH_TEXTURECOORDS[branchType][1]
 		
 		branch:SetTexCoord(tc[1], tc[2], tc[3], tc[4]);
-		branch:SetPoint("TOPLEFT", frame:GetParent(), "TOPLEFT", x, y)
+		branch:SetPoint("TOPLEFT", frame.Tree, "TOPLEFT", x, y) -- Keep the textures anchored to the tree (WAS: frame:GetParent(), not frame.Tree)
 		branch:Show()
 		
 		frame.numBranches = frame.numBranches + 1
@@ -266,7 +270,7 @@ addon:Controller("AltoholicUI.TalentSpecialization", {
 				
 				x = INITIAL_OFFSET_X + ((j-1) * TALENT_OFFSET_X) + 2
 				y = -(INITIAL_OFFSET_Y + ((i-1) * TALENT_OFFSET_Y)) - 2
-				
+
 				if p.node then			-- there's a talent there
 					if p.up then
 						if not ignoreUp then
@@ -332,7 +336,7 @@ addon:Controller("AltoholicUI.TalentSpecialization", {
 	DrawTree = function(frame, class, treeName, character, guildMember)
 		-- character = character key of the alt 
 		-- guildMember = in case no character key is passed, it's a guild member, only his name is necessary
-		
+
 		frame:ResetButtonCount()
 		frame:ResetArrowCount()
 		frame:ResetBranchCount()
@@ -342,7 +346,7 @@ addon:Controller("AltoholicUI.TalentSpecialization", {
 		for i = 1, DataStore:GetNumTalents(class, treeName) do
 			local _, talentName, texture, tier, column, maxRank = DataStore:GetTalentInfo(class, treeName, i)
 			local rank
-			
+
 			if character then
 				rank = DataStore:GetTalentRank(character, treeName, i)
 			elseif guildMember then
@@ -378,15 +382,15 @@ addon:Controller("AltoholicUI.TalentSpecialization", {
 					end
 				end
 				
-				-- frame:DrawArrow(tier, column, prereqTier, prereqColumn, blocked)
+				frame:DrawArrow(tier, column, prereqTier, prereqColumn, blocked)
 				frame:InitBranch(tier, column, prereqTier, prereqColumn, blocked)
 			end
 		end
-		--frame:DrawBranches()
+		frame:DrawBranches()
 		
 		frame:HideUnusedButtons()
 		frame:HideUnusedArrows()
 		frame:HideUnusedBranches()
-		frame:ClearBranchArray()	
+		frame:ClearBranchArray()
 	end,
 })

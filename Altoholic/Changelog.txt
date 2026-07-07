@@ -2,6 +2,10 @@ Altoholic Mists of Pandaria Classic Changelog (dates in dd/mm/yyyy)
 =============================================
 
 
+5.5.004 (06/07/2026)
+
+- Unified version for all classic variants (Classic Era, TBC, MoP) : huge Thanks to GovtGeek for this !
+
 5.5.003 (24/08/2025)
 
 - DataStore_Containers : reworked the handling of the new player bank tabs, this has a serious impact on the code. 

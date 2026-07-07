@@ -569,12 +569,12 @@ columns["RestXP"] = {
 		end,
 	headerOnClick = function() SortView("RestXP") end,
 	headerSort = DataStore.GetRestXPRate,
-	
+
 	-- Content
 	Width = 65,
 	JustifyH = "CENTER",
 	GetText = function(character) 
-		if DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel] then
+		if DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] then
 			return colors.white .. "0%"	-- show 0% at max level
 		end
 
@@ -588,7 +588,7 @@ columns["RestXP"] = {
 
 			local restXP = DataStore:GetRestXP(character)
 			-- if not restXP or restXP == 0 then return end
-			if not restXP or DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel] then return end
+			if not restXP or DataStore:GetCharacterLevel(character) == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] then return end
 
 			local tt = AltoTooltip
 			tt:ClearLines()
@@ -983,11 +983,11 @@ columns["Prof1"] = {
 	Width = 70,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetProfession1Rank(character)
+			local rank = DataStore:GetProfession1Rank(character) or 0
 			local name = DataStore:GetProfession1Name(character)
 			local spellID = DataStore:GetProfessionSpellID(name)
 			local icon = spellID and Formatter.Texture18(addon:GetSpellIcon(spellID)) .. " " or ""
-			
+
 			return format("%s%s%s", icon, GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Profession1, true) end,
@@ -1008,7 +1008,7 @@ columns["Prof2"] = {
 	Width = 70,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetProfession2Rank(character)
+			local rank = DataStore:GetProfession2Rank(character) or 0
 			local name = DataStore:GetProfession2Name(character)
 			local spellID = DataStore:GetProfessionSpellID(name)
 			local icon = spellID and Formatter.Texture18(addon:GetSpellIcon(spellID)) .. " " or ""
@@ -1033,7 +1033,7 @@ columns["ProfCooking"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetCookingRank(character)
+			local rank = DataStore:GetCookingRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Cooking, true) end,
@@ -1054,7 +1054,7 @@ columns["ProfFirstAid"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetFirstAidRank(character)
+			local rank = DataStore:GetFirstAidRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.FirstAid, true) end,
@@ -1075,12 +1075,13 @@ columns["ProfFishing"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetFishingRank(character)
+			local rank = DataStore:GetFishingRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Fishing, true) end,
 }
 
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_BURNING_CRUSADE then
 columns["ProfArchaeology"] = {
 	-- Header
 	headerWidth = 60,
@@ -1095,11 +1096,12 @@ columns["ProfArchaeology"] = {
 	Width = 60,
 	JustifyH = "CENTER",
 	GetText = function(character)
-			local rank = DataStore:GetArchaeologyRank(character)
+			local rank = DataStore:GetArchaeologyRank(character) or 0
 			return format("%s%s", GetSkillRankColor(rank), rank)
 		end,
 	OnEnter = function(frame) Tradeskill_OnEnter(frame, professionIndices.Archaeology, true) end,
 }
+end
 
 -- ** Activity **
 columns["Mails"] = {
@@ -1462,10 +1464,14 @@ end
 local modes = {
 	[MODE_SUMMARY] = { "Name", "Level", "RestXP", "Money", "Played", "AiL", "LastOnline" },
 	[MODE_BAGS] = { "Name", "Level", "BagSlots", "FreeBagSlots", "BankSlots", "FreeBankSlots" },
-	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing", "ProfArchaeology" },
+	--[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing", "ProfArchaeology" },
+	[MODE_SKILLS] = { "Name", "Level", "Prof1", "Prof2", "ProfCooking", "ProfFirstAid", "ProfFishing" },
 	[MODE_ACTIVITY] = { "Name", "Level", "Mails", "LastMailCheck", "Auctions", "Bids", "AHLastVisit" },
 	[MODE_MISCELLANEOUS] = { "Name", "Level", "GuildName", "Hearthstone", "ClassAndSpec" },
 }
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_BURNING_CRUSADE then
+	table.insert(modes[MODE_SKILLS], "ProfArchaeology")
+end
 
 function ns:SetMode(mode)
 	Altoholic_SummaryTab_Options.CurrentMode = mode

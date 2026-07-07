@@ -834,3 +834,12 @@ L["Daily Quests"] = true
 L["Attunements"] = true
 L["Keys"] = true
 L["This faction"] = true
+
+-- ** Settings / Altoholic / Calendar **
+L["Calendar Options"] = true
+L["Profession Cooldowns"] = true
+L["Dungeon Resets"] = true
+L["Calendar Events"] = true
+L["Item Timers"] = true
+L["Week starts on Monday"] = true
+L["Enable warnings"] = true

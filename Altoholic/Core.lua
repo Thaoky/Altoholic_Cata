@@ -300,9 +300,11 @@ AddonFactory:OnAddonLoaded(addonName, function()
 		local timeToNext = Altoholic_UI_Options.Mail.TimeToNextWarning
 		local now = time()
 
+		----[[ Disable when debugging
 		if (now - lastWarning) < (timeToNext * 3600) then	-- has enough time passed ?
 			return		-- no ? exit !
 		end
+		--]]
 
 		AltoMessageBox:SetHeight(130)
 		AltoMessageBox.Text:SetHeight(60)
@@ -314,6 +316,11 @@ AddonFactory:OnAddonLoaded(addonName, function()
 			-- On Yes
 			function()
 				AltoholicFrame:Show()
+
+				-- This is not the optimal way to do this. It should move to using AddonFactory controller eventually
+				PanelTemplates_SetTab(AltoholicFrame, 1)
+				AltoholicTabSummary.MenuItem4:Click()
+
 				--[[ Disable switching to a tab for now
 				AltoholicFrame:SwitchToTab("Summary")
 				
@@ -328,9 +335,15 @@ AddonFactory:OnAddonLoaded(addonName, function()
 	end)
 	
 	addon:ListenTo("DATASTORE_AUCTIONS_NOT_CHECKED_SINCE", function(event, character, charID, days, threshold)
+		local maxAuctionDays, maxMailboxDays = 2, 30
+		local maxDayToWarn = maxAuctionDays + maxMailboxDays -- 2 for longest auction plus 30 for mail
 		if days >= threshold then
+		--if days >= threshold and days <= (maxDayToWarn) then -- Above the check threshold and below the max time to be able to retrieve from mail
 			local key = DataStore:GetCharacterKey(charID)
-			addon:Print(format(L["AUCTION_HOUSE_NOT_VISITED_WARNING"], DataStore:GetColoredCharacterName(key), days))
+			local characterLastMailVisitDays = (time() - DataStore:GetMailboxLastVisit(key)) / (60 * 60 * 24)
+			if characterLastMailVisitDays >= maxDayToWarn then -- the character checked the mailbox, no need to warn about AH/Mail
+				addon:Print(format(L["AUCTION_HOUSE_NOT_VISITED_WARNING"], DataStore:GetColoredCharacterName(key), days))
+			end
 		end
 	end)
 	
@@ -382,11 +395,14 @@ local SPELL_ID_FISHING = 7732			-- do not use 7733, it's "Artisan Fishing", not 
 addon.TradeSkills = {
 	Recipes = {},
 	-- spell IDs in alphabetical order (english), primary then secondary
-   spellIDs = { 2259, 3100, 7411, 4036, 45357, 25229, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
-	firstSecondarySkillIndex = 12, -- index of the first secondary profession in the table
-		
-   AccountSummaryFiltersSpellIDs = { 2259, 3100, 7411, 4036, 45357, 25229, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
-	AccountSummaryFirstSecondarySkillIndex = 12, -- index of the first secondary profession in the table
+	--spellIDs = { 2259, 3100, 7411, 4036, 45357, 25229, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
+	--firstSecondarySkillIndex = 12, -- index of the first secondary profession in the table
+	spellIDs = { 2259, 3100, 7411, 4036, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
+	firstSecondarySkillIndex = 10, -- index of the first secondary profession in the table
+	
+	--AccountSummaryFiltersSpellIDs = { 2259, 3100, 7411, 4036, 45357, 25229, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
+	AccountSummaryFiltersSpellIDs = { 2259, 3100, 7411, 4036, 2108, 3908, 8613, 2575, 2366, 2550, 3273, 7732 },
+	AccountSummaryFirstSecondarySkillIndex = 10, -- index of the first secondary profession in the table
 
 	Names = {
 		ALCHEMY = GetSpellInfo(2259),
@@ -406,6 +422,18 @@ addon.TradeSkills = {
 		TAILORING = GetSpellInfo(3908),
 	},
 }
+if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_CLASSIC then
+	table.insert(addon.TradeSkills.spellIDs, 5, 25229)
+	table.insert(addon.TradeSkills.AccountSummaryFiltersSpellIDs, 5, 25229)
+	addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex = addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex + 1
+	addon.TradeSkills.firstSecondarySkillIndex = addon.TradeSkills.firstSecondarySkillIndex + 1
+	if LE_EXPANSION_LEVEL_CURRENT > LE_EXPANSION_BURNING_CRUSADE then
+		table.insert(addon.TradeSkills.spellIDs, 5, 45357)
+		table.insert(addon.TradeSkills.AccountSummaryFiltersSpellIDs, 5, 45357)
+		addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex = addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex + 1
+		addon.TradeSkills.firstSecondarySkillIndex = addon.TradeSkills.firstSecondarySkillIndex + 1
+	end
+end
 
 -- ** Tabs **
 local tabList = {

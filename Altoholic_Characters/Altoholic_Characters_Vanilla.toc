@@ -1,14 +1,17 @@
-## Interface: 50504, 20505, 11508
+## Interface: 11508
 ## Title: Altoholic_Characters
 ## IconTexture: Interface\Icons\inv_drink_13
 
 ## Notes: Altoholic's Characters UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 5.5.004
+## Version: 5.5.002
 ## Dependencies: Altoholic, DataStore, DataStore_Characters
 ## SavedVariables: Altoholic_CharactersTab_Options
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
+
+# When the SpellBookFrame is fixed by Blizzard, this file can be deleted
+Templates\Blizzard\SpellBookFrame.xml
 
 Templates\UITemplates.xml
 TabCharacters.xml

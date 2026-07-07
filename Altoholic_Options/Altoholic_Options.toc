@@ -1,11 +1,13 @@
-﻿## Interface: 50500
+﻿## Interface: 50504, 20505, 11508
 ## Title: Altoholic_Options
 ## Notes: Altoholic's Options UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 5.5.002
+## Version: 5.5.004
 ## Dependencies: Altoholic, DataStore, DataStore_Characters
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
 
 Templates\UITemplates.xml
 TabOptions.xml
+
+

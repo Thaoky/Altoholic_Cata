@@ -526,7 +526,7 @@ addon:Service("AltoholicUI.Events", { "AltoholicUI.EventsList", function(EventsL
 			ClearExpiredEvents()
 			BuildList()
 			
-			DataStore:Broadcast("ALTOHOLIC_EVENT_EXPIRY")
+			AddonFactory:Broadcast("ALTOHOLIC_EVENT_EXPIRY")
 		end
 	end
 	
