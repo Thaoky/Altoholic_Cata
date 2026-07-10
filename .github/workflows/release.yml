@@ -26,6 +26,11 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: Clean workspace
+        run: |
+          rm -rf DataStore_*
+          rm -rf AddonFactory
+
       - name: Copy subfolders from DataStore repositories
         run: |
           git clone https://github.com/Thaoky/AddonFactory.git temp
