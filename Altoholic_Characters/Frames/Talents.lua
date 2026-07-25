@@ -2,17 +2,21 @@ local addonName = "Altoholic"
 local addon = _G[addonName]
 local colors = addon.Colors
 
-local currentTalentGroup
 local currentClass		-- ex: "MAGE"
 local currentTreeName	-- ex: "Fire"
 local currentTreeID
-local currentGuildKey
-local currentGuildMember	-- guild member currently displayed in the right pane
-local currentGuildMemberTalentGroup = 1
-local rightTreeKey		-- character key to use when drawing the rightmost tree
 
 local isTreeTalents = LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_CLASSIC or LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_BURNING_CRUSADE
 local isRowTalents = LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MISTS_OF_PANDARIA
+
+-- Both panes always show the same tree, the left one for the primary talent group, the right one for the secondary (dual spec)
+local PRIMARY_SPEC_GROUP = 1
+local SECONDARY_SPEC_GROUP = 2
+
+local SPEC_GROUP_LABELS = {
+	[PRIMARY_SPEC_GROUP] = TALENT_SPEC_PRIMARY or "Primary Talents",
+	[SECONDARY_SPEC_GROUP] = TALENT_SPEC_SECONDARY or "Secondary Talents",
+}
 
 addon:Controller("AltoholicUI.TalentIcon", {
 	Icon_OnEnter = function(frame)
@@ -28,26 +32,8 @@ addon:Controller("AltoholicUI.TalentIcon", {
 	end,
 	Icon_OnClick = function(frame, button)
 		if isTreeTalents then
-			currentTreeID = frame:GetID()					-- set the current tree
-			
-			local group = frame:GetParent():GetID()	-- which group of icons did we click ? 1 to 4
-			local isPlayer = (group < 3)					-- 1 or 2 = player, 3 or 4 = guild
-			local isPrimary = (group % 2 == 1)			-- 1 or 3 = primary, 2 or 4 = secondary
+			currentTreeID = frame:GetID()					-- set the current tree, both panes display it
 
-			if isPlayer then
-				if isPrimary then
-					currentTalentGroup = 1
-				else
-					currentTalentGroup = 2
-				end
-			else
-				if isPrimary then
-					currentGuildMemberTalentGroup = 1
-				else
-					currentGuildMemberTalentGroup = 2
-				end
-			end
-			
 			frame:GetParent():GetParent():Update()
 		end
 	end,
@@ -68,10 +54,10 @@ addon:Controller("AltoholicUI.TalentPanel", {
 		frame:HideChildren()
 
 		if isTreeTalents then
-			frame.PlayerSpec:Show()
-			frame.GuildSpec:Show()
+			frame.PrimarySpec:Show()
+			frame.SecondarySpec:Show()
 			frame.Icons1:Show()
-			frame.Icons3:Show()
+			frame.Icons2:Show()
 		elseif isRowTalents then
 			frame.CharacterSpec:Show()
 		end
@@ -84,49 +70,38 @@ addon:Controller("AltoholicUI.TalentPanel", {
 		-- addon:RegisterEvent("PLAYER_TALENT_UPDATE", OnPlayerTalentUpdate)
 		-- addon:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", OnPlayerTalentUpdate)
 	end,
-	DrawClassIcons = function(frame, iconGroup, class, character, guildMember)
-		local text = frame[format("Icons%d", iconGroup)].Text
-		local icon1 = frame[format("Icons%d", iconGroup)].SpecIcon1
+	DrawClassIcons = function(frame, class, character, specGroup, isKnown)
+		-- One row of icons per talent group : group 1 above the left pane, group 2 above the right one.
+		-- isKnown : the character has data saved for this talent group
+		local iconsFrame = frame[format("Icons%d", specGroup)]
+		local text = iconsFrame.Text
+		local icon1 = iconsFrame.SpecIcon1
 
-		local isPlayer = (iconGroup < 3)					-- 1 or 2 = player, 3 or 4 = guild
-		-- local isPrimary = (iconGroup % 2 == 1)			-- 1 or 3 = primary, 2 or 4 = secondary
-		
-		if isPlayer then
+		if specGroup == PRIMARY_SPEC_GROUP then
 			text:SetJustifyH("LEFT")
 			icon1:SetPoint("TOPLEFT", 10, -15)
 		else
 			text:SetJustifyH("RIGHT")
 			icon1:SetPoint("TOPLEFT", 90, -15)
 		end
-		
-		-- if isPrimary then
-			text:SetText(TALENT_SPEC_PRIMARY)
-		-- else
-			-- text:SetText(TALENT_SPEC_SECONDARY)
-		-- end
-		
+
+		text:SetText(SPEC_GROUP_LABELS[specGroup])
+
 		local index = 1
 		for tree in DataStore:GetClassTrees(class) do						-- draw spec icons
-			local itemButton = frame[format("Icons%d", iconGroup)][format("SpecIcon%d", index)]
+			local itemButton = iconsFrame[format("SpecIcon%d", index)]
 			local itemCount = itemButton.Count
 			local icon = DataStore:GetTreeInfo(class, tree)
-			
+
 			itemButton.Icon:SetTexture(icon)
-			
-			local count = 0
-			if character then
-				count = DataStore:GetNumPointsSpent(character, tree)
-			elseif guildMember then
-				count = DataStore:GetGuildMemberNumPointsSpent(currentGuildKey, guildMember, tree)
-			end
+			itemButton.Icon:SetDesaturated(not isKnown)
+
+			local count = isKnown and DataStore:GetNumPointsSpent(character, tree, specGroup) or 0
+
 			itemCount:SetText(format("%s%d", colors.white, count))
 			itemCount:Show()
 			itemButton:Show()
-			
-			if not isPlayer then
-				itemButton.Icon:SetDesaturated((character or guildMember) and 0 or 1)
-			end
-			
+
 			index = index + 1
 		end
 	end,
@@ -147,8 +122,8 @@ addon:Controller("AltoholicUI.TalentPanel", {
 		AltoholicTabCharacters.Status:SetText(format("%s|r / %s", DataStore:GetColoredCharacterName(character), TALENTS))
 		
 		_, currentClass = DataStore:GetCharacterClass(character)
-		--if not DataStore:IsClassKnown(currentClass) then return end
-		
+		if not DataStore:IsClassKnown(currentClass) then return end		-- no reference data for that class yet
+
 		local level = DataStore:GetCharacterLevel(character)
 		--if not level or level < 10 then return end
 
@@ -156,17 +131,21 @@ addon:Controller("AltoholicUI.TalentPanel", {
 		if isTreeTalents then
 			-- Talent Tree version
 			currentTreeName = DataStore:GetTreeNameByID(currentClass, currentTreeID or 1)
+			if not currentTreeName then return end		-- the class reference is not known yet, nothing to draw
+
+			-- A character without dual talent specialization (or not scanned since it was bought) has no secondary group
+			local hasPrimary = DataStore:HasSpecGroup(character, PRIMARY_SPEC_GROUP)
+			local hasSecondary = DataStore:HasSpecGroup(character, SECONDARY_SPEC_GROUP)
 
 			-- background
-			frame.PlayerSpec:DrawBackground(currentClass, currentTreeName)
-			frame.GuildSpec:DrawBackground(currentClass, currentTreeName, (not currentGuildMember and not rightTreeKey))
+			frame.PrimarySpec:DrawBackground(currentClass, currentTreeName, not hasPrimary)
+			frame.SecondarySpec:DrawBackground(currentClass, currentTreeName, not hasSecondary)
 			-- class icons
-			frame:DrawClassIcons(1, currentClass, character)
-			frame:DrawClassIcons(3, currentClass, rightTreeKey, currentGuildMember)
+			frame:DrawClassIcons(currentClass, character, PRIMARY_SPEC_GROUP, hasPrimary)
+			frame:DrawClassIcons(currentClass, character, SECONDARY_SPEC_GROUP, hasSecondary)
 			-- trees
-			frame.PlayerSpec:DrawTree(currentClass, currentTreeName, character)
-			--frame.GuildSpec:DrawTree(currentClass, currentTreeName, nil, currentGuildMember)
-			frame.GuildSpec:DrawTree(currentClass, currentTreeName, rightTreeKey, currentGuildMember)
+			frame.PrimarySpec:DrawTree(currentClass, currentTreeName, hasPrimary and character or nil, PRIMARY_SPEC_GROUP)
+			frame.SecondarySpec:DrawTree(currentClass, currentTreeName, hasSecondary and character or nil, SECONDARY_SPEC_GROUP)
 
 		elseif isRowTalents then
 			local classTalents = DataStore:GetClassTalentsReference(currentClass)

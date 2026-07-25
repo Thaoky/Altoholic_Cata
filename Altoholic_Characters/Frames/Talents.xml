@@ -339,21 +339,21 @@
 				</Anchors>
 			</Frame>
 
-			<!-- Tree 1 : left pane, is the player pane -->
-			<ScrollFrame parentKey="PlayerSpec" inherits="AltoTalentSpecializationTemplate">
+			<!-- Tree 1 : left pane, primary talent group -->
+			<ScrollFrame parentKey="PrimarySpec" inherits="AltoTalentSpecializationTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" x="0" y="-5" />
 				</Anchors>
 			</ScrollFrame>
-			
-			<!-- Tree 2 : right pane, is the guild pane -->
-			<ScrollFrame parentKey="GuildSpec" inherits="AltoTalentSpecializationTemplate">
+
+			<!-- Tree 2 : right pane, secondary talent group (dual talent specialization) -->
+			<ScrollFrame parentKey="SecondarySpec" inherits="AltoTalentSpecializationTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" x="420" y="-5"/>
 				</Anchors>
 			</ScrollFrame>
 
-			<!-- Between both panes -->
+			<!-- Between both panes : tree selectors + points spent, one row per talent group -->
 			<Frame parentKey="Icons1" inherits="AltoTreeIconsTemplate" id="1">
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -363,18 +363,7 @@
 					</Anchor>
 				</Anchors>
 			</Frame>
-			<!-- 
 			<Frame parentKey="Icons2" inherits="AltoTreeIconsTemplate" id="2">
-				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset>
-							<AbsDimension x="225" y="-70"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Frame>
-			-->
-			<Frame parentKey="Icons3" inherits="AltoTreeIconsTemplate" id="3">
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset>
@@ -383,17 +372,6 @@
 					</Anchor>
 				</Anchors>
 			</Frame>
-			<!-- 
-			<Frame parentKey="Icons4" inherits="AltoTreeIconsTemplate" id="4">
-				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset>
-							<AbsDimension x="225" y="-245"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Frame>
-			-->
 		</Frames>
 		<Scripts>
 			<OnLoad>

@@ -333,26 +333,24 @@ addon:Controller("AltoholicUI.TalentSpecialization", {
 		SetDesaturation(frame.BottomLeft, disabled)
 		SetDesaturation(frame.BottomRight, disabled)
 	end,
-	DrawTree = function(frame, class, treeName, character, guildMember)
-		-- character = character key of the alt 
-		-- guildMember = in case no character key is passed, it's a guild member, only his name is necessary
+	DrawTree = function(frame, class, treeName, character, specGroup)
+		-- character = character key of the alt, nil to draw an empty tree
+		-- specGroup = talent group to read the ranks from (1 = primary, 2 = secondary / dual spec)
 
 		frame:ResetButtonCount()
 		frame:ResetArrowCount()
 		frame:ResetBranchCount()
 		frame:InitializeBranchArray()
-		
+
 		-- draw all icons in their respective slot
-		for i = 1, DataStore:GetNumTalents(class, treeName) do
+		for i = 1, (DataStore:GetNumTalents(class, treeName) or 0) do
 			local _, talentName, texture, tier, column, maxRank = DataStore:GetTalentInfo(class, treeName, i)
 			local rank
 
 			if character then
-				rank = DataStore:GetTalentRank(character, treeName, i)
-			elseif guildMember then
-				rank = DataStore:GetGuildMemberTalentRank(currentGuildKey, guildMember, treeName, currentGuildMemberTalentGroup, i)
+				rank = DataStore:GetTalentRank(character, treeName, i, specGroup)
 			end
-			
+
 			frame:DrawTalent(texture, tier, column, rank, maxRank, talentName, i)
 			frame.branchArray[tier][column].node = true
 
