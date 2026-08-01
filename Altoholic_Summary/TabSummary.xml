@@ -120,8 +120,7 @@
 				</KeyValues>
 				<Scripts>
 					<OnClick>
-						Altoholic:ToggleUI()
-						Settings.OpenToCategory("DataStore")
+						self:ShowOptions(8)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -134,8 +133,7 @@
 				</KeyValues>
 				<Scripts>
 					<OnClick>
-						Altoholic:ToggleUI()
-						Settings.OpenToCategory("Altoholic")
+						self:ShowOptions(2)
 					</OnClick>
 				</Scripts>
 			</Button>

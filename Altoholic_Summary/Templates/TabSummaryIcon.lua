@@ -49,9 +49,13 @@ local function OnClassFilterChange(frame)
 	addon.Summary:Update()
 end
 
-local function ShowOptionsCategory(self)
+local function ShowOptionsPanel(menuItemID)
 	addon.Tabs:OnClick("Options")
-	AltoholicTabOptions["MenuItem"..self.value]:Item_OnClick()
+	AltoholicTabOptions["MenuItem"..menuItemID]:Item_OnClick()
+end
+
+local function ShowOptionsCategory(self)
+	ShowOptionsPanel(self.value)
 end
 
 local function ResetAllData_MsgBox_Handler(self, button)
@@ -239,6 +243,10 @@ addon:Controller("AltoholicUI.TabSummaryIcon", {
 		menu:Initialize(menuIconCallbacks[currentMenuID], "LIST")
 		menu:Close()
 		menu:Toggle(frame, 0, 0)
+	end,
+	ShowOptions = function(frame, menuItemID)
+		-- clicking an options icon opens the same panel as the first entry of its own menu
+		ShowOptionsPanel(menuItemID)
 	end,
 })
 
