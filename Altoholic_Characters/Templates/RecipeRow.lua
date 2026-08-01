@@ -9,7 +9,7 @@ local function IsEnchanting(profession)
 end
 
 addon:Controller("AltoholicUI.RecipeRow", {
-	Update = function(frame, profession, recipeID, color)
+	Update = function(frame, profession, recipeID, color, scannedIcon)
 		local maxMade, craftedItemID, itemName, itemLink, itemRarity, spellLink, spellIcon
 		maxMade = 0
 
@@ -42,8 +42,13 @@ addon:Controller("AltoholicUI.RecipeRow", {
 			frame.CraftedItem:Show()
 		else
 			--frame.CraftedItem:Hide() -- testing showing item results for spells with no result item
-			_, _, spellIcon = GetSpellInfo(recipeID)
-			frame.CraftedItem:SetIcon(spellIcon)
+			-- An icon kept by the scan is authoritative: for enchanting the id may be an item id
+			-- (rods, oils, ..) rather than a spell id, and GetSpellInfo() then returns nothing usable.
+			if not scannedIcon then
+				_, _, spellIcon = GetSpellInfo(recipeID)
+			end
+
+			frame.CraftedItem:SetIcon(scannedIcon or spellIcon)
 			frame.CraftedItem.itemID = nil
 
 			frame.CraftedItem.Icon:SetVertexColor(1, 1, 1)
