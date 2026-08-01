@@ -334,11 +334,12 @@
 		</Frames>
 	</Button>
 	
-	<!-- 11 rows of 18px + borders. Must fit within the 306px of its parent panel, which is now
-	     displayed in the options tab rather than in Blizzard's taller options container. -->
+	<!-- 9 rows of 18px + borders. Anchored 56px down, so it must stay under 250px to fit within the
+	     306px of its parent panel, which is now displayed in the options tab rather than in
+	     Blizzard's taller options container. -->
 	<Frame name="AltoholicFrameSharedContent" parent="AltoholicSharedContent">
 		<Size>
-			<AbsDimension x="300" y="266"/>
+			<AbsDimension x="300" y="230"/>
 		</Size>
 		<Anchors>
 			<Anchor point="TOPLEFT" relativeTo="$parent_ToggleAll" relativePoint="BOTTOMLEFT">
