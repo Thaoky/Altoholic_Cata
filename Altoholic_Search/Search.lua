@@ -478,28 +478,12 @@ function ns:Upgrade_Update()
 end
 
 -- ** Sort functions **
-local function GetCraftName(char, profession, num)
-	-- this is a helper function to quickly retrieve the name of a craft based on a character, profession and line number
-	
-	local c = addon:GetCharacterTableByLine(char)
-	local _, _, spellID = strsplit("^", c.recipes[profession].list[num])
-	return GetSpellInfo(tonumber(spellID))
-end
-
 local function SortByItemName(a, b, ascending)
-	local nameA, nameB
-	if a.id then
-		nameA = GetItemInfo(a.id)
-	else		-- some crafts do not have an item ID, since no item is created (ex: enchanting)
-		nameA = GetCraftName(a.char, a.location, a.craftNum)
-	end
+	-- only the loot & upgrade searches sort on this field, their results always come from a loot table,
+	-- so they always have an item id. An uncached item has no name yet, sort it as if it were empty.
+	local nameA = a.id and C_Item.GetItemInfo(a.id) or ""
+	local nameB = b.id and C_Item.GetItemInfo(b.id) or ""
 
-	if b.id then
-		nameB = GetItemInfo(b.id)
-	else
-		nameB = GetCraftName(b.char, b.location, b.craftNum)
-	end
-	
 	if ascending then
 		return nameA < nameB
 	else

@@ -9,8 +9,6 @@ local L = AddonFactory:GetLocale(addonName)
 local LCI = LibStub("LibCraftInfo-1.0")
 local MVC = LibStub("LibMVC-1.0")
 
-local THIS_ACCOUNT = "Default"
-
 local function InitLocalization()
 	-- this function's purpose is to initialize the text attribute of widgets created in XML.
 	-- in versions prior to 3.1.003, they were initialized through global constants named XML_ALTO_???
@@ -65,24 +63,6 @@ local function BuildUnsafeItemList()
 end
 
 -- *** DB functions ***
-local currentAlt = UnitName("player")
-local currentRealm = GetRealmName()
-local currentAccount = THIS_ACCOUNT
-
-function addon:GetCharacterTable(name, realm, account)
-	-- Usage: 
-	-- 	local c = addon:GetCharacterTable(char, realm, account)
-	--	all 3 parameters default to current player, realm or account
-	-- use this for features that have to work regardless of an alt's location (any realm, any account)
-	local key = format("%s.%s.%s", account or currentAccount, realm or currentRealm, name or currentAlt)
-	return addon.db.global.Characters[key]
-end
-
-function addon:GetCharacterTableByLine(line)
-	-- shortcut to get the right character table based on the line number in the info table.
-	return addon:GetCharacterTable( addon.Characters:GetInfo(line) )
-end
-
 function Altoholic:SetLastAccountSharingInfo(name, realm, account)
 	local domains = Altoholic_Sharing_Options.Domains
 	local key = format("%s.%s", account, realm)
@@ -328,11 +308,6 @@ AddonFactory:OnPlayerLogin(function()
 	}
 	--AltoholicFrameName:SetText(format("Altoholic |cFFD6EB00The Burning Crusade|r Anniversary %s%s|r by %sThaoky", colors.white, addon.Version, colors.classMage))
 	AltoholicFrameName:SetText(format("Altoholic %s %s%s|r by %sThaoky", expansionRelease[LE_EXPANSION_LEVEL_CURRENT], colors.white, addon.Version, colors.classMage))
-
-	-- local realm = GetRealmName()
-	-- local player = UnitName("player")
-	-- local key = format("%s.%s.%s", THIS_ACCOUNT, realm, player)
-	-- addon.ThisCharacter = addon.db.global.Characters[key]
 
 	-- Do not move this line, minimap initialization must happen AFTER OnEnable, otherwise options are not yet ready
 	if Altoholic_UI_Options.Minimap.ShowIcon then
