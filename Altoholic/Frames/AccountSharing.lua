@@ -6,8 +6,10 @@ local LibSerialize = LibStub:GetLibrary("LibSerialize")
 
 Altoholic.Sharing = {}
 Altoholic.Sharing.Clients = {}		-- authorized clients
-Altoholic.Sharing.Content = {}		-- shared content
-Altoholic.Sharing.AvailableContent = {}		-- available content
+
+-- the views start empty: both scroll frames can be scrolled before anything has ever been built
+Altoholic.Sharing.Content = { view = {} }		-- shared content
+Altoholic.Sharing.AvailableContent = { view = {} }		-- available content
 
 local THIS_ACCOUNT = "Default"
 local TOC_SEP = ";"	-- separator used between items
@@ -192,7 +194,7 @@ end
 
 
 
-local ContentCollapsedHeaders			-- a table containing the collapsed headers (character keys)
+local ContentCollapsedHeaders = {}			-- a table containing the collapsed headers (character keys)
 
 local ContentScrollFrame_Desc = {
 	NumLines = 14,
@@ -203,11 +205,11 @@ local ContentScrollFrame_Desc = {
 		end,
 	Update = function(self, offset, entry, desc)
 			local line, LineDesc
-			
+
 			for i=1, desc.NumLines do
 				line = i + offset
-				local lineData = Altoholic.Sharing.Content.view[line]
 				if line <= desc:GetSize() then
+					local lineData = Altoholic.Sharing.Content.view[line]
 					LineDesc = desc.Lines[lineData.linetype]
 					LineDesc:DrawCollapseButton(lineData, entry..i)
 					LineDesc:DrawCheckBox(lineData, entry..i)
@@ -458,8 +460,8 @@ end
 
 
 -- *** Available Content ***
-local AvailableContentCollapsedHeaders			-- a table containing the collapsed headers (character keys)
-local AvailableContentCheckedItems				-- a table containing the items checked in the TOC (index = true)
+local AvailableContentCollapsedHeaders = {}	-- a table containing the collapsed headers (character keys)
+local AvailableContentCheckedItems = {}		-- a table containing the items checked in the TOC (index = true)
 
 local AvailableContentScrollFrame_Desc = {
 	NumLines = 10,
@@ -473,8 +475,8 @@ local AvailableContentScrollFrame_Desc = {
 			
 			for i=1, desc.NumLines do
 				line = i + offset
-				local lineData = Altoholic.Sharing.AvailableContent.view[line]
 				if line <= desc:GetSize() then
+					local lineData = Altoholic.Sharing.AvailableContent.view[line]
 					LineDesc = desc.Lines[lineData.linetype]
 					LineDesc:DrawCollapseButton(lineData, entry..i)
 					_G[entry..i.."CheckText"]:SetText(LineDesc:GetText(lineData))
