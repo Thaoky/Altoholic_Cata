@@ -259,27 +259,26 @@ local function BuildView()
 	
 	local currentXPack, currentFactionGroup = GetOptions()
 
+	-- a faction that does not exist in this version of the game has no name, there is nothing to show
+	-- for it, and it would break the alphabetical sort of the all-in-one view.
 	if (currentXPack ~= CAT_ALLINONE) then
 		for index, faction in ipairs(Factions[currentXPack][currentFactionGroup]) do
-			table.insert(view, faction)	-- insert the table pointer
+			if faction.name then
+				table.insert(view, faction)	-- insert the table pointer
+			end
 		end
 	else	-- all in one, add all factions
 		for xPackIndex, xpack in ipairs(Factions) do		-- all xpacks
 			for factionGroupIndex, factionGroup in ipairs(xpack) do 	-- all faction groups
 				for index, faction in ipairs(factionGroup) do
-					table.insert(view, faction)	-- insert the table pointer
+					if faction.name then
+						table.insert(view, faction)	-- insert the table pointer
+					end
 				end
 			end
 		end
-		
+
 		table.sort(view, function(a,b) 	-- sort all factions alphabetically
-			if not a.name then
-				DEFAULT_CHAT_FRAME:AddMessage(a.icon)
-			end
-			if not b.name then
-				DEFAULT_CHAT_FRAME:AddMessage(b.icon)
-			end
-			
 			return a.name < b.name
 		end)
 	end
