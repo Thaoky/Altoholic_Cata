@@ -120,7 +120,7 @@
 				</KeyValues>
 				<Scripts>
 					<OnClick>
-						self:ShowOptions(8)
+						self:ShowOptions(10)
 					</OnClick>
 				</Scripts>
 			</Button>

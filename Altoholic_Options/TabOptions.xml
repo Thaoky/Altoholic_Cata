@@ -77,6 +77,16 @@
 					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem11" relativePoint="BOTTOMLEFT" x="0" y="0" />
 				</Anchors>
 			</Button>
+			<Button parentKey="MenuItem13" inherits="AltoTabOptionsMenuItemTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem12" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
+			<Button parentKey="MenuItem14" inherits="AltoTabOptionsMenuItemTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.MenuItem13" relativePoint="BOTTOMLEFT" x="0" y="0" />
+				</Anchors>
+			</Button>
 		</Frames>
 		<Scripts>
 			<OnLoad>

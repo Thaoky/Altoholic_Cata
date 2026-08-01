@@ -20,25 +20,29 @@ addon:Controller("AltoholicUI.TabOptions", {
 		frame.MenuItem4:SetText(GetLabel(L["Tooltip"]))
 		frame.MenuItem5:SetText(GetLabel(L["Calendar"]))
 		frame.MenuItem6:SetText(GetLabel(MISCELLANEOUS))
-		
-		frame.MenuItem7:SetText(GetLabel("DataStore", true))
-		frame.MenuItem8:SetText(GetLabel("Auctions"))
-		frame.MenuItem9:SetText(GetLabel("Characters"))
-		frame.MenuItem10:SetText(GetLabel("Inventory"))
-		frame.MenuItem11:SetText(GetLabel("Mails"))
-		frame.MenuItem12:SetText(GetLabel("Quests"))
-		
+		frame.MenuItem7:SetText(GetLabel(L["Account Sharing"]))
+		frame.MenuItem8:SetText(GetLabel("Shared Content"))
+
+		frame.MenuItem9:SetText(GetLabel("DataStore", true))
+		frame.MenuItem10:SetText(GetLabel("Auctions"))
+		frame.MenuItem11:SetText(GetLabel("Characters"))
+		frame.MenuItem12:SetText(GetLabel("Inventory"))
+		frame.MenuItem13:SetText(GetLabel("Mails"))
+		frame.MenuItem14:SetText(GetLabel("Quests"))
+
 		panels[2] = AltoholicGeneralOptions
 		panels[3] = AltoholicMailOptions
 		panels[4] = AltoholicTooltipOptions
 		panels[5] = AltoholicCalendarOptions
 		panels[6] = AltoholicMiscOptions
-		
-		panels[8] = DataStoreFrames.AuctionsOptions
-		panels[9] = DataStoreFrames.CharactersOptions
-		panels[10] = DataStoreFrames.InventoryOptions
-		panels[11] = DataStoreMailOptions
-		panels[12] = DataStoreFrames.QuestsOptions
+		panels[7] = AltoholicAccountSharingOptions
+		panels[8] = AltoholicSharedContent
+
+		panels[10] = DataStoreFrames.AuctionsOptions
+		panels[11] = DataStoreFrames.CharactersOptions
+		panels[12] = DataStoreFrames.InventoryOptions
+		panels[13] = DataStoreMailOptions
+		panels[14] = DataStoreFrames.QuestsOptions
 	end,
 
 	Update = function(frame, panelID)
