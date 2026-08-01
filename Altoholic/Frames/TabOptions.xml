@@ -656,8 +656,8 @@
 							Altoholic:SetFirstDayOfWeek(1)
 						end
 						
-						if IsAddOnLoaded("Altoholic_Agenda") then
-							Altoholic.Calendar:Update()
+						if C_AddOns.IsAddOnLoaded("Altoholic_Agenda") then
+							AltoholicTabAgenda:Refresh()
 						end
 					</OnClick>
 				</Scripts>
