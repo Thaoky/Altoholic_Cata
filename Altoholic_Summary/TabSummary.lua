@@ -17,7 +17,7 @@ function ns:AccountSharingButton_OnEnter(self)
 end
 
 function ns:AccountSharingButton_OnClick()
-	if Altoholic_Sharing_Options.IsEnabled then
+	if not Altoholic_Sharing_Options.IsEnabled then
 		addon:Print(L["Both parties must enable account sharing\nbefore using this feature (see options)"])
 		return
 	end
