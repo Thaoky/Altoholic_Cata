@@ -5,6 +5,7 @@ local colors = addon.Colors
 local L = AddonFactory:GetLocale(addonName)
 local LibDeflate = LibStub:GetLibrary("LibDeflate")
 local LibSerialize = LibStub:GetLibrary("LibSerialize")
+local commPrefix = "AltoShare"
 
 Altoholic.Comm = {}
 
@@ -78,7 +79,7 @@ local function Whisper(player, messageType, ...)
 	local compressedData = LibDeflate:CompressDeflate(serializedData, {level = 8})
 	local encodedData = LibDeflate:EncodeForWoWAddonChannel(compressedData)
 
-	Altoholic:SendCommMessage("AltoShare", encodedData, "WHISPER", player)
+	DataStore:SendChatMessage(commPrefix, encodedData, "WHISPER", player)
 end
 
 local function GetRequestee()
@@ -99,8 +100,8 @@ local function SetStatus(text)
 	AltoAccountSharingTransferStatus:SetText(text)
 end
 
-function Altoholic:AccSharingHandler(prefix, message, distribution, sender)
-	-- 	since Ace 3 communication handlers cannot be enabled/disabled on the fly, 
+local function AccSharingHandler(prefix, message, distribution, sender)
+	-- 	since communication handlers cannot be enabled/disabled on the fly,
 	--	let's use a function pointer to either an empty function, or the normal one
 	local self = Altoholic.Comm.Sharing
 
@@ -108,6 +109,10 @@ function Altoholic:AccSharingHandler(prefix, message, distribution, sender)
 		self[self.msgHandler](self, prefix, message, distribution, sender)
 	end
 end
+
+AddonFactory:OnAddonLoaded(addonName, function()
+	DataStore:OnGuildComm(commPrefix, AccSharingHandler)
+end)
 
 function Altoholic.Comm.Sharing:SetMessageHandler(handler)
 	self.msgHandler = handler
@@ -163,8 +168,8 @@ end
 local function ImportCharacters()
 	-- once data has been transfered, finalize the import by acknowledging that these alts can be seen by client addons
 	-- will be changed when account sharing goes into datastore.
-	for k, v in pairs(importedChars) do
-		DataStore:ImportCharacter(k, v.faction, v.guild)
+	for key in pairs(importedChars) do
+		DataStore:ImportCharacter(key)
 	end
 	importedChars = nil
 end
@@ -223,8 +228,11 @@ function Altoholic.Comm.Sharing:RequestNext(player)
 	
 	Altoholic:SetLastAccountSharingInfo(player, GetRealmName(), self.account)
 	
-	Altoholic.Characters:InvalidateView()
-	Altoholic.Summary:Update()
+	-- the summary tab is load on demand, only refresh it if it has been loaded
+	if Altoholic.Characters then
+		Altoholic.Characters:InvalidateView()
+		Altoholic.Summary:Update()
+	end
 end
 
 local function SharingRequestReceived_Handler(self, button, sender)
@@ -406,13 +414,12 @@ function Altoholic.Comm.Sharing:OnDataStoreCharReceived(sender, data)
 	DataStore:ImportData("DataStore_Characters", data, self.ClientCharName, self.ClientRealmName, self.account)
 
 	-- temporarily deal with this here, will be changed when account sharing goes to  DataStore.
+	-- faction & guild are no longer stored in the character table, they are derived from the imported data,
+	-- so just keep track of the key, and finalize the import once the transfer is over.
 	local key = format("%s.%s.%s", self.account, self.ClientRealmName, self.ClientCharName)
-	
-	importedChars[key] = {}
-	importedChars[key].faction = data.faction
-	importedChars[key].guild = data.guildName
-	
-	-- NO REQUEST NEXT HERE !!
+
+	importedChars[key] = true
+
 	self:RequestNext(sender)
 end
 

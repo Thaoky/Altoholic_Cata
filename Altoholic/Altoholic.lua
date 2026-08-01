@@ -84,13 +84,16 @@ function addon:GetCharacterTableByLine(line)
 end
 
 function Altoholic:SetLastAccountSharingInfo(name, realm, account)
-	local sharing = Altoholic.db.global.Sharing.Domains[format("%s.%s", account, realm)]
-	sharing.lastSharingTimestamp = time()
-	sharing.lastUpdatedWith = name
+	local domains = Altoholic_Sharing_Options.Domains
+	local key = format("%s.%s", account, realm)
+
+	domains[key] = domains[key] or {}
+	domains[key].lastSharingTimestamp = time()
+	domains[key].lastUpdatedWith = name
 end
 
 function Altoholic:GetLastAccountSharingInfo(realm, account)
-	local sharing = Altoholic.db.global.Sharing.Domains[format("%s.%s", account, realm)]
+	local sharing = Altoholic_Sharing_Options.Domains[format("%s.%s", account, realm)]
 	
 	if sharing then
 		return date("%m/%d/%Y %H:%M", sharing.lastSharingTimestamp), sharing.lastUpdatedWith

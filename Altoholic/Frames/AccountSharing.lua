@@ -21,11 +21,11 @@ local function FirstCap(s)
 end
 
 local function GetNumClients()
-	return #Altoholic.db.global.Sharing.Clients
+	return #Altoholic_Sharing_Options.Clients
 end
 
 local function GetClientInfo(index)
-	local info = Altoholic.db.global.Sharing.Clients[index]
+	local info = Altoholic_Sharing_Options.Clients[index]
 	if info then
 		local name, auth = strsplit("|", info)
 		return name, tonumber(auth)
@@ -43,7 +43,7 @@ local ClientsScrollFrame_Desc = {
 	LineHeight = 18,
 	Frame = "AltoholicFrameSharingClients",
 	GetSize = function()
-			return #Altoholic.db.global.Sharing.Clients 
+			return #Altoholic_Sharing_Options.Clients 
 		end,
 	Update = function(self, offset, entry, desc)
 			for i=1, desc.NumLines do
@@ -82,7 +82,7 @@ function Altoholic.Sharing.Clients:Add(name)
 	
 	name = FirstCap(name)
 	
-	local clients = Altoholic.db.global.Sharing.Clients
+	local clients = Altoholic_Sharing_Options.Clients
 	local alreadyExists
 	
 	for _, clientInfo in pairs(clients) do
@@ -101,7 +101,7 @@ function Altoholic.Sharing.Clients:Delete(name)
 	if type(name) ~= "string" then return end
 	
 	name = FirstCap(name)
-	local clients = Altoholic.db.global.Sharing.Clients
+	local clients = Altoholic_Sharing_Options.Clients
 	
 	for index, clientInfo in pairs(clients) do
 		local clientName = strsplit("|", clientInfo)
@@ -115,7 +115,7 @@ end
 function Altoholic.Sharing.Clients:Auth_OnClick(self)
 	local line = self:GetParent():GetID()
 	local name = GetClientInfo(line)
-	local clients = Altoholic.db.global.Sharing.Clients
+	local clients = Altoholic_Sharing_Options.Clients
 	
 	clients[line] = format("%s|%s", name, self:GetID())
 	Altoholic.Sharing.Clients:Update()
@@ -123,7 +123,7 @@ end
 
 function Altoholic.Sharing.Clients:GetRights(name)
 	-- returns the right of a given player
-	local clients = Altoholic.db.global.Sharing.Clients
+	local clients = Altoholic_Sharing_Options.Clients
 	
 	for i = 1, GetNumClients() do
 		local clientName, auth = GetClientInfo(i)
@@ -172,19 +172,19 @@ local CHARACTER_DATASTORE_LINE	= 4
 local CLASS_REFDATA_LINE			= 5		-- only for available content, not for shared content view
 
 local function isGuildShared(realm, name)
-	local sc = Altoholic.db.global.Sharing.SharedContent
+	local sc = Altoholic_Sharing_Options.SharedContent
 	local index = format("%s.%s.%s", THIS_ACCOUNT, realm, name)
 
 	return sc[index]
 end
 
 local function isCharacterShared(key)
-	local sc = Altoholic.db.global.Sharing.SharedContent
+	local sc = Altoholic_Sharing_Options.SharedContent
 	return sc[key]
 end
 
 local function isCharacterDataShared(key, module)
-	local sc = Altoholic.db.global.Sharing.SharedContent
+	local sc = Altoholic_Sharing_Options.SharedContent
 	local index = key .. "." .. module
 	
 	return sc[index]
@@ -309,7 +309,7 @@ function Altoholic.Sharing.Content:Check_OnClick(self, button)
 	local self = Altoholic.Sharing.Content
 	local line = self.view[id]
 	
-	local sc = Altoholic.db.global.Sharing.SharedContent
+	local sc = Altoholic_Sharing_Options.SharedContent
 	local index
 	
 	if line.linetype == CHARACTER_HEADER_LINE then
@@ -352,7 +352,7 @@ function Altoholic.Sharing.Content:ToggleAll(self, button)
 end
 
 function Altoholic.Sharing.Content:CheckAll(self, button)
-	local sc = Altoholic.db.global.Sharing.SharedContent
+	local sc = Altoholic_Sharing_Options.SharedContent
 
 	if not self.isChecked then			-- are all entries collapsed or not ?
 		self.isChecked = true
