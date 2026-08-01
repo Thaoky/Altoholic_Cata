@@ -142,6 +142,12 @@ local function TradeskillHeader_OnEnter(frame, tooltip)
 	tooltip:AddLine(format("%s%s|r %s %s %s", colors.orange, L["COLOR_ORANGE"], L["at"], SKILL_CAP, L["and above"]),1,1,1)
 end
 
+local function HasRecipes(profession)
+	-- Old school enchanting is stored as a flat list of crafts, with no categories at all,
+	-- so the number of categories does not tell whether a profession holds any recipe.
+	return (profession and profession.Crafts and #profession.Crafts > 0) and true or false
+end
+
 local function Tradeskill_OnEnter(frame, professionIndex, showRecipeStats)
 	local character = frame:GetParent().character
 	if not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
@@ -172,9 +178,7 @@ local function Tradeskill_OnEnter(frame, professionIndex, showRecipeStats)
 			
 
 
-			local numCategories = DataStore:GetNumRecipeCategories(profession)
-			
-			if numCategories == 0 then
+			if not HasRecipes(profession) then
 				tt:AddLine(format("%s: 0 %s", L["No data"], TRADESKILL_SERVICE_LEARN),1,1,1)
 			else
 				local orange, yellow, green, grey = DataStore:GetNumRecipesByColor(profession)
@@ -221,7 +225,7 @@ local function Tradeskill_OnClick(frame, professionIndex)
 	if not professionIndex or not DataStore:GetModuleLastUpdateByKey("DataStore_Crafts", character) then return end
 
 	local profession = DataStore:GetProfessionByIndex(character, professionIndex)
-	if not profession or DataStore:GetNumRecipeCategories(profession) == 0 then		-- if profession hasn't been scanned (or scan failed), exit
+	if not HasRecipes(profession) then		-- if profession hasn't been scanned (or scan failed), exit
 		return
 	end
 	
