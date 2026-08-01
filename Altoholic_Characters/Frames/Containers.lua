@@ -10,20 +10,26 @@ addon.Containers = {}
 
 local ns = addon.Containers		-- ns = namespace
 
+local function GetMainBankSize(character)
+	-- the main bank is 24 slots on Classic Era, 28 from TBC onwards, so read the size that was
+	-- actually scanned for that character rather than assuming the one of the running client
+	return DataStore:GetPlayerBankSize(character) or 0
+end
+
 local function Bag_OnEnter(self)
 	local id = self:GetID()
+	local character = Altoholic.Tabs.Characters:GetAltKey()
 	GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-	
+
 	if id == 0 then
 		GameTooltip:AddLine(BACKPACK_TOOLTIP, 1, 1, 1)
-		GameTooltip:AddLine(format(CONTAINER_SLOTS, 16, BAGSLOT), 1, 1, 1)
-	
+		GameTooltip:AddLine(format(CONTAINER_SLOTS, DataStore:GetContainerSize(character, id), BAGSLOT), 1, 1, 1)
+
 	elseif id == enum.MainBankSlots then
 		GameTooltip:AddLine(L["Bank"], 0.5, 0.5, 1)
-		GameTooltip:AddLine(format("%d %s", 28, L["slots"]), 1, 1, 1)
-	
+		GameTooltip:AddLine(format("%d %s", GetMainBankSize(character), L["slots"]), 1, 1, 1)
+
 	else
-		local character = Altoholic.Tabs.Characters:GetAltKey()
 		local link = DataStore:GetContainerLink(character, id)
 		GameTooltip:SetHyperlink(link)
 		if (id >= 5) and (id <= 11) then
@@ -59,6 +65,14 @@ local function GetContainer(character, containerID)
 		return DataStore:GetPlayerBank(character)
 	else
 		return DataStore:GetContainer(character, containerID)
+	end
+end
+
+local function GetContainerSize(character, containerID)
+	if containerID == enum.MainBankSlots then
+		return GetMainBankSize(character)
+	else
+		return DataStore:GetContainerSize(character, containerID)
 	end
 end
 
@@ -98,7 +112,7 @@ local function UpdateSpread()
 			
 			local container = GetContainer(character, containerID)
 			local containerIcon = DataStore:GetContainerIcon(character, containerID)
-			local containerSize = DataStore:GetContainerSize(character, containerID)
+			local containerSize = GetContainerSize(character, containerID)
 			
 			-- Column 1 : the bag
 			itemButton = rowFrame.Item1
@@ -194,7 +208,7 @@ local function UpdateAllInOne()
 	
 		for _, containerID in pairs(containerList) do
 			local container = GetContainer(character, containerID)
-			local containerSize = DataStore:GetContainerSize(character, containerID)
+			local containerSize = GetContainerSize(character, containerID)
 
 			for slotID = 1, containerSize do
 				local itemID, itemLink, itemCount, isBattlePet = DataStore:GetSlotInfo(container, slotID)
@@ -281,7 +295,7 @@ function ns:UpdateCache()
 		end
 		
 		if DataStore:HasPlayerVisitedBank(character) then 	-- if bank has been visited, add it
-			UpdateBagIndices(enum.MainBankSlots, 28)
+			UpdateBagIndices(enum.MainBankSlots, GetMainBankSize(character))
 		end
 	end
 end
