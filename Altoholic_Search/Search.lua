@@ -496,8 +496,9 @@ local function SortByName(a, b, ascending)
 	local LineDescA = desc.Lines[a.linetype]
 	local LineDescB = desc.Lines[b.linetype]
 
-	local nameA = LineDescA:GetItemData(a)			-- retrieve the name ..
-	local nameB = LineDescB:GetItemData(b)
+	-- retrieve the name .. an uncached item has none yet, sort it as if it were empty
+	local nameA = LineDescA:GetItemData(a) or ""
+	local nameB = LineDescB:GetItemData(b) or ""
 	
 	if ascending then
 		return nameA < nameB
