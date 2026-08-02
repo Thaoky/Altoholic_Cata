@@ -117,14 +117,15 @@ local function Title(text, color)
 	return format("%s%s%s", color or colors.gold, text, white)
 end
 
-local HELP_SEND_REQUEST = format("%s %s\n%s\n\n%s %s\n%s\n%s",
+local HELP_SEND_REQUEST = format("%s %s\n%s\n%s\n\n%s %s\n%s\n%s",
 	Title("1) Account Name:"),
 	format("a label of your choice for the account you want to import data %s (ex: the name or the nickname", Highlight("from")),
-	"of the player behind it). It only groups the imported characters in your Summary tab, and does not have to be a real account or character name.",
+	"of the player behind it). It only groups the imported characters in your Summary tab, and can be anything you like.",
+	"Type the same name again next time: the import will then update that group, instead of adding a second account.",
 	Title("2) Send Request:"),
-	format("target the player, or type the name of the character he is %s, then click the button.", Highlight("playing right now")),
-	"He must have account sharing enabled, and either accept your request manually, or have authorized you in advance.",
-	"Once he accepts, everything he shares will be listed on the right, and this button will become 'Request Content'.")
+	format("target the other player, or type the name of the character %s, then click the button.", Highlight("currently being played")),
+	"The other side must have account sharing enabled, and must either accept your request, or have authorized your character in advance.",
+	"Once the request is accepted, everything shared on that side will be listed on the right, and this button will become 'Request Content'.")
 
 local HELP_REQUEST_CONTENT = format("%s %s\n%s\n%s\n\n%s",
 	Title("Request accepted.", colors.green),
@@ -137,13 +138,14 @@ local HELP_TRANSFER_IN_PROGRESS = format("%s%s\n%s", white,
 	"Transfer in progress, please wait...",
 	"Both characters must stay online until it is complete.")
 
-local HELP_TRANSFER_COMPLETE = format("%s %s\n%s\n\n%s %s\n%s",
+local HELP_TRANSFER_COMPLETE = format("%s %s\n%s\n\n%s %s\n%s\n%s",
 	Title("Transfer complete.", colors.green),
 	"The imported characters are now in your Summary tab, grouped under the account name you entered.",
 	"The list on the right has been cleared, this is normal.",
 	Title("Note:"),
 	format("an import is a one-time snapshot, it is %s kept up to date automatically.", Highlight("not")),
-	"To refresh it later, right-click the realm line in the Summary tab and choose 'Update from ...', or come back here.")
+	"To refresh it later, right-click the realm line in the Summary tab and choose 'Update from ...', or come back here.",
+	"Any character of that account can serve the data, so ask whichever one is online, and reuse the same account name.")
 
 local function AccSharingHandler(prefix, message, distribution, sender)
 	-- 	since communication handlers cannot be enabled/disabled on the fly,
@@ -208,8 +210,8 @@ function Altoholic.Comm.Sharing:Request()
 		SetStatus(format("Getting table of content from %s", player))
 		SetHelp(format("%s %s\n%s\n%s", Title("Request sent."),
 			format("Waiting for %s to answer...", player),
-			"He has to accept it, unless he has already authorized your character in his own options.",
-			"If nothing happens, make sure he is online, on the same realm, and that he is running Altoholic."))
+			"The request must be accepted on the other side, unless your character is already authorized there.",
+			format("If nothing happens, check that %s is online, on your realm, and running Altoholic.", player)))
 		Whisper(player, MSG_ACCOUNT_SHARING_REQUEST)
 	end
 end
@@ -388,7 +390,7 @@ function Altoholic.Comm.Sharing:OnPlayerInCombat(sender, data)
 	SetStatus(format("%s%s", colors.red, format(L["%s is in combat, request cancelled"], sender)))
 	SetHelp(format("%s %s\n%s", Title("Request cancelled.", colors.red),
 		"Account sharing requests are always rejected while the other player is in combat.",
-		"Wait until he is out of combat, then send the request again."))
+		"Wait until combat is over, then send the request again."))
 	self.SharingInProgress = nil
 end
 
@@ -396,7 +398,7 @@ function Altoholic.Comm.Sharing:OnSharingDisabled(sender, data)
 	SetStatus(format("%s%s", colors.red, format(L["%s has disabled account sharing"], sender)))
 	SetHelp(format("%s %s\n%s", Title("Request rejected.", colors.red),
 		"This player has not enabled account sharing.",
-		"He must tick 'Account Sharing Enabled' in his own Altoholic options before you can request anything."))
+		"'Account Sharing Enabled' must be ticked in the other player's own Altoholic options before you can request anything."))
 	self.SharingInProgress = nil
 end
 

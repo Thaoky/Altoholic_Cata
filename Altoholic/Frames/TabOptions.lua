@@ -346,7 +346,7 @@ function addon:SetupOptions()
 		white.."A request from a character that is not listed opens a confirmation box, and adds that character below, set to 'ask'.",
 		white.."Set the answer in advance instead:",
 		authLegend,
-		white.."A requester is identified by the character sending the request, not by his account: add every alt of a player you want to cover.",
+		white.."A requester is identified by the character sending the request, not by the account behind it: add every alt of a player you want to cover.",
 		white.."Type a name and click Add. Click a name in the list to copy it back to the edit box."))
 
 
