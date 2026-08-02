@@ -1,5 +1,6 @@
 local addonName, addon = ...
 local colors = addon.Colors
+local icons = addon.Icons
 
 local L = AddonFactory:GetLocale(addonName)
 
@@ -329,19 +330,40 @@ function addon:SetupOptions()
 	L["When |cFFFF0000disabled|cFFFFFFFF, all requests will be automatically rejected.\n\n"] = nil
 	L["Security hint: Only enable this when you actually need to transfer data,\ndisable otherwise"] = nil
 
-	AltoholicAccountSharingOptions_InfoButton.tooltip = format("%s\n%s\n\n%s", 
-	
+	AltoholicAccountSharingOptions_InfoButton.tooltip = format("%s\n%s\n\n%s",
+
 	colors.white.."This list allows you to automate responses to account sharing requests.",
 	"You can choose to automatically accept or reject requests, or be asked when a request comes in.",
 	"If account sharing is totally disabled, this list will be ignored, and all requests will be rejected." )
-	
-	
+
+	local white = colors.white
+	local authLegend = format("%s %salways reject,   %s %sask every time,   %s %salways accept",
+		icons.notReady, white, icons.waiting, white, icons.ready, white)
+
+	f.Help:SetText(format("%s\n\n%s\n\n%s\n\n%s\n%s\n\n%s\n\n%s",
+		colors.gold.."How requests are handled",
+		white.."Requests are always rejected while you are in combat.",
+		white.."A request from a character that is not listed opens a confirmation box, and adds that character below, set to 'ask'.",
+		white.."Set the answer in advance instead:",
+		authLegend,
+		white.."A requester is identified by the character sending the request, not by his account: add every alt of a player you want to cover.",
+		white.."Type a name and click Add. Click a name in the list to copy it back to the edit box."))
+
+
 	-- ** Shared Content **
 	AltoholicSharedContentText1:SetText(colors.white.."Shared Content")
-	AltoholicSharedContent_SharedContentInfoButton.tooltip = format("%s\n%s", 
+	AltoholicSharedContent_SharedContentInfoButton.tooltip = format("%s\n%s",
 		colors.white.."Select the content that will be visible to players who send you",
 		"account sharing requests.")
-	
+
+	AltoholicSharedContent.Help:SetText(format("%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s",
+		colors.gold.."What you share",
+		white.."Nothing is sent until you check it here. This applies to every player whose request you accept.",
+		white.."Check a character to share it, its data categories are checked with it. Uncheck what you want to keep private.",
+		white.."Name, class, level, money and played time are always part of the transfer.",
+		white.."The [-] button expands or collapses everything, the 'All' box checks or unchecks everything.",
+		colors.grey.."Changes apply to the next request you accept."))
+
 	
 	-- ** Tooltip **
 	f = AltoholicTooltipOptions

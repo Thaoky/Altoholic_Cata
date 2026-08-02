@@ -100,6 +100,51 @@ local function SetStatus(text)
 	AltoAccountSharingTransferStatus:SetText(text)
 end
 
+-- *** User guidance ***
+-- the help text at the bottom of the frame describes the step the user is currently at
+
+local function SetHelp(text)
+	AltoAccountSharingHelp:SetText(text)
+end
+
+local white = colors.white
+
+local function Highlight(text)		-- highlight a few words inside a white paragraph
+	return format("%s%s%s", colors.green, text, white)
+end
+
+local function Title(text, color)
+	return format("%s%s%s", color or colors.gold, text, white)
+end
+
+local HELP_SEND_REQUEST = format("%s %s\n%s\n\n%s %s\n%s\n%s",
+	Title("1) Account Name:"),
+	format("a label of your choice for the account you want to import data %s (ex: the name or the nickname", Highlight("from")),
+	"of the player behind it). It only groups the imported characters in your Summary tab, and does not have to be a real account or character name.",
+	Title("2) Send Request:"),
+	format("target the player, or type the name of the character he is %s, then click the button.", Highlight("playing right now")),
+	"He must have account sharing enabled, and either accept your request manually, or have authorized you in advance.",
+	"Once he accepts, everything he shares will be listed on the right, and this button will become 'Request Content'.")
+
+local HELP_REQUEST_CONTENT = format("%s %s\n%s\n%s\n\n%s",
+	Title("Request accepted.", colors.green),
+	"What this player shares is now listed on the right, nothing has been imported yet.",
+	"Check the characters and the data you want (checking a character also checks its data categories), or use the",
+	"[-] and 'All' boxes above the list to expand or check everything, then click Request Content.",
+	"The date column tells you how old each item is, 'Up-to-date' means you already have that exact version.")
+
+local HELP_TRANSFER_IN_PROGRESS = format("%s%s\n%s", white,
+	"Transfer in progress, please wait...",
+	"Both characters must stay online until it is complete.")
+
+local HELP_TRANSFER_COMPLETE = format("%s %s\n%s\n\n%s %s\n%s",
+	Title("Transfer complete.", colors.green),
+	"The imported characters are now in your Summary tab, grouped under the account name you entered.",
+	"The list on the right has been cleared, this is normal.",
+	Title("Note:"),
+	format("an import is a one-time snapshot, it is %s kept up to date automatically.", Highlight("not")),
+	"To refresh it later, right-click the realm line in the Summary tab and choose 'Update from ...', or come back here.")
+
 local function AccSharingHandler(prefix, message, distribution, sender)
 	-- 	since communication handlers cannot be enabled/disabled on the fly,
 	--	let's use a function pointer to either an empty function, or the normal one
@@ -161,6 +206,10 @@ function Altoholic.Comm.Sharing:Request()
 		-- AltoAccountSharing:Hide()
 		Altoholic:Print(format(L["Sending account sharing request to %s"], player))
 		SetStatus(format("Getting table of content from %s", player))
+		SetHelp(format("%s %s\n%s\n%s", Title("Request sent."),
+			format("Waiting for %s to answer...", player),
+			"He has to accept it, unless he has already authorized your character in his own options.",
+			"If nothing happens, make sure he is online, on the same realm, and that he is running Altoholic."))
 		Whisper(player, MSG_ACCOUNT_SHARING_REQUEST)
 	end
 end
@@ -225,7 +274,8 @@ function Altoholic.Comm.Sharing:RequestNext(player)
 	
 	Altoholic.Sharing.AvailableContent:Clear()
 	self:SetMode(1)
-	
+	SetHelp(HELP_TRANSFER_COMPLETE)		-- SetMode has just reset the help text, tell the user what happened instead
+
 	Altoholic:SetLastAccountSharingInfo(player, GetRealmName(), self.account)
 	
 	-- the summary tab is load on demand, only refresh it if it has been loaded
@@ -261,6 +311,7 @@ function Altoholic.Comm.Sharing:OnSharingRequest(sender, data)
 	
 	if not auth then		-- if the sender is not a known client, add him with defaults rights (=ask)
 		Altoholic.Sharing.Clients:Add(sender)
+		Altoholic.Sharing.Clients:Update()		-- refresh the authorization list, the option pane may be open
 		auth = AUTH_ASK
 	end
 	
@@ -310,39 +361,52 @@ function Altoholic.Comm.Sharing:SetMode(mode)
 	if mode == 1 then			-- send request, expect toc in return
 		button:SetText("Send Request")
 		button:Enable()
-		button.requestMode = nil	
+		button.requestMode = nil
+		SetHelp(HELP_SEND_REQUEST)
 	elseif mode == 2 then	-- request content, get data in return
 		button:SetText("Request Content")
 		button:Enable()
-		button.requestMode = true	
+		button.requestMode = true
+		SetHelp(HELP_REQUEST_CONTENT)
 	elseif mode == 3 then
 		importedChars = importedChars or {}
 		wipe(importedChars)
 		button:Disable()
+		SetHelp(HELP_TRANSFER_IN_PROGRESS)
 	end
 end
 
 function Altoholic.Comm.Sharing:OnSharingRefused(sender, data)
-	SetStatus(format(L["Request rejected by %s"], sender))
+	SetStatus(format("%s%s", colors.red, format(L["Request rejected by %s"], sender)))
+	SetHelp(format("%s %s\n%s", Title("Request rejected.", colors.red),
+		"This player either declined your request, or has set your character to 'always reject'.",
+		"Nothing has been imported. You may send a new request at any time."))
 	self.SharingInProgress = nil
 end
 
 function Altoholic.Comm.Sharing:OnPlayerInCombat(sender, data)
-	SetStatus(format(L["%s is in combat, request cancelled"], sender))
+	SetStatus(format("%s%s", colors.red, format(L["%s is in combat, request cancelled"], sender)))
+	SetHelp(format("%s %s\n%s", Title("Request cancelled.", colors.red),
+		"Account sharing requests are always rejected while the other player is in combat.",
+		"Wait until he is out of combat, then send the request again."))
 	self.SharingInProgress = nil
 end
 
 function Altoholic.Comm.Sharing:OnSharingDisabled(sender, data)
-	SetStatus(format(L["%s has disabled account sharing"], sender))
+	SetStatus(format("%s%s", colors.red, format(L["%s has disabled account sharing"], sender)))
+	SetHelp(format("%s %s\n%s", Title("Request rejected.", colors.red),
+		"This player has not enabled account sharing.",
+		"He must tick 'Account Sharing Enabled' in his own Altoholic options before you can request anything."))
 	self.SharingInProgress = nil
 end
 
 function Altoholic.Comm.Sharing:OnSharingAccepted(sender, data)
 	self.DestTOC = data
 	self.NetDestCurItem = 0
-	SetStatus(format(L["Table of content received (%d items)"], #self.DestTOC))
-	
+	SetStatus(format("%s%s", colors.green, format(L["Table of content received (%d items)"], #self.DestTOC)))
+
 	-- build & refresh the scroll frame
+	Altoholic.Sharing.AvailableContent:ResetScroll()
 	Altoholic.Sharing.AvailableContent:BuildView()
 	Altoholic.Sharing.AvailableContent:Update()
 	

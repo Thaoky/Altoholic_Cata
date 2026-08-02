@@ -304,22 +304,29 @@ function Altoholic.Sharing.Content:Collapse_OnClick(self, button)
 	self:Update()
 end
 
-function Altoholic.Sharing.Content:Check_OnClick(self, button)
-	local id = self:GetParent():GetID()
-	local isChecked = self:GetChecked()
-	
-	local self = Altoholic.Sharing.Content
+function Altoholic.Sharing.Content:Check_OnClick(checkbox, button)
+	local id = checkbox:GetParent():GetID()
+	local isChecked = checkbox:GetChecked() or nil
 	local line = self.view[id]
-	
+
 	local sc = Altoholic_Sharing_Options.SharedContent
-	local index
-	
+
 	if line.linetype == CHARACTER_HEADER_LINE then
-		index = line.key
+		-- a character and its data categories are checked/unchecked together
+		sc[line.key] = isChecked
+
+		for _, module in ipairs(optionalModules) do
+			sc[line.key .. "." .. module] = isChecked
+		end
 	else
-		index = line.key .. "." .. line.module
+		sc[line.key .. "." .. line.module] = isChecked
+
+		-- a data category is only sent if its character is shared, so share it implicitly
+		if isChecked then
+			sc[line.key] = true
+		end
 	end
-	sc[index] = isChecked
+
 	self:BuildView()
 	self:Update()
 end
@@ -463,6 +470,11 @@ end
 local AvailableContentCollapsedHeaders = {}	-- a table containing the collapsed headers (character keys)
 local AvailableContentCheckedItems = {}		-- a table containing the items checked in the TOC (index = true)
 
+-- the TOC is a flat list, these two tables keep track of the character/data module hierarchy,
+-- so that checking a line can also check the lines that depend on it (even if they are collapsed)
+local AvailableContentChildren = {}				-- [TOC index of a character] = table of TOC indexes of its data modules
+local AvailableContentParents = {}				-- [TOC index of a data module] = TOC index of its character
+
 local AvailableContentScrollFrame_Desc = {
 	NumLines = 10,
 	LineHeight = 18,
@@ -584,30 +596,41 @@ function Altoholic.Sharing.AvailableContent:BuildView()
 	AvailableContentCheckedItems = AvailableContentCheckedItems or {}
 	self.view = self.view or {}
 	wipe(self.view)
-	
+	wipe(AvailableContentChildren)
+	wipe(AvailableContentParents)
+
 	local sharing = Altoholic.Comm.Sharing
 	self.ToC = sharing.DestTOC
 	if not self.ToC then return end
-	
+
 	local account = sharing:GetAccount()
 	local realm, character, guildName
-	
+	local characterID		-- TOC index of the character being parsed
+
 	for i = 1, #self.ToC do
 		local tocType, arg1, arg2, arg3, arg4 = strsplit(TOC_SEP, self.ToC[i])
-		
+
 		if tocType == TOC_SETREALM then
 			realm = arg1
 		elseif tocType == TOC_SETCHAR then
 			character = format("%s.%s.%s", account, realm, arg1)
-			table.insert(self.view, { 
-				linetype = CHARACTER_HEADER_LINE, 
-				key = character, 
-				class = arg2, 
+			characterID = i
+			AvailableContentChildren[i] = {}
+
+			table.insert(self.view, {
+				linetype = CHARACTER_HEADER_LINE,
+				key = character,
+				class = arg2,
 				size = tonumber(arg3),
 				lastUpdate = tonumber(arg4),
 				parentID = i,
 			} )
 		elseif tocType == TOC_DATASTORE then
+			if characterID then		-- keep track of the hierarchy, collapsed or not
+				table.insert(AvailableContentChildren[characterID], i)
+				AvailableContentParents[i] = characterID
+			end
+
 			if not AvailableContentCollapsedHeaders[character] then
 				table.insert(self.view, { 
 					linetype = CHARACTER_DATASTORE_LINE, 
@@ -649,14 +672,25 @@ function Altoholic.Sharing.AvailableContent:Collapse_OnClick(self, button)
 	content:Update()
 end
 
-function Altoholic.Sharing.AvailableContent:Check_OnClick(self, button)
-	local id = self:GetID()
-	
-	if not AvailableContentCheckedItems[id] then
-		AvailableContentCheckedItems[id] = true
-	else
-		AvailableContentCheckedItems[id] = nil
+function Altoholic.Sharing.AvailableContent:Check_OnClick(checkbox, button)
+	local id = checkbox:GetID()			-- the id of a checkbox is its index in the TOC
+	local isChecked = checkbox:GetChecked() or nil
+
+	AvailableContentCheckedItems[id] = isChecked
+
+	local children = AvailableContentChildren[id]
+	if children then			-- a character : check/uncheck all its data modules along with it
+		for _, childID in ipairs(children) do
+			AvailableContentCheckedItems[childID] = isChecked
+		end
+	elseif isChecked then	-- a data module : its character must be transferred too, or the data would be imported on the wrong alt
+		local parentID = AvailableContentParents[id]
+		if parentID then
+			AvailableContentCheckedItems[parentID] = true
+		end
 	end
+
+	self:Update()
 end
 
 function Altoholic.Sharing.AvailableContent:ToggleAll(self, button)
@@ -699,9 +733,16 @@ function Altoholic.Sharing.AvailableContent:CheckAll(self, button)
 	
 	local content = Altoholic.Sharing.AvailableContent
 	if not content.view then return end
-	
+
 	for k, v in pairs(content.view) do			-- parse the whole view
 		AvailableContentCheckedItems[v.parentID] = self.isChecked	-- check or uncheck all
+
+		local children = AvailableContentChildren[v.parentID]
+		if children then		-- also handle the data modules of collapsed characters
+			for _, childID in ipairs(children) do
+				AvailableContentCheckedItems[childID] = self.isChecked
+			end
+		end
 	end
 
 	local self = Altoholic.Sharing.AvailableContent
@@ -725,12 +766,22 @@ function Altoholic.Sharing.AvailableContent:IsItemChecked(index)
 	return AvailableContentCheckedItems[index]
 end
 
+function Altoholic.Sharing.AvailableContent:ResetScroll()
+	-- the scroll frame keeps its offset from one transfer to the next, and a stale offset
+	-- would leave the list looking empty until the next scroll, so reset it before listing new content
+	local scrollFrame = AltoholicFrameAvailableContentScrollFrame
+
+	scrollFrame:SetOffset(0)
+	scrollFrame.ScrollBar:SetValue(0)
+end
+
 function Altoholic.Sharing.AvailableContent:Clear()
 	-- clear command, after a successful transfer
-	
+
 	wipe(AvailableContentCollapsedHeaders)
 	wipe(AvailableContentCheckedItems)
-	
+
+	self:ResetScroll()
 	self:BuildView()
 	self:Update()
 end

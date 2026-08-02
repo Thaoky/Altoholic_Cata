@@ -481,6 +481,13 @@
 						<Anchor point="TOPLEFT" relativeKey="$parent.IconAsk" relativePoint="TOPRIGHT" x="3" y="0" />
 					</Anchors>
 				</FontString>
+				<!-- the authorization list only takes the left half of the pane, the help text goes on the right -->
+				<FontString parentKey="Help" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP">
+					<Size x="305" y="275" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="290" y="-20" />
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -588,6 +595,13 @@
 					<Size x="100" y="18" />
 					<Anchors>
 						<Anchor point="TOPLEFT" x="110" y="-20" />
+					</Anchors>
+				</FontString>
+				<!-- the content list only takes the left half of the pane, the help text goes on the right -->
+				<FontString parentKey="Help" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP">
+					<Size x="255" y="275" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="345" y="-20" />
 					</Anchors>
 				</FontString>
 			</Layer>

@@ -14,8 +14,9 @@ local function InitLocalization()
 	-- in versions prior to 3.1.003, they were initialized through global constants named XML_ALTO_???
 	-- the strings stayed in memory for no reason, and could not be included in the automated localization offered by curse, hence the change of approach.
 	
-	AltoAccountSharing_InfoButton.tooltip = format("%s|r\n%s\n%s\n\n%s",
-		colors.white..L["Account Name"], 
+	AltoAccountSharing_InfoButton.tooltip = format("%s|r\n%s\n%s\n%s\n\n%s",
+		colors.white..L["Account Name"],
+		"It identifies the account you are importing\ndata |cFF00FF00from|r, ex: the name of the player behind it.",
 		L["Enter an account name that will be\nused for |cFF00FF00display|r purposes only."],
 		L["This name can be anything you like,\nit does |cFF00FF00NOT|r have to be the real account name."],
 		L["This field |cFF00FF00cannot|r be left empty."])

@@ -225,16 +225,17 @@
 		</Frames>
 	</Frame>
 	
+	<!-- 300px for the request controls & the content list, plus 120px for the help text at the bottom -->
 	<Frame name="AltoAccountSharing" toplevel="true" parent="UIParent" hidden="true">
-		<Size x="800" y="300" />
+		<Size x="800" y="420" />
 		<Anchors>
 			<Anchor point="CENTER" x="0" y="20" />
 		</Anchors>
 		<Frames>
 			<!-- 	for readability reasons, the scroll frame is in Frames/AccountSharing.xml	-->
-			
+
 			<Frame parentKey="Backdrop" setAllPoints="true" inherits="BackdropTemplate">
-				<Size x="800" y="300" />
+				<Size x="800" y="420" />
 				<Anchors>
 					<Anchor point="TOPLEFT"/>
 				</Anchors>
@@ -287,6 +288,13 @@
 							<Size x="260" y="18" />
 							<Anchors>
 								<Anchor point="TOPLEFT" x="30" y="-170" />
+							</Anchors>
+						</FontString>
+						<!-- Guides the user through the request, its text is set in Comm.lua, and depends on the current step -->
+						<FontString name="$parentHelp" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP">
+							<Size x="740" y="110" />
+							<Anchors>
+								<Anchor point="TOPLEFT" x="30" y="-295" />
 							</Anchors>
 						</FontString>
 					</Layer>
