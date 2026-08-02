@@ -193,7 +193,8 @@ addon:Controller("AltoholicUI.Recipes", {
 		end
 	end,
 	OnSearchTextChanged = function(frame, self)
-		currentSearch = self:GetText()
+		-- lower case it, recipe names are matched in lower case too
+		currentSearch = strlower(self:GetText())
 		frame:Update()
 	end,
 })
