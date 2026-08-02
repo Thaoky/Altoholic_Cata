@@ -96,6 +96,11 @@ local function RecipePassesSlotFilter(recipeID)
 	return (currentSlots == NONEQUIPSLOT)
 end
 
+-- An item is only named once the client has cached it, which may not be the case for an alt's
+-- recipes. Track those, the search would silently hide them until their name is known.
+local isNameMissing
+local isWaitingForItemNames
+
 local function RecipePassesSearchFilter(recipeID)
 	-- no search filter ? ok
 	if currentSearch == "" then return true end
@@ -103,14 +108,19 @@ local function RecipePassesSearchFilter(recipeID)
 
 	-- Match on the name of the crafted item, which is the one being displayed ..
 	local itemID = GetCraftedItemID(recipeID)
-	local name = itemID and C_Item.GetItemInfo(itemID)
+	local name = itemID and C_Item.GetItemInfo(itemID)		-- this also queries the server if need be
 
 	-- .. or on the spell name for recipes that craft no item, like enchants
 	if not itemID then
 		name = GetSpellInfo(recipeID)
 	end
 
-	if name and string.find(strlower(name), currentSearch, 1, true) then
+	if not name then
+		isNameMissing = true
+		return
+	end
+
+	if string.find(strlower(name), currentSearch, 1, true) then
 		return true
 	end
 end
@@ -119,12 +129,14 @@ local function GetRecipeList(character, professionName, mainCategory)
 	local list = {}
 	local profession = DataStore:GetProfession(character, professionName)
 
-	DataStore:IterateRecipes(profession, mainCategory, 0, function(color, recipeID, index) 
+	isNameMissing = nil
+
+	DataStore:IterateRecipes(profession, mainCategory, 0, function(color, recipeID, index)
 		if RecipePassesColorFilter(color) and RecipePassesSlotFilter(recipeID) and RecipePassesSearchFilter(recipeID) then
 			table.insert(list, index)
 		end
 	end)
-	
+
 	return list
 end
 
@@ -140,10 +152,35 @@ addon:Controller("AltoholicUI.Recipes", {
 	GetRecipeColorName = function(frame, index) return format("%s%s", RecipeColors[index], RecipeColorNames[index]) end,
 	GetCraftedItemID = function(frame, recipeID) return GetCraftedItemID(recipeID) end,
 
+	-- Redo the search when the names missing from the item cache arrive
+	WaitForItemNames = function(frame, isWaiting)
+		if isWaiting == isWaitingForItemNames then return end		-- already in the right state ?
+
+		isWaitingForItemNames = isWaiting
+
+		-- tag it, the scope is the whole add-on, and this event is of interest to others
+		if not isWaiting then
+			addon:StopListeningTo("GET_ITEM_INFO_RECEIVED", "Recipes")
+			return
+		end
+
+		addon:ListenTo("GET_ITEM_INFO_RECEIVED", function()
+			-- stop as soon as the recipes are not being looked at anymore
+			if not frame:IsVisible() then
+				frame:WaitForItemNames(nil)
+				return
+			end
+
+			frame:Update()
+		end, "Recipes")
+	end,
+
 	Update = function(frame)
 		local character = addon.Tabs.Characters:GetAltKey()
 		local recipeList = GetRecipeList(character, currentProfession, mainCategory)
-		
+
+		frame:WaitForItemNames(isNameMissing)
+
 		local isEnchanting = IsEnchanting(currentProfession)
 		SetStatus(character, currentProfession, mainCategory, #recipeList)
 	
