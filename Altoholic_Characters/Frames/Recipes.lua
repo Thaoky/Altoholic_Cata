@@ -4,6 +4,10 @@ local colors = addon.Colors
 
 local L = AddonFactory:GetLocale(addonName)
 
+local recipeIsSpell = (LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_BURNING_CRUSADE)
+local ITEM_CLASS_ARMOR = LE_ITEM_CLASS_ARMOR or Enum.ItemClass.Armor
+local ITEM_CLASS_WEAPON = LE_ITEM_CLASS_WEAPON or Enum.ItemClass.Weapon
+
 local SKILL_ANY = 0
 local SKILL_ORANGE = 1
 local SKILL_YELLOW = 2
@@ -56,40 +60,55 @@ local function RecipePassesColorFilter(color)
 	return ((currentColor == SKILL_ANY) or (currentColor == color))
 end
 
+-- Get the item crafted by a recipe, or nil if it crafts none (enchants, ..)
+local function GetCraftedItemID(recipeID)
+	if not recipeID then return end		-- on a data line, recipeID is numeric
+
+	-- Past vanilla, recipes are stored as a spell id, and only the scan knows the crafted item.
+	if recipeIsSpell then
+		local _, itemID = DataStore:GetCraftResultItem(recipeID)		-- maxMade comes first
+		return itemID
+	end
+
+	-- In vanilla, recipes are stored as the id of the item they craft, except for enchanting,
+	-- where the id is the enchant's spell id, and would resolve to an unrelated item.
+	if not IsEnchanting(currentProfession) then
+		return C_Item.GetItemInfoInstant(recipeID)
+	end
+end
+
 local function RecipePassesSlotFilter(recipeID)
 	if currentSlots == ALL_INVENTORY_SLOTS then return true end
-	
-	if recipeID then	-- on a data line, recipeID is numeric
-		local itemID = DataStore:GetCraftResultItem(recipeID)
-		if itemID then
-			local _, _, _, _, _, itemType, _, _, itemEquipLoc = GetItemInfo(itemID)
-			
-			if itemType == GetItemClassInfo(LE_ITEM_CLASS_ARMOR) or itemType == GetItemClassInfo(LE_ITEM_CLASS_WEAPON) then
-				if itemEquipLoc and strlen(itemEquipLoc) > 0 then
-					if currentSlots == itemEquipLoc then
-						return true
-					end
-				end
-			else	-- not a weapon or armor ? then test if it's a generic "Created item"
-				if currentSlots == NONEQUIPSLOT then
-					return true
-				end
-			end
-		else		-- enchants, like socket bracer, might not have an item id, so hide the line
-			return false
-		end
-	else
-		if currentSlots ~= NONEQUIPSLOT then
-			return false
-		end
+
+	local itemID = GetCraftedItemID(recipeID)
+
+	-- enchants, like socket bracer, craft no item at all
+	if not itemID then return (currentSlots == NONEQUIPSLOT) end
+
+	-- GetItemInfoInstant does not depend on the item being cached, unlike GetItemInfo
+	local _, _, _, itemEquipLoc, _, classID = C_Item.GetItemInfoInstant(itemID)
+
+	if classID == ITEM_CLASS_ARMOR or classID == ITEM_CLASS_WEAPON then
+		return (itemEquipLoc and strlen(itemEquipLoc) > 0 and currentSlots == itemEquipLoc) and true or false
 	end
+
+	-- not a weapon or armor ? then it is a generic "Created item"
+	return (currentSlots == NONEQUIPSLOT)
 end
 
 local function RecipePassesSearchFilter(recipeID)
 	-- no search filter ? ok
 	if currentSearch == "" then return true end
-	
-	local name = GetSpellInfo(recipeID)
+	if not recipeID then return end
+
+	-- Match on the name of the crafted item, which is the one being displayed ..
+	local itemID = GetCraftedItemID(recipeID)
+	local name = itemID and C_Item.GetItemInfo(itemID)
+
+	-- .. or on the spell name for recipes that craft no item, like enchants
+	if not itemID then
+		name = GetSpellInfo(recipeID)
+	end
 
 	if name and string.find(strlower(name), currentSearch, 1, true) then
 		return true
@@ -119,6 +138,7 @@ addon:Controller("AltoholicUI.Recipes", {
 	SetCurrentColor = function(frame, color) currentColor = color end,
 	GetCurrentColor = function(frame) return currentColor end,
 	GetRecipeColorName = function(frame, index) return format("%s%s", RecipeColors[index], RecipeColorNames[index]) end,
+	GetCraftedItemID = function(frame, recipeID) return GetCraftedItemID(recipeID) end,
 
 	Update = function(frame)
 		local character = addon.Tabs.Characters:GetAltKey()

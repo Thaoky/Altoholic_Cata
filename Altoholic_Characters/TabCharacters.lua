@@ -726,11 +726,13 @@ local function ProfessionsIcon_Initialize(self, level)
 			local invSlots = {}
 			local profession = DataStore:GetProfession(character, currentProfession)
 			
-			DataStore:IterateRecipes(profession, 0, 0, function(color, itemID, index) 
-			
+			DataStore:IterateRecipes(profession, 0, 0, function(color, recipeID, index)
+
+				-- the stored id is the crafted item in vanilla, but a spell past that
+				local itemID = recipes:GetCraftedItemID(recipeID)
 				if not itemID then return end
-					
-				local _, _, _, _, _, itemType, _, _, itemEquipLoc = GetItemInfo(itemID)
+
+				local _, _, _, itemEquipLoc = C_Item.GetItemInfoInstant(itemID)
 
 				if itemEquipLoc and strlen(itemEquipLoc) > 0 then
 					local slot = Altoholic.Equipment:GetInventoryTypeName(itemEquipLoc)
