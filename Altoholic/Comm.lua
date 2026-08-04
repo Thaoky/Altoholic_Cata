@@ -107,45 +107,81 @@ local function SetHelp(text)
 	AltoAccountSharingHelp:SetText(text)
 end
 
-local white = colors.white
+local HELP_SEND_REQUEST = L["SHARING_HELP_SEND_REQUEST"]
+local HELP_REQUEST_CONTENT = L["SHARING_HELP_REQUEST_CONTENT"]
+local HELP_TRANSFER_IN_PROGRESS = L["SHARING_HELP_TRANSFER_IN_PROGRESS"]
+local HELP_TRANSFER_COMPLETE = L["SHARING_HELP_TRANSFER_COMPLETE"]
 
-local function Highlight(text)		-- highlight a few words inside a white paragraph
-	return format("%s%s%s", colors.green, text, white)
+-- *** Transfer watchdog ***
+-- every step of the protocol waits for the other side to answer, and nothing ever
+-- says that it will not: if the other player logs out, or simply reloads, the frame
+-- stays on the step it had reached, with the send button disabled and no way back.
+-- so each time a message is sent that expects an answer, a timer is armed, and any
+-- answer disarms it. if it ever fires, the request is abandoned and the button is
+-- given back to the user.
+
+local TRANSFER_TIMEOUT = 45		-- seconds to wait for an answer before giving up
+local watchdog
+
+local function CancelWatchdog()
+	if watchdog then
+		watchdog:Cancel()
+		watchdog = nil
+	end
 end
 
-local function Title(text, color)
-	return format("%s%s%s", color or colors.gold, text, white)
+local ImportCharacters		-- forward declaration, the watchdog salvages a partial import
+
+local function OnTransferTimeout()
+	local self = Altoholic.Comm.Sharing
+	local player = self.lastRequestee or UNKNOWN
+
+	watchdog = nil
+
+	-- the transfer never reached the point where the alts are made visible, so do it here:
+	-- their data is already saved, leaving them out would keep it invisible and unreachable.
+	local isPartial = importedChars and next(importedChars) and true or nil
+	if isPartial then
+		ImportCharacters()
+	end
+
+	-- a request that never got its table of content failed before anything was transfered,
+	-- which is worth telling apart from one that stopped halfway through.
+	if self.DestTOC then
+		SetStatus(format("%s%s", colors.red, L["Transfer interrupted"]))
+		SetHelp(format(L["SHARING_HELP_TRANSFER_INTERRUPTED"], player,
+			isPartial and L["SHARING_PARTIAL_IMPORT_KEPT"] or L["SHARING_PARTIAL_IMPORT_NONE"]))
+		wipe(self.DestTOC)
+	else
+		SetStatus(format("%s%s", colors.red, format(L["No answer from %s"], player)))
+		SetHelp(format(L["SHARING_HELP_NO_ANSWER"], player))
+	end
+
+	self.DestTOC = nil
+	self.SharingInProgress = nil
+	self.SharingEnabled = nil
+	self.NetDestCurItem = nil
+	self.ClientRealmName = nil
+	self.ClientGuildName = nil
+	self.ClientCharName = nil
+
+	Altoholic.Sharing.AvailableContent:Clear()
+
+	local help = AltoAccountSharingHelp:GetText()		-- SetMode resets the help text, keep what just happened
+	Altoholic.Comm.Sharing:SetMode(1)
+	SetHelp(help)
+
+	if isPartial and Altoholic.Characters then
+		Altoholic.Characters:InvalidateView()
+		Altoholic.Summary:Update()
+	end
 end
 
-local HELP_SEND_REQUEST = format("%s %s\n%s\n%s\n\n%s %s\n%s\n%s",
-	Title("1) Account Name:"),
-	format("a label of your choice for the account you want to import data %s (ex: the name or the nickname", Highlight("from")),
-	"of the player behind it). It only groups the imported characters in your Summary tab, and can be anything you like.",
-	"Type the same name again next time: the import will then update that group, instead of adding a second account.",
-	Title("2) Send Request:"),
-	format("target the other player, or type the name of the character %s, then click the button.", Highlight("currently being played")),
-	"The other side must have account sharing enabled, and must either accept your request, or have authorized your character in advance.",
-	"Once the request is accepted, everything shared on that side will be listed on the right, and this button will become 'Request Content'.")
-
-local HELP_REQUEST_CONTENT = format("%s %s\n%s\n%s\n\n%s",
-	Title("Request accepted.", colors.green),
-	"What this player shares is now listed on the right, nothing has been imported yet.",
-	"Check the characters and the data you want (checking a character also checks its data categories), or use the",
-	"[-] and 'All' boxes above the list to expand or check everything, then click Request Content.",
-	"The date column tells you how old each item is, 'Up-to-date' means you already have that exact version.")
-
-local HELP_TRANSFER_IN_PROGRESS = format("%s%s\n%s", white,
-	"Transfer in progress, please wait...",
-	"Both characters must stay online until it is complete.")
-
-local HELP_TRANSFER_COMPLETE = format("%s %s\n%s\n\n%s %s\n%s\n%s",
-	Title("Transfer complete.", colors.green),
-	"The imported characters are now in your Summary tab, grouped under the account name you entered.",
-	"The list on the right has been cleared, this is normal.",
-	Title("Note:"),
-	format("an import is a one-time snapshot, it is %s kept up to date automatically.", Highlight("not")),
-	"To refresh it later, right-click the realm line in the Summary tab and choose 'Update from ...', or come back here.",
-	"Any character of that account can serve the data, so ask whichever one is online, and reuse the same account name.")
+local function ArmWatchdog(player)
+	CancelWatchdog()
+	Altoholic.Comm.Sharing.lastRequestee = player
+	watchdog = C_Timer.NewTimer(TRANSFER_TIMEOUT, OnTransferTimeout)
+end
 
 local function AccSharingHandler(prefix, message, distribution, sender)
 	-- 	since communication handlers cannot be enabled/disabled on the fly,
@@ -207,16 +243,14 @@ function Altoholic.Comm.Sharing:Request()
 		self.SharingInProgress = true
 		-- AltoAccountSharing:Hide()
 		Altoholic:Print(format(L["Sending account sharing request to %s"], player))
-		SetStatus(format("Getting table of content from %s", player))
-		SetHelp(format("%s %s\n%s\n%s", Title("Request sent."),
-			format("Waiting for %s to answer...", player),
-			"The request must be accepted on the other side, unless your character is already authorized there.",
-			format("If nothing happens, check that %s is online, on your realm, and running Altoholic.", player)))
+		SetStatus(format(L["Getting table of content from %s"], player))
+		SetHelp(format(L["SHARING_HELP_REQUEST_SENT"], player, player))
 		Whisper(player, MSG_ACCOUNT_SHARING_REQUEST)
+		ArmWatchdog(player)
 	end
 end
 
-local function ImportCharacters()
+function ImportCharacters()		-- declared as a local above, the watchdog needs it too
 	-- once data has been transfered, finalize the import by acknowledging that these alts can be seen by client addons
 	-- will be changed when account sharing goes into datastore.
 	for key in pairs(importedChars) do
@@ -237,7 +271,7 @@ function Altoholic.Comm.Sharing:RequestNext(player)
 	end
 
 	if isChecked and index <= #self.DestTOC then
-		SetStatus(format("Transfering item %d/%d", index, #self.DestTOC ))
+		SetStatus(format(L["Transfering item %d/%d"], index, #self.DestTOC ))
 		local TocData = self.DestTOC[index]
 		local TocType = strsplit(TOC_SEP, TocData)
 		local _
@@ -257,9 +291,11 @@ function Altoholic.Comm.Sharing:RequestNext(player)
 		
 		Whisper(player, MSG_ACCOUNT_SHARING_SENDITEM, index)
 		self.NetDestCurItem = index
+		ArmWatchdog(player)		-- this item is now owed to us, restart the countdown
 		return
 	end
 
+	CancelWatchdog()		-- nothing further is expected from the other side
 	ImportCharacters()
 	SetStatus(L["Transfer complete"])
 	Whisper(player, MSG_ACCOUNT_SHARING_COMPLETED)
@@ -361,12 +397,12 @@ end
 function Altoholic.Comm.Sharing:SetMode(mode)
 	local button = AltoAccountSharing_SendButton
 	if mode == 1 then			-- send request, expect toc in return
-		button:SetText("Send Request")
+		button:SetText(L["Send Request"])
 		button:Enable()
 		button.requestMode = nil
 		SetHelp(HELP_SEND_REQUEST)
 	elseif mode == 2 then	-- request content, get data in return
-		button:SetText("Request Content")
+		button:SetText(L["Request Content"])
 		button:Enable()
 		button.requestMode = true
 		SetHelp(HELP_REQUEST_CONTENT)
@@ -379,30 +415,28 @@ function Altoholic.Comm.Sharing:SetMode(mode)
 end
 
 function Altoholic.Comm.Sharing:OnSharingRefused(sender, data)
+	CancelWatchdog()
 	SetStatus(format("%s%s", colors.red, format(L["Request rejected by %s"], sender)))
-	SetHelp(format("%s %s\n%s", Title("Request rejected.", colors.red),
-		"This player either declined your request, or has set your character to 'always reject'.",
-		"Nothing has been imported. You may send a new request at any time."))
+	SetHelp(L["SHARING_HELP_REQUEST_REJECTED"])
 	self.SharingInProgress = nil
 end
 
 function Altoholic.Comm.Sharing:OnPlayerInCombat(sender, data)
+	CancelWatchdog()
 	SetStatus(format("%s%s", colors.red, format(L["%s is in combat, request cancelled"], sender)))
-	SetHelp(format("%s %s\n%s", Title("Request cancelled.", colors.red),
-		"Account sharing requests are always rejected while the other player is in combat.",
-		"Wait until combat is over, then send the request again."))
+	SetHelp(L["SHARING_HELP_REQUEST_CANCELLED_COMBAT"])
 	self.SharingInProgress = nil
 end
 
 function Altoholic.Comm.Sharing:OnSharingDisabled(sender, data)
+	CancelWatchdog()
 	SetStatus(format("%s%s", colors.red, format(L["%s has disabled account sharing"], sender)))
-	SetHelp(format("%s %s\n%s", Title("Request rejected.", colors.red),
-		"This player has not enabled account sharing.",
-		"'Account Sharing Enabled' must be ticked in the other player's own Altoholic options before you can request anything."))
+	SetHelp(L["SHARING_HELP_SHARING_DISABLED"])
 	self.SharingInProgress = nil
 end
 
 function Altoholic.Comm.Sharing:OnSharingAccepted(sender, data)
+	CancelWatchdog()		-- the next move is the user's, not the other side's
 	self.DestTOC = data
 	self.NetDestCurItem = 0
 	SetStatus(format("%s%s", colors.green, format(L["Table of content received (%d items)"], #self.DestTOC)))

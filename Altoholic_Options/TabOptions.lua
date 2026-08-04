@@ -21,7 +21,7 @@ addon:Controller("AltoholicUI.TabOptions", {
 		frame.MenuItem5:SetText(GetLabel(L["Calendar"]))
 		frame.MenuItem6:SetText(GetLabel(MISCELLANEOUS))
 		frame.MenuItem7:SetText(GetLabel(L["Account Sharing"]))
-		frame.MenuItem8:SetText(GetLabel("Shared Content"))
+		frame.MenuItem8:SetText(GetLabel(L["Shared Content"]))
 
 		frame.MenuItem9:SetText(GetLabel("DataStore", true))
 		frame.MenuItem10:SetText(GetLabel("Auctions"))

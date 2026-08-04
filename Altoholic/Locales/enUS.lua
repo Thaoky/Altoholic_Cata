@@ -843,3 +843,42 @@ L["Calendar Events"] = true
 L["Item Timers"] = true
 L["Week starts on Monday"] = true
 L["Enable warnings"] = true
+
+-- ** Account sharing **
+-- The help paragraphs walk the user through the request, one per step of the protocol.
+-- Colour codes are inline so that translators can move the highlighted words around.
+L["Send Request"] = true
+L["Request Content"] = true
+L["Getting table of content from %s"] = true
+L["Transfering item %d/%d"] = true
+L["Transfer interrupted"] = true
+L["No answer from %s"] = true
+L["Opens the account sharing panel"] = true
+L["Shared Content"] = true
+L["ACCOUNT_NAME_IDENTIFIES"] = "It identifies the account you are importing\ndata |cFF00FF00from|r, ex: the name of the player behind it."
+
+L["SHARING_HELP_SEND_REQUEST"] = "|cFFFFD7001) Account Name:|cFFFFFFFF a label of your choice for the account you want to import data |cFF00FF00from|cFFFFFFFF (ex: the name or the nickname\nof the player behind it). It only groups the imported characters in your Summary tab, and can be anything you like.\nType the same name again next time: the import will then update that group, instead of adding a second account.\n\n|cFFFFD7002) Send Request:|cFFFFFFFF target the other player, or type the name of the character |cFF00FF00currently being played|cFFFFFFFF, then click the button.\nThe other side must have account sharing enabled, and must either accept your request, or have authorized your character in advance.\nOnce the request is accepted, everything shared on that side will be listed on the right, and this button will become 'Request Content'."
+L["SHARING_HELP_REQUEST_CONTENT"] = "|cFF00FF00Request accepted.|cFFFFFFFF What this player shares is now listed on the right, nothing has been imported yet.\nCheck the characters and the data you want (checking a character also checks its data categories), or use the\n[-] and 'All' boxes above the list to expand or check everything, then click Request Content.\n\nThe date column tells you how old each item is, 'Up-to-date' means you already have that exact version."
+L["SHARING_HELP_TRANSFER_IN_PROGRESS"] = "|cFFFFFFFFTransfer in progress, please wait...\nBoth characters must stay online until it is complete."
+L["SHARING_HELP_TRANSFER_COMPLETE"] = "|cFF00FF00Transfer complete.|cFFFFFFFF The imported characters are now in your Summary tab, grouped under the account name you entered.\nThe list on the right has been cleared, this is normal.\n\n|cFFFFD700Note:|cFFFFFFFF an import is a one-time snapshot, it is |cFF00FF00not|cFFFFFFFF kept up to date automatically.\nTo refresh it later, right-click the realm line in the Summary tab and choose 'Update from ...', or come back here.\nAny character of that account can serve the data, so ask whichever one is online, and reuse the same account name."
+L["SHARING_HELP_REQUEST_SENT"] = "|cFFFFD700Request sent.|cFFFFFFFF Waiting for %s to answer...\nThe request must be accepted on the other side, unless your character is already authorized there.\nIf nothing happens, check that %s is online, on your realm, and running Altoholic."
+L["SHARING_HELP_REQUEST_REJECTED"] = "|cFFFF0000Request rejected.|cFFFFFFFF This player either declined your request, or has set your character to 'always reject'.\nNothing has been imported. You may send a new request at any time."
+L["SHARING_HELP_REQUEST_CANCELLED_COMBAT"] = "|cFFFF0000Request cancelled.|cFFFFFFFF Account sharing requests are always rejected while the other player is in combat.\nWait until combat is over, then send the request again."
+L["SHARING_HELP_SHARING_DISABLED"] = "|cFFFF0000Request rejected.|cFFFFFFFF This player has not enabled account sharing.\n'Account Sharing Enabled' must be ticked in the other player's own Altoholic options before you can request anything."
+L["SHARING_HELP_TRANSFER_INTERRUPTED"] = "|cFFFF0000Transfer interrupted.|cFFFFFFFF %s stopped answering, so the request was given up on.\n%s\nThe button is enabled again: check that the other character is still online, then send a new request."
+L["SHARING_HELP_NO_ANSWER"] = "|cFFFF0000No answer.|cFFFFFFFF %s never replied to the request.\nCheck that this character is online, on your realm, running Altoholic, and that account sharing is enabled on that side.\nNothing has been imported. You may send a new request at any time."
+L["SHARING_PARTIAL_IMPORT_KEPT"] = "What had already been transfered was kept, so those characters are in your Summary tab: send the request again with the same account name to finish them."
+L["SHARING_PARTIAL_IMPORT_NONE"] = "Nothing had been transfered yet, so nothing was imported."
+
+-- ** Loot table searches **
+L["SEARCHING_UPGRADES"] = "Searching the loot tables for an upgrade over %s ... this blocks the game for a few seconds."
+L["SEARCH_RESULTS"] = "%d results found"
+L["SEARCH_RESULTS_INCOMPLETE"] = "%d results - %d names not known yet"
+L["SEARCH_IN_PROGRESS"] = "Searching the loot tables... %d%%"
+L["SEARCH_ALREADY_RUNNING"] = "A search is already running, wait for it to finish."
+
+-- ** Guild members' equipment **
+L["EQUIPMENT_COMES_FROM_MEMBER"] = "Their equipment is sent by their own copy of the addon, so they have to be online for it."
+L["EQUIPMENT_ASKING"] = "Asking %s..."
+L["EQUIPMENT_NO_ANSWER"] = "%s did not answer"
+L["EQUIPMENT_RECEIVED_ON"] = "Received on %s"

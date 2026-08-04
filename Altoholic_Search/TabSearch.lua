@@ -9,6 +9,7 @@ local parentName = "AltoholicTabSearch"
 local parent
 
 local highlightIndex
+local selectedClass, selectedSubClass		-- the category the tree on the left is showing as picked
 
 addon.Tabs.Search = {}
 
@@ -134,8 +135,29 @@ local function Item_OnClick(frame)
 	-- 1005 = class 1, sub 5
 	highlightIndex = (frame.itemTypeIndex * 1000) + frame.itemSubTypeIndex
 	ns:Update()
-	
-	addon.Search:FindItem(C_Item.GetItemClassInfo(class), C_Item.GetItemSubClassInfo(class, subClass))
+
+	-- kept so that the search button, which carries no category of its own, does not
+	-- silently widen the search while this entry still looks picked
+	selectedClass = C_Item.GetItemClassInfo(class)
+	selectedSubClass = C_Item.GetItemSubClassInfo(class, subClass)
+
+	addon.Search:FindItem(selectedClass, selectedSubClass)
+end
+
+function ns:GetSelectedCategory()
+	return selectedClass, selectedSubClass
+end
+
+-- An upgrade search comes from a right click in the Grids tab and brings the user here to read
+-- its results. Whatever category was picked the last time this tab was used has nothing to do
+-- with what is now on screen, and leaving it lit says the list was filtered by it. The rest of
+-- the panel is left alone: Reset() is a different thing, and the user did not ask for it.
+function ns:ClearCategorySelection()
+	if not highlightIndex and not selectedClass then return end
+
+	highlightIndex = nil
+	selectedClass, selectedSubClass = nil, nil
+	ns:Update()
 end
 
 function ns:OnLoad()
@@ -205,7 +227,12 @@ function ns:Update()
 				local class = category.class
 				local subClass = category.subClasses[p.dataIndex]
 
-				menuButton.Text:SetText("|cFFBBFFBB   " .. C_Item.GetItemSubClassInfo(class, subClass))
+				-- Blizzard lists -1 among the sub classes of some categories - Consumable on
+				-- Era is one - as the sentinel for "the whole class, no sub filter". It has
+				-- no name of its own, so asking for one answers nothing.
+				local subClassName = C_Item.GetItemSubClassInfo(class, subClass) or ALL or ""
+
+				menuButton.Text:SetText("|cFFBBFFBB   " .. subClassName)
 				menuButton:SetScript("OnClick", Item_OnClick)
 				menuButton.itemTypeIndex = p.parentIndex
 				menuButton.itemSubTypeIndex = p.dataIndex
@@ -231,6 +258,7 @@ function ns:Reset()
 		category.isCollapsed = true
 	end
 	highlightIndex = nil
+	selectedClass, selectedSubClass = nil, nil
 	
 	for i = 1, 8 do 
 		parent.SortButtons["Sort"..i]:Hide()
@@ -336,16 +364,22 @@ function ns:SetMode(mode)
 		addon.Search:SetUpdateHandler("Loots_Update")
 		
 		parent.SortButtons:SetButton(1, L["Item / Location"], 240, function(self) addon.Search:SortResults(self, "item") end)
-		parent.SortButtons:SetButton(2, L["Source"], 160, function(self) addon.Search:SortResults(self, "bossName") end)
-		parent.SortButtons:SetButton(3, L["Item Level"], 150, function(self) addon.Search:SortResults(self, "iLvl") end)
+		-- the source column now holds every place an item drops from, joined: it needs the
+		-- room, and the item level column only ever shows a three digit number
+		parent.SortButtons:SetButton(2, L["Source"], 240, function(self) addon.Search:SortResults(self, "bossName") end)
+		parent.SortButtons:SetButton(3, L["Item Level"], 70, function(self) addon.Search:SortResults(self, "iLvl") end)
 		
 	elseif mode == "upgrade" then
 		addon.Search:SetUpdateHandler("Upgrade_Update")
 
 		parent.SortButtons:SetButton(1, L["Item / Location"], 200, function(self) addon.Search:SortResults(self, "item") end)
-		
-		for i=1, 6 do 
-			local text = select(i, strsplit("|", addon.Equipment.FormatStats[addon.Search:GetClass()]))
+
+		-- the layout the search was set up with, rather than a lookup on the current class:
+		-- right-clicking another grid cell overwrites that with the bare class name
+		local statFormat = addon.Search:GetUpgradeStatFormat()
+
+		for i=1, 6 do
+			local text = statFormat and select(i, strsplit("|", statFormat))
 			
 			if text then
 				parent.SortButtons:SetButton(i+1, string.sub(text, 1, 3), 50, function(self)
@@ -368,10 +402,13 @@ function ns:TooltipStats(frame)
 	AltoTooltip:AddLine(" ");
 	
 	local s = addon.Search:GetResult(frame:GetID())
+	local statFormat = addon.Search:GetUpgradeStatFormat()
+
+	if not s or not statFormat then return end
 
 	for i=1, 6 do
-		local text = select(i, strsplit("|", addon.Equipment.FormatStats[addon.Search:GetClass()]))
-		if text then 
+		local text = select(i, strsplit("|", statFormat))
+		if text then
 			local color
 			local diff = select(2, strsplit("|", s["stat"..i]))
 			diff = tonumber(diff)
@@ -392,7 +429,6 @@ end
 
 AddonFactory:OnAddonLoaded(addonTabName, function() 
 	Altoholic_SearchTab_Options = Altoholic_SearchTab_Options or {
-		["ItemInfoAutoQuery"] = false,
 		["IncludeNoMinLevel"] = true,				-- include items with no minimum level
 		["IncludeMailboxItems"] = true,
 		-- ["IncludeGuildBankItems"] = true,

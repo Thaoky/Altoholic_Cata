@@ -36,7 +36,10 @@
 					</Anchors>
 					<Color r="255" g="255" b="255" />
 				</FontString>
-				<FontString parentKey="Status" inherits="GameFontNormal" justifyH="LEFT">
+				<!-- a size smaller than the rest of the pane: this line also carries the count
+				     of items the client could not resolve. Geometry left exactly as it was,
+				     widening it pushed the text out over the panel on its left. -->
+				<FontString parentKey="Status" inherits="GameFontNormalSmall" justifyH="LEFT">
 					<Size x="320" y="24" />
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" x="-250" y="13" />

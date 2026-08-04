@@ -16,7 +16,7 @@ local function InitLocalization()
 	
 	AltoAccountSharing_InfoButton.tooltip = format("%s|r\n%s\n%s\n%s\n\n%s",
 		colors.white..L["Account Name"],
-		"It identifies the account you are importing\ndata |cFF00FF00from|r, ex: the name of the player behind it.",
+		L["ACCOUNT_NAME_IDENTIFIES"],
 		L["Enter an account name that will be\nused for |cFF00FF00display|r purposes only."],
 		L["This name can be anything you like,\nit does |cFF00FF00NOT|r have to be the real account name."],
 		L["This field |cFF00FF00cannot|r be left empty."])
@@ -42,25 +42,122 @@ local function InitLocalization()
 	-- end
 end
 
-local function BuildUnsafeItemList()
-	-- This method will clean the unsafe item list currently in the DB. 
-	-- In the previous game session, the list has been populated with items id's that were originally unsafe and for which a query was sent to the server.
-	-- In this session, a getiteminfo on these id's will keep returning a nil if the item is really unsafe, so this method will get rid of the id's that are now valid.
-	local TmpUnsafe = {}		-- create a temporary table with confirmed unsafe id's
-	local unsafeItems = Altoholic_UI_Options.unsafeItems or {}
-	
-	for _, itemID in pairs(unsafeItems) do
-		local itemName = C_Item.GetItemInfo(itemID)
-		if not itemName then							-- if the item is really unsafe .. save it
-			table.insert(TmpUnsafe, itemID)
+-- *** Item memory ***
+-- The client's item cache is volatile. It is dropped when a patch lands, and a loot table
+-- search asks it about tens of thousands of items it has never heard of, which appears to
+-- push out entries it did hold - including the equipment of the alts the grids are drawing.
+-- The symptoms are an empty item level column, a name that reads "Unknown #31234", and a
+-- quality border that loses its colour.
+--
+-- None of those three change over an item's life, so what has been seen once is worth
+-- keeping. This is a fallback, not a cache: the client is asked first and its answer wins,
+-- because only it knows about the upgrades carried by a specific link.
+local ITEM_MEMORY_SEP = "|"		-- item names hold no pipe, colour codes are not stored here
+
+function Altoholic:GetItemInfo(item)
+	-- returns name, rarity, itemLevel
+	if not item then return end
+
+	local itemID = tonumber(item) or Altoholic:GetIDFromLink(item)
+	local name, _, rarity, level = C_Item.GetItemInfo(item)
+
+	-- a link carries the upgrades that the bare id does not know about
+	if level and type(item) == "string" then
+		level = C_Item.GetDetailedItemLevelInfo(item) or level
+	end
+
+	if not Altoholic_ItemInfo then return name, rarity, level end		-- before the saved variables exist
+
+	if name and rarity and level then		-- the client answered in full, remember it
+		if itemID then
+			Altoholic_ItemInfo[itemID] = format("%s%s%d%s%d", name, ITEM_MEMORY_SEP, rarity, ITEM_MEMORY_SEP, level)
 		end
+		return name, rarity, level
 	end
-	
-	wipe(unsafeItems)	-- clear the DB table
-	
-	for _, itemID in pairs(TmpUnsafe) do
-		table.insert(unsafeItems, itemID)	-- save the confirmed unsafe ids back in the db
+
+	local remembered = itemID and Altoholic_ItemInfo[itemID]
+	if not remembered then return name, rarity, level end
+
+	-- fill in only what the client came up short on
+	local pastName, pastRarity, pastLevel = strsplit(ITEM_MEMORY_SEP, remembered)
+
+	return name or pastName, rarity or tonumber(pastRarity), level or tonumber(pastLevel)
+end
+
+function Altoholic:GetItemLevel(item)
+	return select(3, Altoholic:GetItemInfo(item))
+end
+
+-- Write side, for a caller that has already resolved the item and has nothing to gain from
+-- resolving it a second time. The loot scans are exactly that: they run every entry through
+-- C_Item.GetItemInfo to filter it, so asking again per result was a duplicate call - and on
+-- an uncached item that call is a request to the server, thousands of them on a wide search.
+function Altoholic:RememberItem(itemID, name, rarity, level)
+	if not itemID or not name or not rarity or not level then return end
+	if not Altoholic_ItemInfo or Altoholic_ItemInfo[itemID] then return end		-- already known
+
+	Altoholic_ItemInfo[itemID] = format("%s%s%d%s%d", name, ITEM_MEMORY_SEP, rarity, ITEM_MEMORY_SEP, level)
+end
+
+-- The same memory, read without asking the client anything. The loot scans go through this
+-- for tens of thousands of entries, where a second C_Item.GetItemInfo call per entry would
+-- not be free.
+function Altoholic:GetRememberedItemInfo(itemID)
+	local remembered = itemID and Altoholic_ItemInfo and Altoholic_ItemInfo[itemID]
+	if not remembered then return end
+
+	local name, rarity, level = strsplit(ITEM_MEMORY_SEP, remembered)
+
+	return name, tonumber(rarity), tonumber(level)
+end
+
+--[[
+	*** Filling the memory on purpose ***
+
+	Everything above only writes when something else happened to ask. That is the wrong way
+	round for the one case the memory exists for: the equipment of the alts, which has to
+	survive a loot table search and which nothing asks about until the grids are opened - by
+	which time the client may already have dropped it.
+
+	So it is seeded deliberately, from every character on every realm and account, at login.
+
+	The first pass comes up short by design. The client's item cache is empty at login too, it
+	is rebuilt from nothing every session, and asking for an item is itself what makes the
+	client go and fetch it. The answers arrive over the following seconds, so the pass is
+	repeated while anything is still missing, and gives up rather than running forever - some
+	items belong to a realm this session will never talk to, and no answer is ever coming.
+
+	Once seeded, this is permanent: the memory lives in the saved variables, so later sessions
+	start with it already filled and the first pass finds nothing left to do.
+--]]
+local SEED_PASS_DELAY = 5		-- seconds between passes, long enough for answers to come back
+local SEED_MAX_PASSES = 10
+local NUM_EQUIPPED_SLOTS = 19
+
+local function SeedItemMemory(passesLeft)
+	if not DataStore.GetInventoryItem then return end		-- DataStore_Inventory is not there
+
+	local pending = 0
+
+	DataStore:IterateCharacters(function(character)
+		for slotID = 1, NUM_EQUIPPED_SLOTS do
+			local item = DataStore:GetInventoryItem(character, slotID)
+
+			-- the call is the point: it remembers whatever the client is able to answer, and
+			-- for what it cannot, it is the request that will make the answer arrive
+			if item and not Altoholic:GetItemInfo(item) then
+				pending = pending + 1
+			end
+		end
+	end)
+
+	if pending > 0 and passesLeft > 1 then
+		C_Timer.After(SEED_PASS_DELAY, function() SeedItemMemory(passesLeft - 1) end)
 	end
+end
+
+function Altoholic:SeedItemMemory()
+	SeedItemMemory(SEED_MAX_PASSES)
 end
 
 -- *** DB functions ***
@@ -71,13 +168,54 @@ function Altoholic:SetLastAccountSharingInfo(name, realm, account)
 	domains[key] = domains[key] or {}
 	domains[key].lastSharingTimestamp = time()
 	domains[key].lastUpdatedWith = name
+	domains[key].accountName = account		-- the key cannot be split back apart, account names may contain a dot
 end
 
 function Altoholic:GetLastAccountSharingInfo(realm, account)
 	local sharing = Altoholic_Sharing_Options.Domains[format("%s.%s", account, realm)]
-	
+
 	if sharing then
 		return date("%m/%d/%Y %H:%M", sharing.lastSharingTimestamp), sharing.lastUpdatedWith
+	end
+end
+
+function Altoholic:GetLastAccountSharingName(realm)
+	-- the account name that was imported most recently on this realm.
+	-- an import is meant to be repeated under the same name - a different one adds a second
+	-- account to the summary instead of updating the first - so it makes a sensible default.
+	local domains = Altoholic_Sharing_Options.Domains
+	if not domains then return end
+
+	realm = realm or GetRealmName()
+
+	local lastName, lastTime
+
+	for key, info in pairs(domains) do
+		-- entries saved before the account name was stored can still be split, dots in an
+		-- account name are rare enough that a wrong guess only costs a wrong default.
+		local name = info.accountName or strsplit(".", key)
+		local timestamp = info.lastSharingTimestamp
+
+		if name and timestamp and key:sub(-strlen(realm) - 1) == format(".%s", realm)
+			and (not lastTime or timestamp > lastTime) then
+			lastTime = timestamp
+			lastName = name
+		end
+	end
+
+	return lastName
+end
+
+function Altoholic:SetDefaultAccountName()
+	-- called when the sharing frame opens, it must not overwrite a name put there on purpose
+	-- by 'Update from ...' in the summary tab, so it only fills an empty field.
+	local editBox = AltoAccountSharing_AccNameEditBox
+	if strlen(editBox:GetText()) > 0 then return end
+
+	local name = Altoholic:GetLastAccountSharingName()
+	if name then
+		editBox:SetText(name)
+		editBox:HighlightText()		-- typing replaces it, the default must not get in the way
 	end
 end
 
@@ -296,6 +434,11 @@ AddonFactory:OnPlayerLogin(function()
 
 	AltoholicFrame:SetClampedToScreen(Altoholic_UI_Options.ClampWindowToScreen)
 
+	-- Not at once: at this point the client has just started rebuilding its item cache and
+	-- every other addon is asking it for things. A few seconds later the passes are cheaper
+	-- and more of them succeed.
+	C_Timer.After(SEED_PASS_DELAY, Altoholic.SeedItemMemory)
+
 	addon:ListenTo("AUCTION_HOUSE_SHOW", OnAuctionHouseShow)	-- must stay here for the AH hook (to manage recipe coloring)
 
 	-- hook the Merchant update function
@@ -321,9 +464,6 @@ AddonFactory:OnPlayerLogin(function()
 	-- to be moved to their respective tabs
 	addon:RestoreOptionsToUI()
 	addon:ListenTo("CHAT_MSG_LOOT", OnChatMsgLoot)
-	
-	BuildUnsafeItemList()
-
 end)
 
 function addon:ToggleUI()
@@ -715,22 +855,6 @@ end
 function addon:GetFirstDayOfWeek()
 	return calendarFirstWeekday
 end
-
--- ** Unsafe Items **
-function addon:SaveUnsafeItem(itemID)
-	if not addon:IsItemUnsafe(itemID) then			-- if the item is not a known unsafe item, save it in the db
-		table.insert(Altoholic_UI_Options.unsafeItems, itemID)
-	end
-end
-
-function addon:IsItemUnsafe(itemID)
-	for _, v in pairs(Altoholic_UI_Options.unsafeItems) do 	-- browse current realm's unsafe item list
-		if v == itemID then		-- if the itemID passed as parameter is a known unsafe item .. return true to skip it
-			return true
-		end
-	end
-end
-
 
 -- ** Equipment ** 
 -- 02/09/2012 : Global to the add-on, should be loaded in the core, ideally code should be in its own file. This will happen later.

@@ -39,7 +39,8 @@
 				Altoholic_Calendar_Options[self.option] = not Altoholic_Calendar_Options[self.option]
 			</OnClick>
 		</Scripts>
-	</CheckButton>	
+	</CheckButton>
+
 
 	<Frame name="AltoholicGeneralOptions" hidden="true">
 		<Size x="615" y="306" />
@@ -214,17 +215,11 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<CheckButton parentKey="ItemInfoAutoQuery" inherits="AltoToggleableOptionTemplate">
-				<Anchors> 
-					<Anchor point="TOPLEFT" x="20" y="-20" />
-				</Anchors>
-				<KeyValues>
-					<KeyValue key="option" value="UI.Tabs.Search.ItemInfoAutoQuery" />
-				</KeyValues>
-			</CheckButton>
+			<!-- the AutoQuery checkbox stood here: the loot searches now fill themselves in
+			     when the item cache answers, so there is nothing left to switch on -->
 			<CheckButton parentKey="IncludeNoMinLevel" inherits="AltoToggleableOptionTemplate">
-				<Anchors> 
-					<Anchor point="TOPLEFT" relativeKey="$parent.ItemInfoAutoQuery" relativePoint="BOTTOMLEFT" x="0" y="-40" />
+				<Anchors>
+					<Anchor point="TOPLEFT" x="20" y="-20" />
 				</Anchors>
 				<KeyValues>
 					<KeyValue key="option" value="UI.Tabs.Search.IncludeNoMinLevel" />

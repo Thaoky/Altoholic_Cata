@@ -215,8 +215,64 @@ local function ClearPlayerEquipmentFrame(frame)
 	end
 end
 
+--[[
+	*** Why this panel needs to explain itself ***
+
+	Nothing here is collected by playing alongside a guild member: DataStore_Inventory does not
+	inspect anyone. Clicking an item level sends an addon whisper to that character, or to their
+	main, and the answer is their own Altoholic sending back its inventory. If they are offline,
+	or do not run the addon, nobody answers and the panel simply stays empty - which reads as a
+	broken feature rather than as a request nobody was there to take.
+
+	The average item level next to the name comes from somewhere else entirely, the guild wide
+	broadcast, and is kept. That is why a member can show 62.0 and no equipment at all.
+
+	A copy that did arrive is kept too, so the panel can fill instantly from something received
+	long ago. Without a date that is worse than empty, because it looks current.
+--]]
+local EQUIPMENT_TIMEOUT = 10		-- seconds to wait for an answer before saying there was none
+
+local awaitingEquipmentFrom		-- the member whose answer we are waiting for, if any
+local equipmentTimer
+
+local function SetEquipmentStatus(text, color)
+	if not panel then return end
+
+	panel.Equipment.Status:SetText(text and format("%s%s", color or colors.white, text) or "")
+end
+
+local function CancelEquipmentTimer()
+	if not equipmentTimer then return end
+
+	equipmentTimer:Cancel()
+	equipmentTimer = nil
+end
+
+local function OnEquipmentTimeout()
+	equipmentTimer = nil
+
+	local member = awaitingEquipmentFrom
+	if not member then return end
+
+	awaitingEquipmentFrom = nil
+	SetEquipmentStatus(format(L["EQUIPMENT_NO_ANSWER"], member), colors.red)
+end
+
 local function OnPlayerEquipmentReceived(event, sender, player)
 	panel.Equipment:Update(player)
+
+	-- an answer to an earlier click, on a member no longer on screen
+	if player ~= awaitingEquipmentFrom then return end
+
+	awaitingEquipmentFrom = nil
+	CancelEquipmentTimer()
+
+	local guild = DataStore:GetGuild()
+	local timestamp = guild and DataStore:GetGuildMemberEquipmentTimestamp(guild, player)
+
+	-- no timestamp means one of our own characters, whose data is written as we play
+	SetEquipmentStatus(timestamp and format(L["EQUIPMENT_RECEIVED_ON"],
+		date("%d/%m/%Y %H:%M", timestamp)) or nil, colors.green)
 end
 
 addon:Controller("AltoholicUI.GuildMembers", {
@@ -378,12 +434,25 @@ addon:Controller("AltoholicUI.GuildMembers", {
 		if line.lineType == NORMALPLAYER_LINE then return end
 
 		ClearPlayerEquipmentFrame(frame)
-		DataStore:RequestGuildMemberEquipment(characterName)
-		
+
 		local englishClass = select(11, DataStore:GetGuildMemberInfo(characterName))
 		local coloredName = format("%s%s", DataStore:GetClassColor(englishClass), characterName)
-		
+
 		frame.Equipment.Name:SetText(coloredName)
+
+		CancelEquipmentTimer()
+		awaitingEquipmentFrom = characterName
+		SetEquipmentStatus(format(L["EQUIPMENT_ASKING"], characterName), colors.yellow)
+
+		DataStore:RequestGuildMemberEquipment(characterName)
+
+		-- One of our own characters, and a member whose equipment we already hold, are both
+		-- answered on the spot: the handler above has already run and cleared the wait before
+		-- the call returned. Only a request that really left for the network is still pending
+		-- here, and only that one can go unanswered.
+		if awaitingEquipmentFrom then
+			equipmentTimer = C_Timer.NewTimer(EQUIPMENT_TIMEOUT, OnEquipmentTimeout)
+		end
 	end,
 })
 

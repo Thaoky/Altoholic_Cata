@@ -193,7 +193,7 @@ local function AltoholicOptionsIcon_Initialize(frame, level)
 	-- frame:AddButton(SEARCH, AltoholicSearchOptions, ShowOptionsCategory)
 	frame:AddButton(L["Tooltip"], 4, ShowOptionsCategory)
 	frame:AddButton(L["Account Sharing"], 7, ShowOptionsCategory)
-	frame:AddButton("Shared Content", 8, ShowOptionsCategory)
+	frame:AddButton(L["Shared Content"], 8, ShowOptionsCategory)
 	
 	-- frame:AddTitle()
 	-- frame:AddTitle(OTHER)	

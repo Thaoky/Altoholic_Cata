@@ -137,13 +137,14 @@ local whatsnew = {
 
 function addon:ToggleOption(frame, option)
 	local value
-	
+
 	if frame then
 		value = frame:GetChecked() and true or false
 	else
 	end
-	
+
 end
+
 
 -- ** Ripped from **
 -- Altoholic Retail Options
@@ -209,7 +210,7 @@ function addon:SetupOptions()
 	DataStore:AddOptionCategory(AltoholicMailOptions, MAIL_LABEL, addonName)
 	DataStore:AddOptionCategory(AltoholicMiscOptions, MISCELLANEOUS, addonName)
 	DataStore:AddOptionCategory(AltoholicAccountSharingOptions, L["Account Sharing"], addonName)
-	DataStore:AddOptionCategory(AltoholicSharedContent, "Shared Content", addonName)
+	DataStore:AddOptionCategory(AltoholicSharedContent, L["Shared Content"], addonName)
 	DataStore:AddOptionCategory(AltoholicTooltipOptions, L["Tooltip"], addonName)
 	DataStore:AddOptionCategory(AltoholicCalendarOptions, L["Calendar"], addonName)
 
@@ -276,17 +277,9 @@ function addon:SetupOptions()
 	
 	-- ** Search **
 	f = AltoholicSearchOptions
-	f.ItemInfoAutoQuery.Text:SetText(L["AutoQuery server |cFFFF0000(disconnection risk)"])
-	f.ItemInfoAutoQuery.tooltip = format("%s%s%s%s",
-		L["|cFFFFFFFFIf an item not in the local item cache\nis encountered while searching loot tables,\nAltoholic will attempt to query the server for 5 new items.\n\n"],
-		L["This will gradually improve the consistency of the searches,\nas more items are available in the item cache.\n\n"],
-		L["There is a risk of disconnection if the queried item\nis a loot from a high level dungeon.\n\n"],
-		L["|cFF00FF00Disable|r to avoid this risk"])	
-	
 	f.IncludeNoMinLevel.Text:SetText(L["Include items without level requirement"])
 	f.IncludeMailboxItems.Text:SetText(L["Include mailboxes"])
 	f.IncludeKnownRecipes.Text:SetText(L["Include known recipes"])
-	L["AutoQuery server |cFFFF0000(disconnection risk)"] = nil
 	L["Sort loots in descending order"] = nil
 	L["Include items without level requirement"] = nil
 	L["Include mailboxes"] = nil
@@ -351,7 +344,7 @@ function addon:SetupOptions()
 
 
 	-- ** Shared Content **
-	AltoholicSharedContentText1:SetText(colors.white.."Shared Content")
+	AltoholicSharedContentText1:SetText(colors.white..L["Shared Content"])
 	AltoholicSharedContent_SharedContentInfoButton.tooltip = format("%s\n%s",
 		colors.white.."Select the content that will be visible to players who send you",
 		"account sharing requests.")
@@ -437,10 +430,7 @@ function addon:RestoreOptionsToUI()
 		Altoholic.Comm.Sharing:SetMessageHandler("EmptyHandler")
 	end
 	
-	-- local options = Altoholic_SearchTab_Options
-	
 	-- local f = AltoholicSearchOptions
-	-- f.ItemInfoAutoQuery:SetChecked(options.ItemInfoAutoQuery)
 	-- f.IncludeNoMinLevel:SetChecked(options.IncludeNoMinLevel)
 	-- f.IncludeMailboxItems:SetChecked(options.IncludeMailboxItems)
 	-- f.IncludeKnownRecipes:SetChecked(options.IncludeKnownRecipes)

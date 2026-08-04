@@ -390,21 +390,18 @@ local callbacks = {
 				
 				button.Background:SetTexture(C_Item.GetItemIconByID(item))
 				
+				-- asks the client first and falls back on what was seen before, so neither the
+				-- border nor the level go blank whenever the item cache loses these items
+				local _, itemRarity, itemLevel = addon:GetItemInfo(item)
+
 				-- display the coloured border
-				local _, _, itemRarity, itemLevel = C_Item.GetItemInfo(item)
 				if itemRarity and itemRarity >= 2 then
 					local r, g, b = C_Item.GetItemQualityColor(itemRarity)
 					button.IconBorder:SetVertexColor(r, g, b, 0.5)
 					button.IconBorder:Show()
 				end
-				
-				-- This returns a correct iLvl for upgraded items
-				-- There are mistakes though, sometimes for leveling items, it returns an iLvl higher than what is shown in the tooltip (+10, +20)
-				if type(item) == "string" then
-					itemLevel = C_Item.GetDetailedItemLevelInfo(item)
-				end
 
-				button.Name:SetText(itemLevel)
+				button.Name:SetText(itemLevel or "")
 			else
 				button.key = nil
 				button.Background:SetTexture(addon:GetEquipmentSlotIcon(dataRowID))
@@ -436,10 +433,9 @@ local callbacks = {
 			end
 			
 			GameTooltip:SetHyperlink(link)
-			--[[ This functionality hasn't been available for a while, right?
+			-- the menu this points at works, it was the menu's initialization that did not
 			GameTooltip:AddLine(" ")
 			GameTooltip:AddLine(colors.green .. L["Right-Click to find an upgrade"])
-			--]]
 			GameTooltip:Show()
 		end,
 	OnClick = function(frame, button)
@@ -462,16 +458,26 @@ local callbacks = {
 			if not link then return end
 			
 			if button == "RightButton" then
+				-- the menu callbacks live in Altoholic_Search, which is load on demand
 				if not C_AddOns.IsAddOnLoaded("Altoholic_Search") then
 					C_AddOns.LoadAddOn("Altoholic_Search")
-					addon:DDM_Initialize(AltoholicFrameGridsRightClickMenu, RightClickMenu_Initialize)
 				end
-				
+
+				-- Initializing inside the branch above only worked when this right-click was
+				-- what loaded the search module. Reaching the search tab first - which is the
+				-- normal way to use the addon - left the dropdown without its initialize
+				-- function, and then nothing opened here, for the rest of the session.
+				addon:DDM_Initialize(AltoholicFrameGridsRightClickMenu, RightClickMenu_Initialize)
+
 				addon.Search:SetCurrentItem( addon:GetIDFromLink(link) ) 		-- item ID of the item to find an upgrade for
 				local _, class = DataStore:GetCharacterClass(character)
 				addon.Search:SetClass(class)
 				
-				ToggleDropDownMenu(1, nil, AltoholicFrameGridsRightClickMenu, frame:GetName(), 0, -5);
+				-- anchor to the frame itself, not to its name: the grid rows are built by
+				-- ScrollFrames.lua with CreateFrame("Button", nil, ...), so every cell is
+				-- anonymous and GetName() is nil here. The menu was being told to open
+				-- relative to nothing, and so it never appeared.
+				ToggleDropDownMenu(1, nil, AltoholicFrameGridsRightClickMenu, frame, 0, -5);
 				return
 			end
 			

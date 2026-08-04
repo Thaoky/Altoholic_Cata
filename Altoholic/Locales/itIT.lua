@@ -611,3 +611,40 @@ L["Zone"] = "Zona"
 
 -- ** Settings / Altoholic / Calendar **
 L["Week starts on Monday"] = "La settimana inizia di Lunedì"
+
+-- ** Condivisione account **
+L["Send Request"] = "Invia richiesta"
+L["Request Content"] = "Richiedi contenuto"
+L["Getting table of content from %s"] = "Ricezione dell'indice dei contenuti da %s"
+L["Transfering item %d/%d"] = "Trasferimento elemento %d/%d"
+L["Transfer interrupted"] = "Trasferimento interrotto"
+L["No answer from %s"] = "Nessuna risposta da %s"
+L["Opens the account sharing panel"] = "Apre il pannello di condivisione account"
+L["Shared Content"] = "Contenuto condiviso"
+L["ACCOUNT_NAME_IDENTIFIES"] = "Identifica l'account |cFF00FF00da cui|r stai\nimportando i dati, es. il nome del giocatore che c'è dietro."
+
+L["SHARING_HELP_SEND_REQUEST"] = "|cFFFFD7001) Nome account:|cFFFFFFFF un'etichetta a tua scelta per l'account |cFF00FF00da cui|cFFFFFFFF vuoi importare i dati (es. il nome o il soprannome\ndel giocatore che c'è dietro). Serve solo a raggruppare i personaggi importati nella scheda Riepilogo, e può essere qualsiasi cosa.\nRiscrivi lo stesso nome la prossima volta: l'importazione aggiornerà quel gruppo, invece di aggiungere un secondo account.\n\n|cFFFFD7002) Invia richiesta:|cFFFFFFFF seleziona l'altro giocatore, oppure scrivi il nome del personaggio |cFF00FF00con cui sta giocando ora|cFFFFFFFF, poi premi il pulsante.\nL'altra parte deve avere la condivisione account attiva, e deve accettare la richiesta o aver già autorizzato il tuo personaggio.\nAccettata la richiesta, tutto ciò che quel giocatore condivide comparirà a destra, e questo pulsante diventerà 'Richiedi contenuto'."
+L["SHARING_HELP_REQUEST_CONTENT"] = "|cFF00FF00Richiesta accettata.|cFFFFFFFF Ciò che questo giocatore condivide è ora elencato a destra, non è stato importato ancora nulla.\nSpunta i personaggi e i dati che vuoi (spuntando un personaggio spunti anche le sue categorie di dati), oppure usa le\ncaselle [-] e 'Tutto' sopra l'elenco per espandere o spuntare tutto, poi premi Richiedi contenuto.\n\nLa colonna della data dice quanto è vecchio ogni elemento, 'Aggiornato' significa che hai già esattamente quella versione."
+L["SHARING_HELP_TRANSFER_IN_PROGRESS"] = "|cFFFFFFFFTrasferimento in corso, attendi...\nEntrambi i personaggi devono restare online finché non è completo."
+L["SHARING_HELP_TRANSFER_COMPLETE"] = "|cFF00FF00Trasferimento completato.|cFFFFFFFF I personaggi importati sono ora nella scheda Riepilogo, raggruppati sotto il nome account che hai inserito.\nL'elenco a destra è stato svuotato, è normale.\n\n|cFFFFD700Nota:|cFFFFFFFF un'importazione è un'istantanea una tantum, |cFF00FF00non|cFFFFFFFF viene tenuta aggiornata automaticamente.\nPer aggiornarla in seguito, fai clic destro sulla riga del reame nella scheda Riepilogo e scegli 'Aggiorna da ...', oppure torna qui.\nQualsiasi personaggio di quell'account può fornire i dati, quindi chiedi a quello che è online, e riusa lo stesso nome account."
+L["SHARING_HELP_REQUEST_SENT"] = "|cFFFFD700Richiesta inviata.|cFFFFFFFF In attesa che %s risponda...\nLa richiesta deve essere accettata dall'altra parte, a meno che il tuo personaggio non sia già autorizzato.\nSe non succede nulla, controlla che %s sia online, sul tuo reame, e stia usando Altoholic."
+L["SHARING_HELP_REQUEST_REJECTED"] = "|cFFFF0000Richiesta rifiutata.|cFFFFFFFF Questo giocatore ha rifiutato la richiesta, oppure ha impostato il tuo personaggio su 'rifiuta sempre'.\nNon è stato importato nulla. Puoi inviare una nuova richiesta quando vuoi."
+L["SHARING_HELP_REQUEST_CANCELLED_COMBAT"] = "|cFFFF0000Richiesta annullata.|cFFFFFFFF Le richieste di condivisione account vengono sempre rifiutate mentre l'altro giocatore è in combattimento.\nAspetta la fine del combattimento, poi invia di nuovo la richiesta."
+L["SHARING_HELP_SHARING_DISABLED"] = "|cFFFF0000Richiesta rifiutata.|cFFFFFFFF Questo giocatore non ha attivato la condivisione account.\n'Condivisione account attiva' deve essere spuntata nelle opzioni di Altoholic dell'altro giocatore prima che tu possa richiedere qualcosa."
+L["SHARING_HELP_TRANSFER_INTERRUPTED"] = "|cFFFF0000Trasferimento interrotto.|cFFFFFFFF %s ha smesso di rispondere, quindi la richiesta è stata abbandonata.\n%s\nIl pulsante è di nuovo attivo: controlla che l'altro personaggio sia ancora online, poi invia una nuova richiesta."
+L["SHARING_HELP_NO_ANSWER"] = "|cFFFF0000Nessuna risposta.|cFFFFFFFF %s non ha mai risposto alla richiesta.\nControlla che questo personaggio sia online, sul tuo reame, stia usando Altoholic, e che la condivisione account sia attiva da quella parte.\nNon è stato importato nulla. Puoi inviare una nuova richiesta quando vuoi."
+L["SHARING_PARTIAL_IMPORT_KEPT"] = "Quello che era già stato trasferito è stato mantenuto, quindi quei personaggi sono nella scheda Riepilogo: reinvia la richiesta con lo stesso nome account per completarli."
+L["SHARING_PARTIAL_IMPORT_NONE"] = "Non era ancora stato trasferito nulla, quindi non è stato importato niente."
+
+-- ** Ricerche nelle loot table **
+L["SEARCHING_UPGRADES"] = "Ricerca di una miglioria rispetto a %s nelle loot table... il gioco resta bloccato per qualche secondo."
+L["SEARCH_RESULTS"] = "%d risultati trovati"
+L["SEARCH_RESULTS_INCOMPLETE"] = "%d risultati - %d nomi non ancora noti"
+L["SEARCH_IN_PROGRESS"] = "Ricerca nelle loot table... %d%%"
+L["SEARCH_ALREADY_RUNNING"] = "Una ricerca è già in corso, aspetta che finisca."
+
+-- ** Equipaggiamento dei membri di gilda **
+L["EQUIPMENT_COMES_FROM_MEMBER"] = "L'equipaggiamento lo manda la sua copia dell'addon, quindi deve essere online."
+L["EQUIPMENT_ASKING"] = "Richiesta a %s..."
+L["EQUIPMENT_NO_ANSWER"] = "%s non ha risposto"
+L["EQUIPMENT_RECEIVED_ON"] = "Ricevuto il %s"

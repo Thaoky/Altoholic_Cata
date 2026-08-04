@@ -30,6 +30,15 @@
 								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="0" y="20" />
 							</Anchors>
 						</FontString>
+						<!-- Where the equipment above came from and when. This panel is filled over
+						     the guild channel by the member's own copy of the addon, so it can just
+						     as well stay empty, and it never says so on its own. -->
+						<FontString parentKey="Status" inherits="GameFontNormalSmall" justifyH="Center">
+							<Size x="170" y="14" />
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="0" y="4" />
+							</Anchors>
+						</FontString>
 					</Layer>
 				</Layers>
 				<Frames>

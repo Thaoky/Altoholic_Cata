@@ -1,0 +1,9 @@
+## Interface: 20505, 11508
+## Title: Altoholic Loot Extractor
+## Notes: Development tool. Dumps the AtlasLoot data to a saved variable, once, so it can be turned into Altoholic's own loot table. Not part of the addon.
+## Author: Altoholic fork
+## Version: 1.0
+## OptionalDeps: AtlasLootClassic
+## SavedVariables: AltoholicLootExtractDB
+
+Extract.lua

@@ -13,6 +13,34 @@ local ns = addon.Search		-- ns = namespace
 
 local updateHandler
 
+-- *** Reporting what the item cache did not have ***
+-- A loot table entry the client has never seen resolves to nothing, so it is filtered out
+-- and missing from the results. Filtering it is itself the request for it, so the data does
+-- turn up a few seconds later, and running the search again then returns more.
+--
+-- Doing that automatically was tried and taken back out: one pass walks the bundled table
+-- plus the three LibPeriodicTable sets, tens of thousands of entries, and blocks the game
+-- for seconds. Doing it twice doubles that, and floods the client with requests for items
+-- it does not know, which appears to push things it did know back out of the cache.
+-- So the count is reported instead, and repeating the search is left to the user.
+-- Must run *after* ns:Update(), which writes its own "n results found" line and would
+-- otherwise wipe this one. When nothing was missing, Update's text is the right text and
+-- is left alone.
+local function ReportSearchStatus()
+	local numUnnamed = addon.Loots:GetNumItemsUnnamed()
+	if not numUnnamed or numUnnamed == 0 then return end
+
+	AltoholicTabSearch.Status:SetText(format(L["SEARCH_RESULTS_INCOMPLETE"], ns:GetNumResults(), numUnnamed))
+end
+
+-- The loot scans hand back a frame between batches, which is the only moment anything can
+-- be drawn: this is where the progress the user was missing gets written.
+local function ReportScanProgress(done, total)
+	if not total or total == 0 then return end
+
+	AltoholicTabSearch.Status:SetText(format(L["SEARCH_IN_PROGRESS"], floor(done / total * 100)))
+end
+
 function ns:Update()
 	ns[updateHandler](ns)
 end
@@ -37,9 +65,9 @@ local function Realm_UpdateEx(self, offset, desc)
 		rowFrame = frame["Entry"..rowIndex]
 		
 		rowFrame.Name:SetWidth(240)
-		rowFrame.Stat1:SetWidth(160)
+		rowFrame.Stat1:SetWidth(240)		-- holds the joined list of sources
 		rowFrame.Stat1:SetPoint("LEFT", rowFrame.Name, "RIGHT", 5, 0)
-		rowFrame.Stat2:SetWidth(150)
+		rowFrame.Stat2:SetWidth(70)
 		rowFrame.Stat2:SetPoint("LEFT", rowFrame.Stat1, "RIGHT", 5, 0)
 		
 		for j=3, 6 do
@@ -125,10 +153,17 @@ local RealmScrollFrame_Desc = {
 	Lines = {
 		[PLAYER_ITEM_LINE] = {
 			GetItemData = function(self, result)		-- GetItemData..just to avoid calling it GetItemInfo
-					local name = C_Item.GetItemInfo(result.id)
-					
+					-- The link is worth asking about first, it carries what the bare id cannot.
+					-- Either way this goes through the item memory rather than straight to the
+					-- client: an item sitting in an offline alt's bags may well be one this
+					-- session has never had a reason to look up, and the bare call answered
+					-- nothing at all - an empty name that no amount of waiting would fill in,
+					-- and no "unknown" marker either, so the row just looked broken.
+					local name = addon:GetItemInfo(result.link or result.id)
+						or format("%s%d", UNKNOWN .. " #", result.id)
+
 					-- return name, source, sourceID
-					return name, colors.teal .. result.location, 0 
+					return name, colors.teal .. result.location, 0
 				end,
 			GetItemTexture = function(self, result)
 					return (result.id) and C_Item.GetItemIconByID(result.id) or "Interface\\Icons\\Trade_Engraving"
@@ -154,7 +189,7 @@ local RealmScrollFrame_Desc = {
 					return name, colors.teal .. result.location, 0 
 				end,
 			GetItemTexture = function(self, result)
-					return (result.id) and GetItemIconByID(result.id) or "Interface\\Icons\\Trade_Engraving"
+					return (result.id) and C_Item.GetItemIconByID(result.id) or "Interface\\Icons\\Trade_Engraving"
 				end,
 			GetCharacter = function(self, result)
 					local _, _, guildName = strsplit(".", result.source)
@@ -308,9 +343,9 @@ function ns:Loots_Update()
 	for rowIndex = 1, numRows do
 		rowFrame = frame["Entry"..rowIndex]
 		rowFrame.Name:SetWidth(240)
-		rowFrame.Stat1:SetWidth(160)
+		rowFrame.Stat1:SetWidth(240)		-- holds the joined list of sources
 		rowFrame.Stat1:SetPoint("LEFT", rowFrame.Name, "RIGHT", 5, 0)
-		rowFrame.Stat2:SetWidth(150)
+		rowFrame.Stat2:SetWidth(70)
 		rowFrame.Stat2:SetPoint("LEFT", rowFrame.Stat1, "RIGHT", 5, 0)
 		
 		for j=3, 6 do
@@ -329,15 +364,22 @@ function ns:Loots_Update()
 			itemButton = rowFrame.Item
 			itemButton.IconBorder:Hide()
 			
-			local itemName, _, itemRarity, itemLevel = GetItemInfo(itemID)
-			local r, g, b, hex = GetItemQualityColor(itemRarity)
-			
-			if itemRarity >= 2 then
+			-- a result can be drawn long after it was found, and the client may still not
+			-- resolve the item: this falls back on what was seen before, and on what the
+			-- search itself recorded, rather than feeding nil to the colour and text calls
+			local itemName, itemRarity, itemLevel = addon:GetItemInfo(itemID)
+			local r, g, b, hex = C_Item.GetItemQualityColor(itemRarity or 1)
+
+			itemName = itemName or format("%s%d", UNKNOWN .. " #", itemID)
+			itemLevel = itemLevel or result.iLvl or ""
+			result.iLvl = result.iLvl or tonumber(itemLevel)		-- heals the row for sorting
+
+			if itemRarity and itemRarity >= 2 then
 				itemButton.IconBorder:SetVertexColor(r, g, b, 0.5)
 				itemButton.IconBorder:Show()
 			end
-			
-			itemButton.Icon:SetTexture(GetItemIconByID(itemID));
+
+			itemButton.Icon:SetTexture(C_Item.GetItemIconByID(itemID));
 
 			rowFrame.Stat2:SetText(colors.yellow .. itemLevel)
 			rowFrame.Name:SetText("|c" .. hex .. itemName)
@@ -400,7 +442,8 @@ function ns:Upgrade_Update()
 		rowFrame.Stat1:SetPoint("LEFT", rowFrame.Name, "RIGHT", 0, 0)
 		rowFrame.Stat2:SetWidth(50)
 		rowFrame.Stat2:SetPoint("LEFT", rowFrame.Stat1, "RIGHT", 0, 0)
-		rowFrame:SetScript("OnEnter", function(self) ns:TooltipStats(self) end)
+		-- TooltipStats lives on addon.Tabs.Search, not on addon.Search which ns points at here
+		rowFrame:SetScript("OnEnter", function(self) addon.Tabs.Search:TooltipStats(self) end)
 		rowFrame:SetScript("OnLeave", function(self) AltoTooltip:Hide() end)
 		
 		local line = rowIndex + offset
@@ -411,20 +454,33 @@ function ns:Upgrade_Update()
 			itemButton = rowFrame.Item
 			itemButton.IconBorder:Hide()
 			
-			local itemName, _, itemRarity, itemLevel = GetItemInfo(itemID)
-			local r, g, b, hex = GetItemQualityColor(itemRarity)
-			
-			if itemRarity >= 2 then
+			-- same as the loot list: the item may still be unresolved when the row is drawn
+			local itemName, itemRarity, itemLevel = addon:GetItemInfo(itemID)
+			local r, g, b, hex = C_Item.GetItemQualityColor(itemRarity or 1)
+
+			itemName = itemName or format("%s%d", UNKNOWN .. " #", itemID)
+			itemLevel = itemLevel or result.iLvl or ""
+			result.iLvl = result.iLvl or tonumber(itemLevel)		-- heals the row for sorting
+
+			if itemRarity and itemRarity >= 2 then
 				itemButton.IconBorder:SetVertexColor(r, g, b, 0.5)
 				itemButton.IconBorder:Show()
 			end
-			
+
 			itemButton.Icon:SetTexture(C_Item.GetItemIconByID(itemID));
 
 			rowFrame.Name:SetText("|c" .. hex .. itemName)
-			rowFrame.Source.Text:SetText(colors.teal .. result.dropLocation)
+
+			-- the same item is often reachable several ways: no room to list them on this
+			-- layout, so say how many there are beyond the one shown
+			local location = result.dropLocation
+			if result.numSources and result.numSources > 1 then
+				location = format("%s %s(+%d)", location, colors.white, result.numSources - 1)
+			end
+
+			rowFrame.Source.Text:SetText(colors.teal .. location)
 			rowFrame.Source:SetID(0)
-		
+
 			for j=1, 6 do
 				stat = rowFrame["Stat"..j]
 				
@@ -542,12 +598,13 @@ local function SortByRealm(a, b, ascending)
 end
 
 local function SortByStat(a, b, field, ascending)
-	local statA = strsplit("|", a[field])
-	local statB = strsplit("|", b[field])
-	
-	statA = tonumber(statA)
-	statB = tonumber(statB)
-	
+	-- the reference row and any row whose stats could not be read carry nothing here
+	local statA = a[field] and strsplit("|", a[field])
+	local statB = b[field] and strsplit("|", b[field])
+
+	statA = tonumber(statA) or 0
+	statB = tonumber(statB) or 0
+
 	if ascending then
 		return statA < statB
 	else
@@ -556,10 +613,20 @@ local function SortByStat(a, b, field, ascending)
 end
 
 local function SortByField(a, b, field, ascending)
+	local valueA, valueB = a[field], b[field]
+
+	-- A row can legitimately be missing the field it is being sorted on: an item the client
+	-- has not cached has no item level to record. Those go last either way, rather than
+	-- taking the whole sort down with them.
+	if valueA == nil or valueB == nil then
+		if valueA == valueB then return false end
+		return valueB == nil
+	end
+
 	if ascending then
-		return a[field] < b[field]
+		return valueA < valueB
 	else
-		return a[field] > b[field]
+		return valueA > valueB
 	end
 end
 
@@ -572,6 +639,7 @@ function ns:ClearResults()
 end
 
 function ns:AddResult(t)
+
 	table.insert(results, t)
 end
 
@@ -591,6 +659,18 @@ function ns:SortResults(frame, field)
 	local id = frame:GetID()
 	local ascending = Altoholic_SearchTab_Options.SortAscending
 		
+	-- The item level was written when the row was found, and at that point the client may
+	-- not have known it. It very often does by now - the rows on screen already show it,
+	-- because drawing them resolves it again - so bring the stored value up to date before
+	-- sorting on it, rather than sorting on the nil it was found with.
+	if field == "iLvl" then
+		for _, result in ipairs(results) do
+			if not result.iLvl and result.id then
+				result.iLvl = select(3, addon:GetRememberedItemInfo(result.id))
+			end
+		end
+	end
+
 	if field == "name" then
 		table.sort(results, function(a, b) return SortByName(a, b, ascending) end)
 	elseif field == "item" then
@@ -780,10 +860,20 @@ end
 local ongoingSearch
 
 function ns:FindItem(searchType, searchSubType)
-	if ongoingSearch then
-		return		-- if a search is already happening .. then exit
+	-- The search button passes nothing: fall back on whatever the category tree is
+	-- highlighting, otherwise pressing it drops the category while it still looks selected
+	if not searchType and not searchSubType then
+		searchType, searchSubType = addon.Tabs.Search:GetSelectedCategory()
 	end
-	
+
+	-- A loot scan now spans several seconds, so clicking another category while one runs is
+	-- the user replacing the search, not something to drop. Dropping it left the previous
+	-- results on screen and looked like the category filter returning the wrong things.
+	if ongoingSearch then
+		addon.Loots:CancelScan()
+		ongoingSearch = nil
+	end
+
 	ongoingSearch = true
 	
 	-- Set Filters
@@ -857,46 +947,67 @@ function ns:FindItem(searchType, searchSubType)
 		end
 	else	-- search loot tables
 		SearchLoots = true -- this value will be tested in ns:Update() to resize columns properly
-		addon.Loots:Find()
 	end
-	
-	filters:ClearFilters()
-	
+
+	-- everything below has to wait for the results, and the loot scan only produces them
+	-- several frames from now, so it is packed up here and run either way
+	local function Finish()
+		filters:ClearFilters()
+
+		if not AltoholicTabSearch:IsVisible() then
+			addon.Tabs:OnClick("Search")
+		end
+
+		ongoingSearch = nil 	-- search done
+
+		addon.Tabs.Search:SetMode(SearchLoots and "loots" or "realm")
+
+		ns:Update()
+
+		-- all of this has to come after Update, which writes a status line of its own -
+		-- "0 results found (Showing 1-0)" being the least helpful of them
+		if ns:GetNumResults() == 0 then
+			if currentValue == "" then
+				AltoholicTabSearch.Status:SetText(L["No match found!"])
+			else
+				AltoholicTabSearch.Status:SetText(value .. L[" not found!"])
+			end
+		elseif SearchLoots then
+			ReportSearchStatus()
+		end
+
+		collectgarbage()
+	end
+
+	if not SearchLoots then
+		Finish()
+		return
+	end
+
+	-- show the tab now so that the progress written between batches is actually on screen
 	if not AltoholicTabSearch:IsVisible() then
 		addon.Tabs:OnClick("Search")
 	end
-	
-	if ns:GetNumResults() == 0 then
-		if currentValue == "" then 
-			AltoholicTabSearch.Status:SetText(L["No match found!"])
-		else
-			AltoholicTabSearch.Status:SetText(value .. L[" not found!"])
-		end
-	end
-	ongoingSearch = nil 	-- search done
-	
-	if SearchLoots then
-		addon.Tabs.Search:SetMode("loots")
-		-- if Altoholic_SearchTab_Options.SortDescending then 		-- descending sort ?
-			-- AltoholicTabSearch.SortButtons.Sort3.ascendingSort = true		-- say it's ascending now, it will be toggled
-			-- ns:SortResults(AltoholicTabSearch.SortButtons.Sort3, "iLvl")
-		-- else
-			-- AltoholicTabSearch.SortButtons.Sort3.ascendingSort = nil
-			-- ns:SortResults(AltoholicTabSearch.SortButtons.Sort3, "iLvl")
-		-- end
-	else
-		addon.Tabs.Search:SetMode("realm")
-	end
-
+	addon.Tabs.Search:SetMode("loots")
 	ns:Update()
-	collectgarbage()
+
+	addon.Loots:Find(ReportScanProgress, Finish)
 end
 
 local currentClass				-- the current character class
+local upgradeStatFormat		-- the stat layout the displayed upgrade list was built with
 local currentItemID				-- itemID of the item for which we're searching for an upgrade
 
 function ns:SetClass(class)
 	currentClass = class
+end
+
+function ns:SetUpgradeStatFormat(format)
+	upgradeStatFormat = format
+end
+
+function ns:GetUpgradeStatFormat()
+	return upgradeStatFormat
 end
 
 function ns:GetClass()
@@ -911,15 +1022,55 @@ function ns:GetRealmsLineDesc(line)
 	return RealmScrollFrame_Desc.Lines[line]
 end
 
-function ns:FindEquipmentUpgrade()
-	local upgradeType = self.value
+function ns:FindEquipmentUpgrade(upgradeType)
+	-- called as a drop down callback, where self is the button carrying the value
+	upgradeType = upgradeType or self.value
+	local upgradeItemID = currentItemID		-- cleared once the search actually runs
 
+	-- Resolve the reference item before touching anything else. Without it there is nothing
+	-- to be better than: every filter value would be nil, which means "no constraint", and
+	-- the search would return the entire loot table as an upgrade.
+	local _, itemLink, _, itemLevel, _, itemType, itemSubType, _, itemEquipLoc = C_Item.GetItemInfo(upgradeItemID)
+
+	if not itemLevel then
+		currentItemID = nil
+		addon:Print(L["Unknown link, please relog this character"])		-- the search tab may not even be up yet
+		return		-- deliberately before ClearResults: do not wipe what is on screen
+	end
+
+	-- Walking the loot tables blocks the game for seconds, and nothing is drawn while Lua
+	-- runs, so the tab has to be shown and the message set now, and the search itself put
+	-- off to the next frame. Otherwise the user stares at a frozen client with no clue.
+	if not AltoholicTabSearch:IsVisible() then
+		addon.Tabs:OnClick("Search")
+	end
+
+	-- The category tree on the left holds whatever was picked the last time this tab was used
+	-- by hand. It has no bearing on an upgrade search, which is driven by the reference item,
+	-- so leaving it lit claims a filter that is not being applied.
+	addon.Tabs.Search:ClearCategorySelection()
+
+	-- SetMode("upgrade") builds the stat columns from FormatStats[GetClass()], and those
+	-- keys are the role strings ("WarriorTank"), not the bare class the grid stored here
+	if upgradeType ~= -1 then
+		ns:SetClass(upgradeType)
+		ns:SetUpgradeStatFormat(addon.Equipment.FormatStats[upgradeType])
+	end
+
+	addon.Tabs.Search:SetMode(upgradeType ~= -1 and "upgrade" or "loots")
 	ns:ClearResults()
-	
-	-- Set Filters
-	local _, itemLink, _, itemLevel, _, itemType, itemSubType, _, itemEquipLoc = GetItemInfo(currentItemID)
+	ns:Update()
+	AltoholicTabSearch.Status:SetText(format(L["SEARCHING_UPGRADES"], itemLink))
+	AltoTooltip:Hide()
+
+	C_Timer.After(0, function()
+		ns:RunUpgradeSearch(upgradeItemID, upgradeType, itemLevel, itemType, itemSubType, itemEquipLoc)
+	end)
+end
+
+function ns:RunUpgradeSearch(upgradeItemID, upgradeType, itemLevel, itemType, itemSubType, itemEquipLoc)
 	local itemSlot = addon.Equipment:GetInventoryTypeIndex(itemEquipLoc)
-	
+
 	filters:SetFilterValue("itemLevel", itemLevel)
 	filters:SetFilterValue("itemType", itemType)
 	filters:SetFilterValue("itemSubType", itemSubType)
@@ -934,32 +1085,28 @@ function ns:FindEquipmentUpgrade()
 		filters:EnableFilter("EquipmentSlot")
 	end
 	
+	local function Finish()
+		filters:ClearFilters()
+		currentItemID = nil
+
+		AltoTooltip:Hide();	-- mandatory hide after processing
+
+		ns:Update()
+		ReportSearchStatus()		-- after Update, which writes a status line of its own
+	end
+
 	-- Start the search
 	if upgradeType ~= -1 then	-- not an item level upgrade
-		ns:SetClass(upgradeType)
-		addon.Loots:FindUpgradeByStats( currentItemID, upgradeType)
+		addon.Loots:FindUpgradeByStats(upgradeItemID, upgradeType, ReportScanProgress, Finish)
 
 	else	-- simple search, point to simple VerifyUpgrade method
-		addon.Loots:FindUpgrade()
-		AltoholicSearchOptionsLootInfo:SetText( colors.green .. Altoholic_UI_Options.TotalLoots .. "|r " .. L["Loots"] .. " / "
-				.. colors.green .. Altoholic_UI_Options.UnknownLoots .. "|r " .. L["Unknown"])
+		addon.Loots:FindUpgrade(ReportScanProgress, function()
+			AltoholicSearchOptionsLootInfo:SetText( colors.green .. Altoholic_UI_Options.TotalLoots .. "|r " .. L["Loots"] .. " / "
+					.. colors.green .. Altoholic_UI_Options.UnknownLoots .. "|r " .. L["Unknown"])
+			Finish()
+		end)
 	end
-	
-	filters:ClearFilters()
-	currentItemID = nil
 
-	AltoTooltip:Hide();	-- mandatory hide after processing	
-	
-	if not AltoholicTabSearch:IsVisible() then
-		addon.Tabs:OnClick("Search")
-	end
-	
-	if upgradeType ~= -1 then	-- not an item level upgrade
-		addon.Tabs.Search:SetMode("upgrade")
-	else
-		addon.Tabs.Search:SetMode("loots")
-	end
-	
 	-- if Altoholic_SearchTab_Options.SortDescending then 		-- descending sort ?
 		-- AltoholicTabSearch.SortButtons.Sort8.ascendingSort = true		-- say it's ascending now, it will be toggled
 		-- ns:SortResults(AltoholicTabSearch.SortButtons.Sort8, "iLvl")
@@ -967,6 +1114,4 @@ function ns:FindEquipmentUpgrade()
 		-- AltoholicTabSearch.SortButtons.Sort8.ascendingSort = nil
 		-- ns:SortResults(AltoholicTabSearch.SortButtons.Sort8, "iLvl")
 	-- end
-
-	ns:Update()
 end

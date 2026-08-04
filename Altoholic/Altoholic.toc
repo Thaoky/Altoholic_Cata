@@ -1,3 +1,8 @@
+# Of the three interface versions below, only two have actually been run:
+#   11508 - Classic Era ...... tested
+#   20505 - Burning Crusade .. tested, this is the client the local changes were made on
+#   50504 - Mists of Pandaria. NOT TESTED, inherited from upstream and left in place
+# Treat Mists as unverified: it loads in the sense that the toc claims it, nothing more.
 ## Interface: 50504, 20505, 11508
 ## Title: Altoholic Classic by |cFF69CCF0Thaoky|r
 ## Title-zhCN: |cffeedd99 [物品] |r: 全角色统计 Altoholic
@@ -12,12 +17,13 @@
 ## Author: Thaoky (EU-Marécages de Zangar)
 ## Version: 5.5.005
 ## Dependencies: AddonFactory, DataStore, DataStore_Achievements, DataStore_Agenda, DataStore_Auctions, DataStore_Characters, DataStore_Containers, DataStore_Crafts, DataStore_Currencies, DataStore_Inventory, DataStore_Mails, DataStore_Quests, DataStore_Reputations, DataStore_Spells, DataStore_Talents
-## SavedVariables: Altoholic_UI_Options, Altoholic_Tooltip_Options, Altoholic_Sharing_Options, Altoholic_Calendar_Options
+## SavedVariables: Altoholic_UI_Options, Altoholic_Tooltip_Options, Altoholic_Sharing_Options, Altoholic_Calendar_Options, Altoholic_ItemInfo
 
 Embeds.xml
 Locale.xml
 
 Core.lua
+LootTable.lua
 Services\Services.xml
 Templates\UITemplates.xml
 Altoholic.xml

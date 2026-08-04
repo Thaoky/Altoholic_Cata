@@ -45,7 +45,17 @@ addon:Controller("AltoholicUI.TabGuild", {
 		tab = frame
 		
 		frame.MenuItem1:SetText(L["Guild Members"])
-		frame.MenuItem2:SetText(GUILD_BANK)
+
+		-- Guild banks arrived with the Burning Crusade. On Classic Era the entry led to a panel
+		-- that could never hold anything, so it is not offered. The test is on the API rather
+		-- than on the interface version: a client either has the thing or it does not, and that
+		-- is the question being asked.
+		if GetNumGuildBankTabs then
+			frame.MenuItem2:SetText(GUILD_BANK)
+		else
+			frame.MenuItem2:Hide()
+		end
+
 		frame:MenuItem_Highlight(1)
 		frame:SetMode(1)
 

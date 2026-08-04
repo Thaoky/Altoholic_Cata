@@ -80,6 +80,20 @@ addon:Controller("AltoholicUI.GuildMemberRow", {
 		addon:AiLTooltip()
 		tooltip:AddLine(" ", 1, 1, 1)
 		tooltip:AddLine(format("%s%s", colors.green, L["Left-click to see this character's equipment"]), 1, 1, 1)
+
+		-- The item level above travelled on the guild wide broadcast and is kept; the equipment
+		-- does not travel with it. It is asked for one character at a time and only their own
+		-- addon can answer, so it is worth saying before the click rather than after it.
+		tooltip:AddLine(format("%s%s", colors.white, L["EQUIPMENT_COMES_FROM_MEMBER"]), 1, 1, 1, true)
+
+		local guild = DataStore:GetGuild()
+		local timestamp = guild and DataStore:GetGuildMemberEquipmentTimestamp(guild, member)
+
+		if timestamp then
+			tooltip:AddLine(format("%s%s", colors.green,
+				format(L["EQUIPMENT_RECEIVED_ON"], date("%d/%m/%Y %H:%M", timestamp))), 1, 1, 1)
+		end
+
 		tooltip:Show()
 	end,
 	Level_OnClick = function(frame, button)

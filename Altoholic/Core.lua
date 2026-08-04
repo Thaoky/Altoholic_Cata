@@ -122,11 +122,28 @@ local function SearchBags(searchText)
 	addon.Search:FindItem()
 end
 
+local function ShowAccountSharing()
+	if not Altoholic_Sharing_Options.IsEnabled then
+		addon:Print(L["Both parties must enable account sharing\nbefore using this feature (see options)"])
+		return
+	end
+
+	-- the sharing frame is its own top level window, the main one would sit on top of it
+	if AltoholicFrame:IsVisible() then
+		AltoholicFrame:Hide()
+	end
+
+	-- keep whatever step the previous request had reached, exactly like the summary tab button does
+	addon.Comm.Sharing:SetMode(AltoAccountSharing_SendButton.requestMode and 2 or 1)
+	AltoAccountSharing:Show()
+end
+
 local commandLineCommands = {
 	["show"] = function() AltoholicFrame:Show() end,
 	["hide"] = function() AltoholicFrame:Hide() end,
 	["toggle"] = function() addon:ToggleUI() end,
 	["search"] = SearchBags,
+	["sharing"] = ShowAccountSharing,
 }
 
 local function CommandLineCallback(args)
@@ -139,12 +156,14 @@ local function CommandLineCallback(args)
 		print(format("  %shide|r - %s", yellow, L["Hides the UI"]))
 		print(format("  %stoggle|r - %s", yellow, L["Toggles the UI"]))
 		print(format("  %ssearch <item name>|r - %s", yellow, L["Search in bags"]))
+		print(format("  %ssharing|r - %s", yellow, L["Opens the account sharing panel"]))
 		return
 	end
 
-	-- Get the command name and its argument
-	local name, arg1 = strsplit(" ", args)
-	
+	-- Get the command name and its argument.
+	-- The limit of 2 keeps the rest of the line in one piece, item names have spaces in them.
+	local name, arg1 = strsplit(" ", args, 2)
+
 	if name and commandLineCommands[name] then
 		commandLineCommands[name](arg1)
 	end
@@ -204,10 +223,9 @@ AddonFactory:OnAddonLoaded(addonName, function()
 		AHColorCoding = true,							-- color coded recipes at the AH
 		VendorColorCoding = true,						-- color coded recipes at vendors
 		
-		-- To do : Plan removal of these 3
+		-- To do : Plan removal of these 2
 		TotalLoots = 0,							-- make at least one search in the loot tables to initialize these values
-		UnknownLoots = 0,	
-		unsafeItems = {},
+		UnknownLoots = 0,
 	}
 	
 	Altoholic_Tooltip_Options = Altoholic_Tooltip_Options or {
@@ -246,6 +264,9 @@ AddonFactory:OnAddonLoaded(addonName, function()
 		},
 	}
 	
+	-- item id -> "name|rarity|level", for what the client's item cache cannot answer for
+	Altoholic_ItemInfo = Altoholic_ItemInfo or {}
+
 	Altoholic_Calendar_Options = Altoholic_Calendar_Options or {
 		WarningsEnabled = true,
 		WeekStartsOnMonday = false,
@@ -258,7 +279,9 @@ AddonFactory:OnAddonLoaded(addonName, function()
 
 	RegisterChatCommand("Altoholic", CommandLineCallback)
 	RegisterChatCommand("Alto", CommandLineCallback)
-	
+
+	addon:SetupTabsForThisExpansion()
+
 	DataStore:SetGuildCommCallbacks(commPrefix, GuildCommCallbacks)
 	DataStore:OnGuildComm(commPrefix, DataStore:GetGuildCommHandler())
 	
@@ -450,6 +473,32 @@ local tabList = {
 local frameToID = {}
 for index, name in ipairs(tabList) do
 	frameToID[name] = index
+end
+
+function addon:SetupTabsForThisExpansion()
+	-- Achievements arrived with Wrath. Before that the whole tab has nothing to show, and
+	-- the API behind it does not exist, so drop the button rather than offer an empty pane.
+	if select(4, GetBuildInfo()) >= 30000 then return end
+
+	-- the buttons are declared as $parentTabN, so they are globals, not parent keys
+	local function GetTabButton(index)
+		return _G[format("%sFrameTab%d", addonName, index)]
+	end
+
+	local achievements = GetTabButton(frameToID.Achievements)
+	if not achievements then return end
+
+	achievements:Hide()
+
+	-- the tab buttons are anchored in a chain, each to the one before it, so hiding one
+	-- leaves its gap behind: re-point the next tab at the one that now precedes it
+	local nextTab = GetTabButton(frameToID.Achievements + 1)
+	local previousTab = GetTabButton(frameToID.Achievements - 1)
+
+	if nextTab and previousTab then
+		nextTab:ClearAllPoints()
+		nextTab:SetPoint("TOPLEFT", previousTab, "TOPRIGHT", -8, 0)
+	end
 end
 
 local function SafeLoadAddOn(name)

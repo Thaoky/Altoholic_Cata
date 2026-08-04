@@ -231,6 +231,11 @@
 		<Anchors>
 			<Anchor point="CENTER" x="0" y="20" />
 		</Anchors>
+		<Scripts>
+			<OnShow>
+				Altoholic:SetDefaultAccountName()
+			</OnShow>
+		</Scripts>
 		<Frames>
 			<!-- 	for readability reasons, the scroll frame is in Frames/AccountSharing.xml	-->
 
