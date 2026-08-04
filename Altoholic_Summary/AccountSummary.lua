@@ -1589,12 +1589,19 @@ function addon:AiLTooltip()
 	local tt = AltoTooltip
 	
 	tt:AddLine(" ")
-	if tocVersion < 30000 then
+	if tocVersion < 20000 then
 		tt:AddDoubleLine(format("%sTier 0", colors.teal), FormatAiL("58-63"))
 		tt:AddDoubleLine(format("%sTier 1", colors.teal), FormatAiL("66"))
 		tt:AddDoubleLine(format("%sTier 2", colors.teal), FormatAiL("76"))
 		tt:AddDoubleLine(format("%sTier 3", colors.teal), FormatAiL("86-92"))
-	
+
+	elseif tocVersion < 30000 then
+		-- Burning Crusade tier sets
+		tt:AddDoubleLine(format("%sTier 4", colors.teal), FormatAiL("120"))
+		tt:AddDoubleLine(format("%sTier 5", colors.teal), FormatAiL("133"))
+		tt:AddDoubleLine(format("%sTier 6", colors.teal), FormatAiL("146"))
+		tt:AddDoubleLine(format("%sTier 6.5", colors.teal), FormatAiL("154"))
+
 	elseif tocVersion < 100000 then
 		-- Wrath achievement levels
 		tt:AddDoubleLine(format("%sSuperior", colors.teal), FormatAiL("187-200"))
