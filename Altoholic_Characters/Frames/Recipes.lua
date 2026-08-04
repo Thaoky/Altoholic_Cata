@@ -101,6 +101,10 @@ end
 local isNameMissing
 local isWaitingForItemNames
 
+local function NameMatches(name)
+	return (name and string.find(strlower(name), currentSearch, 1, true)) and true or false
+end
+
 local function RecipePassesSearchFilter(recipeID)
 	-- no search filter ? ok
 	if currentSearch == "" then return true end
@@ -108,21 +112,31 @@ local function RecipePassesSearchFilter(recipeID)
 
 	-- Match on the name of the crafted item, which is the one being displayed ..
 	local itemID = GetCraftedItemID(recipeID)
-	local name = itemID and C_Item.GetItemInfo(itemID)		-- this also queries the server if need be
 
-	-- .. or on the spell name for recipes that craft no item, like enchants
-	if not itemID then
-		name = GetSpellInfo(recipeID)
+	if itemID then
+		local name = C_Item.GetItemInfo(itemID)		-- this also queries the server if need be
+
+		if not name then
+			isNameMissing = true
+			return
+		end
+
+		return NameMatches(name)
 	end
 
-	if not name then
+	-- .. or on the spell name for the recipes that craft no item, like enchants.
+	-- Enchanting stores the enchant's spell id, except for the few entries that do create
+	-- an item (rods, oils, ..), stored as the item id, and nothing tells the two apart
+	-- here, so try both rather than lose the ones that are items.
+	local spellName = GetSpellInfo(recipeID)
+	local itemName = C_Item.GetItemInfo(recipeID)
+
+	if not spellName and not itemName then
 		isNameMissing = true
 		return
 	end
 
-	if string.find(strlower(name), currentSearch, 1, true) then
-		return true
-	end
+	return NameMatches(spellName) or NameMatches(itemName)
 end
 
 local function GetRecipeList(character, professionName, mainCategory)
