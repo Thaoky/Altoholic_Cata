@@ -20,6 +20,12 @@ local currentAlt = UnitName("player")
 local questsIconAdjust = LE_EXPANSION_LEVEL_CURRENT <= LE_EXPANSION_BURNING_CRUSADE
 local SKILL_ANY = 0
 
+-- Menu item id's of the options tab
+local OPTIONS_MENU_ITEM_MAIL = 3
+local OPTIONS_MENU_ITEM_DS_AUCTIONS = 10
+local OPTIONS_MENU_ITEM_DS_MAILS = 13
+local OPTIONS_MENU_ITEM_DS_QUESTS = 14
+
 -- ** Icons Menus **
 local VIEW_BAGS = 1
 local VIEW_QUESTS = 2
@@ -282,6 +288,18 @@ local function OnQuestHeaderChange(self)
 	ns:ViewCharInfo(VIEW_QUESTS)
 end
 
+-- Jump to one of the menu items of the options tab (see AltoholicUI.TabOptions)
+local function OpenOptionsPanel(menuItemID)
+	CloseDropDownMenus()
+
+	addon.Tabs:OnClick("Options")		-- this also loads Altoholic_Options if necessary
+
+	local menuItem = AltoholicTabOptions and AltoholicTabOptions["MenuItem" .. menuItemID]
+	if menuItem then
+		menuItem:Item_OnClick()
+	end
+end
+
 
 local function OnTalentChange(self)
 	CloseDropDownMenus()
@@ -490,8 +508,8 @@ local function QuestsIcon_Initialize(self, level)
 	
 	DDM_AddTitle("|r ")
 	DDM_AddTitle(GAMEOPTIONS_MENU)
-	if DataStore_Quests then
-		DDM_Add("DataStore Quests", nil, function() Altoholic:ToggleUI(); InterfaceOptionsFrame_OpenToCategory("DataStore_Quests") end)
+	if DataStoreFrames and DataStoreFrames.QuestsOptions then
+		DDM_Add("DataStore Quests", nil, function() OpenOptionsPanel(OPTIONS_MENU_ITEM_DS_QUESTS) end)
 	end
 	DDM_AddCloseMenu()
 end
@@ -536,8 +554,8 @@ local function AuctionIcon_Initialize(self, level)
 	
 	DDM_AddTitle("|r ")
 	DDM_AddTitle(GAMEOPTIONS_MENU)
-	if DataStore_Auctions then
-		DDM_Add("DataStore Auctions", nil, function() Altoholic:ToggleUI(); InterfaceOptionsFrame_OpenToCategory("DataStore_Auctions") end)
+	if DataStoreFrames and DataStoreFrames.AuctionsOptions then
+		DDM_Add("DataStore Auctions", nil, function() OpenOptionsPanel(OPTIONS_MENU_ITEM_DS_AUCTIONS) end)
 	end
 	DDM_AddCloseMenu()
 end
@@ -557,14 +575,12 @@ local function MailIcon_Initialize(self, level)
 
 	DDM_Add(colors.white .. L["Clear all entries"], nil, OnClearMailboxEntries)
 	DDM_AddTitle("|r ")
-	--[[ Commented out because the InterfaceOptions calls should be changed to Settings
 	DDM_AddTitle(GAMEOPTIONS_MENU)
-	DDM_Add(MAIL_LABEL, nil, function() Altoholic:ToggleUI(); InterfaceOptionsFrame_OpenToCategory(AltoholicMailOptions) end)
-	if DataStore_Mails then
-		DDM_Add("DataStore Mails", nil, function() Altoholic:ToggleUI(); InterfaceOptionsFrame_OpenToCategory(DataStoreMailOptions) end)
+	DDM_Add(MAIL_LABEL, nil, function() OpenOptionsPanel(OPTIONS_MENU_ITEM_MAIL) end)
+	if DataStoreMailOptions then
+		DDM_Add("DataStore Mails", nil, function() OpenOptionsPanel(OPTIONS_MENU_ITEM_DS_MAILS) end)
 	end
-	--]]
-	
+
 	DDM_AddCloseMenu()
 end
 
