@@ -108,6 +108,43 @@ function ns:CancelScan()
 	currentScan = nil
 end
 
+-- *** Banking the answers that arrive after the scan asked for them ***
+-- Filtering an item is what requests it, and on a cold cache the client answers a moment later,
+-- long after that item was judged. The judging is where the level is needed, so an item level
+-- filter drops it, and the answer that would have kept it lands on an event nobody was reading.
+--
+-- That is why the candidate pool grew a little on each search instead of arriving whole: only
+-- the items the client happened to answer for on the spot were written down. Reading the event
+-- while a scan is in flight banks the rest of them, so the search after it sees the lot.
+--
+-- Altoholic:GetItemInfo writes to the memory itself when the client answers in full, so there
+-- is nothing to do here but ask.
+local ITEM_INFO_TAG = "LootScanMemory"
+local stopBankingTimer
+
+local function OnItemInfoReceived(event, itemID, success)
+	if success then Altoholic:GetItemInfo(itemID) end
+end
+
+local function StartBankingItemInfo()
+	if stopBankingTimer then
+		stopBankingTimer:Cancel()
+		stopBankingTimer = nil
+	end
+
+	addon:ListenTo("GET_ITEM_INFO_RECEIVED", OnItemInfoReceived, ITEM_INFO_TAG)
+end
+
+local function StopBankingItemInfo()
+	-- the answers to the last batch are still on their way, so keep reading for a while
+	if stopBankingTimer then stopBankingTimer:Cancel() end
+
+	stopBankingTimer = C_Timer.NewTimer(15, function()
+		stopBankingTimer = nil
+		addon:StopListeningTo("GET_ITEM_INFO_RECEIVED", ITEM_INFO_TAG)
+	end)
+end
+
 local function RunScan(work, batchSize, onProgress, onDone)
 	-- A scan takes seconds, so a second search landing in the middle of one is the user
 	-- asking to replace it. Dropping it instead left the previous results on screen, which
@@ -118,6 +155,7 @@ local function RunScan(work, batchSize, onProgress, onDone)
 	itemsThisStep = 0
 	scanDone = 0
 
+	StartBankingItemInfo()
 	currentScan = coroutine.create(work)
 
 	local ticker
@@ -129,6 +167,7 @@ local function RunScan(work, batchSize, onProgress, onDone)
 			ticker:Cancel()
 			currentTicker = nil
 			currentScan = nil
+			StopBankingItemInfo()
 			geterrorhandler()(err)
 			return
 		end
@@ -137,6 +176,7 @@ local function RunScan(work, batchSize, onProgress, onDone)
 			ticker:Cancel()
 			currentTicker = nil
 			currentScan = nil
+			StopBankingItemInfo()
 			if onDone then onDone() end
 		elseif onProgress then
 			onProgress(scanDone, scanTotal)
