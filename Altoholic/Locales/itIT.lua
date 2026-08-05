@@ -648,3 +648,11 @@ L["EQUIPMENT_COMES_FROM_MEMBER"] = "L'equipaggiamento lo manda la sua copia dell
 L["EQUIPMENT_ASKING"] = "Richiesta a %s..."
 L["EQUIPMENT_NO_ANSWER"] = "%s non ha risposto"
 L["EQUIPMENT_RECEIVED_ON"] = "Ricevuto il %s"
+
+-- ** Learning the loot tables **
+L["LEARN_COMMAND"] = "Chiede al gioco tutti gli oggetti delle loot table, una volta sola"
+L["LEARN_STARTED"] = "Richiesta di %d oggetti al gioco. Ci vuole circa un minuto e va fatto una volta sola - ridai il comando per fermarlo."
+L["LEARN_PROGRESS"] = "Lettura delle loot table... %d%%"
+L["LEARN_STOPPED"] = "Fermato. Quello che ha imparato resta, e rilanciandolo riprende da dove era arrivato."
+L["LEARN_NOTHING_TO_DO"] = "Non c'e' piu' niente da chiedere, le loot table sono gia' note."
+L["LEARN_DONE"] = "Fatto: %d oggetti noti su %d. %d non hanno mai risposto, che e' l'aspetto di un oggetto che questo gioco in realta' non ha."

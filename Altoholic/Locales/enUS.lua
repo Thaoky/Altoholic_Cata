@@ -882,3 +882,11 @@ L["EQUIPMENT_COMES_FROM_MEMBER"] = "Their equipment is sent by their own copy of
 L["EQUIPMENT_ASKING"] = "Asking %s..."
 L["EQUIPMENT_NO_ANSWER"] = "%s did not answer"
 L["EQUIPMENT_RECEIVED_ON"] = "Received on %s"
+
+-- ** Learning the loot tables **
+L["LEARN_COMMAND"] = "Ask the game about every item in the loot tables, once"
+L["LEARN_STARTED"] = "Asking the game about %d items. This takes about a minute, and only has to be done once - type the command again to stop it."
+L["LEARN_PROGRESS"] = "Learning the loot tables... %d%%"
+L["LEARN_STOPPED"] = "Stopped. Whatever was learned is kept, and running it again picks up where this left off."
+L["LEARN_NOTHING_TO_DO"] = "Nothing left to ask about, the loot tables are already known."
+L["LEARN_DONE"] = "Done: %d of %d items known. %d never answered, which is what an item this game does not really have looks like."

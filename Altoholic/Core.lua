@@ -138,12 +138,48 @@ local function ShowAccountSharing()
 	AltoAccountSharing:Show()
 end
 
+-- Fill the item memory in one go, rather than a search at a time. See ns:LearnItems in
+-- Loots.lua for why an upgrade search is short of candidates until this has been done once.
+local function LearnLootTableItems()
+	if addon.Loots:IsLearning() then
+		addon.Loots:StopLearning()
+		addon:Print(L["LEARN_STOPPED"])
+		return
+	end
+
+	local nextReport = 10
+
+	local total = addon.Loots:LearnItems(
+		function(done, count)
+			local percent = floor(done / count * 100)
+
+			if percent >= nextReport then
+				nextReport = percent - (percent % 10) + 10
+				addon:Print(format(L["LEARN_PROGRESS"], percent))
+			end
+		end,
+		function()
+			-- the answers to the last of them are still arriving
+			C_Timer.After(16, function()
+				local known, all = addon.Loots:CountItemsLearned()
+				addon:Print(format(L["LEARN_DONE"], known, all, all - known))
+			end)
+		end)
+
+	if total == 0 then
+		addon:Print(L["LEARN_NOTHING_TO_DO"])
+	else
+		addon:Print(format(L["LEARN_STARTED"], total))
+	end
+end
+
 local commandLineCommands = {
 	["show"] = function() AltoholicFrame:Show() end,
 	["hide"] = function() AltoholicFrame:Hide() end,
 	["toggle"] = function() addon:ToggleUI() end,
 	["search"] = SearchBags,
 	["sharing"] = ShowAccountSharing,
+	["learn"] = LearnLootTableItems,
 }
 
 local function CommandLineCallback(args)
@@ -157,6 +193,7 @@ local function CommandLineCallback(args)
 		print(format("  %stoggle|r - %s", yellow, L["Toggles the UI"]))
 		print(format("  %ssearch <item name>|r - %s", yellow, L["Search in bags"]))
 		print(format("  %ssharing|r - %s", yellow, L["Opens the account sharing panel"]))
+		print(format("  %slearn|r - %s", yellow, L["LEARN_COMMAND"]))
 		return
 	end
 

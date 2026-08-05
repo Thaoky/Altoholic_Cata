@@ -190,6 +190,115 @@ function ns:IsScanning()
 	return currentScan and true
 end
 
+-- *** Learning the whole table once ***
+--
+-- An item level filter needs a level, and a level only exists once the client has been asked
+-- about that item. Asking is what a search does, one item at a time, and the answers land after
+-- the search has already judged them - so the pool an upgrade search sees grows a little on
+-- each run, and every fresh install starts from nothing. On a client where nothing had been
+-- asked yet, a search for a pair of pants offered 44 candidates where the table holds 239.
+--
+-- Waiting for the game to find them a search at a time is the wrong way round. Ask for all of
+-- them, once, and keep what comes back: the memory is a saved variable, so this is paid once
+-- per install rather than once per session. Ids already in the memory are skipped, which makes
+-- a second run cheap and turns it into the way to mop up whatever did not answer the first time.
+--
+-- Paced on purpose. The whole table is thousands of items, and asking for all of them at once
+-- is what used to push the answers the client already had back out of its own cache.
+local LEARN_BATCH = 10			-- items asked for per tick ..
+local LEARN_INTERVAL = 0.05	-- .. every 20th of a second, so 200 a second
+local LEARN_GRACE = 15			-- the last answers are still on their way when the asking stops
+
+local learnTicker
+
+function ns:IsLearning()
+	return learnTicker and true
+end
+
+function ns:StopLearning()
+	if learnTicker then
+		learnTicker:Cancel()
+		learnTicker = nil
+	end
+
+	StopBankingItemInfo()
+end
+
+-- Returns how many items it is going to ask about, so the caller can say so before it starts.
+function ns:LearnItems(onProgress, onDone)
+	ns:StopLearning()
+
+	local seen = {}
+	local todo = {}
+
+	for _, bossList in pairs(addon.LootTable) do
+		for _, lootList in pairs(bossList) do
+			for _, itemID in pairs(lootList) do
+				if not seen[itemID] then
+					seen[itemID] = true
+
+					-- an id this build does not have will never answer, and one the memory
+					-- already holds has nothing left to say
+					if C_Item.GetItemInfoInstant(itemID) and not Altoholic:GetRememberedItemInfo(itemID) then
+						todo[#todo + 1] = itemID
+					end
+				end
+			end
+		end
+	end
+
+	local total = #todo
+	local index = 0
+
+	if total == 0 then
+		if onDone then onDone(0) end
+		return 0
+	end
+
+	StartBankingItemInfo()
+
+	learnTicker = C_Timer.NewTicker(LEARN_INTERVAL, function()
+		for _ = 1, LEARN_BATCH do
+			index = index + 1
+
+			if index > total then
+				ns:StopLearning()		-- the banking listener keeps reading through its grace
+				if onDone then onDone(total) end
+				return
+			end
+
+			-- asking is the request; Altoholic:GetItemInfo writes down whatever comes back,
+			-- now or on the event
+			Altoholic:GetItemInfo(todo[index])
+		end
+
+		if onProgress then onProgress(index, total) end
+	end)
+
+	return total
+end
+
+-- How much of the table the memory can already answer for, which is what the caller reports
+-- once the last answers have had their grace period.
+function ns:CountItemsLearned()
+	local seen = {}
+	local known, total = 0, 0
+
+	for _, bossList in pairs(addon.LootTable) do
+		for _, lootList in pairs(bossList) do
+			for _, itemID in pairs(lootList) do
+				if not seen[itemID] and C_Item.GetItemInfoInstant(itemID) then
+					seen[itemID] = true
+					total = total + 1
+					if Altoholic:GetRememberedItemInfo(itemID) then known = known + 1 end
+				end
+			end
+		end
+	end
+
+	return known, total
+end
+
 local function ParseAltoholicLoots(OnMatch)
 	assert(type(OnMatch) == "function")
 	local count = 0
