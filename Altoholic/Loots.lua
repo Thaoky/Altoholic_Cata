@@ -253,36 +253,30 @@ end
 local function AddLootResult(domain, subdomain, fields)
 	local itemID = filters:GetSearchedItemInfo("itemID")
 
-	-- Browsing keeps one row per item and instance and grows the boss column; an upgrade
-	-- search keeps one row per item, whatever instance it came from, and grows the location
-	-- column instead - there is no boss column in that layout.
+	-- Browsing keeps one row per item and instance, an upgrade search one row per item whatever
+	-- instance it came from. Either way the two columns keep the meaning their headers give
+	-- them: the left one is the place, the right one is what drops it there.
 	local key = ResultKey(itemID, domain)
-	local field = mergeSources and "bossName" or "dropLocation"
-	local source = mergeSources and subdomain
-		or (subdomain and format("%s, %s%s", domain, colors.green, subdomain) or domain)
-
 	local index = resultsByKey[key]
 
 	if index then
 		local result = Altoholic.Search:GetResult(index)
 
+		-- An upgrade row covers every instance at once, so a source from somewhere other than
+		-- the one named on the left has to say where it is, or the right hand column would
+		-- list bosses of places the row does not mention. It also keeps two bosses of the same
+		-- name, in two different instances, from being taken for one.
+		local source = subdomain or domain
+
+		if result and not mergeSources and domain ~= result.dropLocation then
+			source = subdomain and format("%s, %s%s", domain, colors.green, subdomain) or domain
+		end
+
 		-- a set rather than a substring test: one boss name can contain another
 		if result and source and result.sources and not result.sources[source] then
 			result.sources[source] = true
 			result.numSources = (result.numSources or 1) + 1
-
-			-- Browsing grows the boss column, which already sits under the name of the one
-			-- instance the row is about. An upgrade row covers every instance at once, so its
-			-- first source goes in the location column and the rest fill the boss column, each
-			-- naming its own place - a piece of tier gear is listed under the raid and again
-			-- under the set page, and reading one row that says both beats reading two rows.
-			if mergeSources then
-				result[field] = result[field] .. SOURCE_SEP .. source
-			else
-				result.bossName = result.bossName
-					and (result.bossName .. SOURCE_SEP .. source)
-					or source
-			end
+			result.bossName = result.bossName and (result.bossName .. SOURCE_SEP .. source) or source
 		end
 		return
 	end
@@ -291,9 +285,14 @@ local function AddLootResult(domain, subdomain, fields)
 
 	result.id = itemID
 	result.iLvl = filters:GetSearchedItemInfo("itemLevel")
-	result.dropLocation = mergeSources and domain or source
-	result.bossName = mergeSources and subdomain or nil
-	result.sources = source and { [source] = true } or nil
+	result.dropLocation = domain
+	result.bossName = subdomain
+
+	-- the stat comparison layout has no second column, it writes "place, boss" on one line and
+	-- has no room for the rest, so the first source is kept on its own
+	result.firstBoss = subdomain
+
+	result.sources = subdomain and { [subdomain] = true } or nil
 	result.numSources = 1
 
 	local name = filters:GetSearchedItemInfo("itemName")

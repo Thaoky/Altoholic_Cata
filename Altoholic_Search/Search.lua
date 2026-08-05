@@ -523,9 +523,14 @@ function ns:Upgrade_Update()
 
 			rowFrame.Name:SetText("|c" .. hex .. itemName)
 
-			-- the same item is often reachable several ways: no room to list them on this
-			-- layout, so say how many there are beyond the one shown
+			-- The same item is often reachable several ways, and this layout has one line for
+			-- all of it : it spells out the first way and says how many others there are.
 			local location = result.dropLocation
+
+			if result.firstBoss then
+				location = format("%s, %s%s", location, colors.green, result.firstBoss)
+			end
+
 			if result.numSources and result.numSources > 1 then
 				location = format("%s %s(+%d)", location, colors.white, result.numSources - 1)
 			end
