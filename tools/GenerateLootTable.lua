@@ -160,6 +160,20 @@ local function IsAdvisoryModule(module)
 	return module:find("_Phase_", 1, true) and true or false
 end
 
+-- *** Pages whose name does not say what they are ***
+--
+-- A page keeps the name AtlasLoot gives it, which reads well while you are sitting inside the
+-- module it belongs to. Out of that context one of them says nothing: the PvP module's "Class
+-- Sets" is the rank sets, and a search result reading "Class Sets / Epic (Alliance)" gives the
+-- reader no way to tell that the way to get those pants is to grind battlegrounds.
+--
+-- The other PvP pages name a battleground and are clear enough on their own, so this is a list
+-- of one rather than a rule about the module. Keyed on the page name, not on the module, so it
+-- can be checked against the output without a dump in hand.
+local RENAMED_PAGES = {
+	["Class Sets"] = "PvP Class Sets",
+}
+
 -- One field can hold several ids, joined by a plus.
 local MULTI_FIELDS = { setitems = true }
 local MAX_ITEM_ID = 100000		-- above this the value is a file id, not an item
@@ -279,7 +293,7 @@ local function Collect(layer, db, advisoryPass)
 			-- too. Trusting them threw away 1348 items - the Trash page of nearly every
 			-- instance, the pattern drops of Sunwell and Black Temple, the class books of
 			-- Ahn'Qiraj, the Dire Maul tribute run, the Zul'Aman timed chest.
-			local instance = source.instance
+			local instance = RENAMED_PAGES[source.instance] or source.instance
 			if instance and instance ~= "" then
 				local boss = BossLabel(source)
 				local idFields = ID_FIELDS[source.tableType or ""] or DEFAULT_ID_FIELDS
