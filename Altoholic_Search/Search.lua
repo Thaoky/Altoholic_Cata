@@ -33,6 +33,39 @@ local function ReportSearchStatus()
 	AltoholicTabSearch.Status:SetText(format(L["SEARCH_RESULTS_INCOMPLETE"], ns:GetNumResults(), numUnnamed))
 end
 
+-- *** Filling in the names that arrive after the search ***
+-- Asking for an uncached item is what requests it, so by the time a row is drawn as
+-- "Unknown #id" the answer is already on its way - it lands on GET_ITEM_INFO_RECEIVED a moment
+-- later. Nothing listened for it, so the row kept the placeholder until the whole search was
+-- run again, and running it again re-requests everything, which is how a row could stay
+-- unknown through any number of clicks on Search.
+--
+-- Only the rows actually on screen are watched, and the listener stops as soon as they are all
+-- named or the tab is left. Same approach as the recipes panel, see WaitForItemNames there.
+local isNameMissing				-- a row of the last drawn page had no name yet
+local isWaitingForItemNames
+
+function ns:WaitForItemNames(isWaiting)
+	if isWaiting == isWaitingForItemNames then return end		-- already in the right state ?
+
+	isWaitingForItemNames = isWaiting
+
+	-- tag it, the scope is the whole add-on, and this event is of interest to others
+	if not isWaiting then
+		addon:StopListeningTo("GET_ITEM_INFO_RECEIVED", "Search")
+		return
+	end
+
+	addon:ListenTo("GET_ITEM_INFO_RECEIVED", function()
+		if not AltoholicFrameSearch or not AltoholicFrameSearch:IsVisible() then
+			ns:WaitForItemNames(nil)
+			return
+		end
+
+		ns:Update()
+	end, "Search")
+end
+
 -- The loot scans hand back a frame between batches, which is the only moment anything can
 -- be drawn: this is where the progress the user was missing gets written.
 local function ReportScanProgress(done, total)
@@ -320,18 +353,21 @@ function ns:Realm_Update()
 end
 
 function ns:Loots_Update()
-	
+
 	local frame = AltoholicFrameSearch
 	local scrollFrame = frame.ScrollFrame
 	local numRows = scrollFrame.numRows
 	local numResults = ns:GetNumResults()
-	
+
+	isNameMissing = nil		-- recomputed over the rows drawn below
+
 	if numResults == 0 then
 		-- Hides all entries of the scrollframe, and updates it accordingly
-		for rowIndex = 1, numRows do	
+		for rowIndex = 1, numRows do
 			frame["Entry"..rowIndex]:Hide()
 		end
 		scrollFrame:Update(numRows)
+		ns:WaitForItemNames(nil)		-- nothing on screen, nothing left to wait for
 		return
 	end
 
@@ -370,7 +406,11 @@ function ns:Loots_Update()
 			local itemName, itemRarity, itemLevel = addon:GetItemInfo(itemID)
 			local r, g, b, hex = C_Item.GetItemQualityColor(itemRarity or 1)
 
-			itemName = itemName or format("%s%d", UNKNOWN .. " #", itemID)
+			if not itemName then
+				itemName = format("%s%d", UNKNOWN .. " #", itemID)
+				isNameMissing = true		-- the answer is on its way, see WaitForItemNames
+			end
+
 			itemLevel = itemLevel or result.iLvl or ""
 			result.iLvl = result.iLvl or tonumber(itemLevel)		-- heals the row for sorting
 
@@ -386,7 +426,7 @@ function ns:Loots_Update()
 			rowFrame.Source.Text:SetText(colors.teal .. result.dropLocation)
 			rowFrame.Source:SetID(0)
 			
-			rowFrame.Stat1:SetText(colors.green .. result.bossName)
+			rowFrame.Stat1:SetText(colors.green .. (result.bossName or ""))
 
 			itemButton:SetInfo(itemID)
 			itemButton:SetCount(result.count)
@@ -411,6 +451,8 @@ function ns:Loots_Update()
 	if not AltoholicFrameSearch:IsVisible() then
 		AltoholicFrameSearch:Show()
 	end
+
+	ns:WaitForItemNames(isNameMissing)
 end
 
 function ns:Upgrade_Update()
@@ -418,13 +460,16 @@ function ns:Upgrade_Update()
 	local scrollFrame = frame.ScrollFrame
 	local numRows = scrollFrame.numRows
 	local numResults = ns:GetNumResults()
-	
+
+	isNameMissing = nil		-- recomputed over the rows drawn below
+
 	if numResults == 0 then
 		-- Hides all entries of the scrollframe, and updates it accordingly
-		for rowIndex = 1, numRows do	
+		for rowIndex = 1, numRows do
 			frame["Entry"..rowIndex]:Hide()
 		end
 		scrollFrame:Update(numRows)
+		ns:WaitForItemNames(nil)		-- nothing on screen, nothing left to wait for
 		return
 	end
 
@@ -458,7 +503,11 @@ function ns:Upgrade_Update()
 			local itemName, itemRarity, itemLevel = addon:GetItemInfo(itemID)
 			local r, g, b, hex = C_Item.GetItemQualityColor(itemRarity or 1)
 
-			itemName = itemName or format("%s%d", UNKNOWN .. " #", itemID)
+			if not itemName then
+				itemName = format("%s%d", UNKNOWN .. " #", itemID)
+				isNameMissing = true		-- the answer is on its way, see WaitForItemNames
+			end
+
 			itemLevel = itemLevel or result.iLvl or ""
 			result.iLvl = result.iLvl or tonumber(itemLevel)		-- heals the row for sorting
 
@@ -531,6 +580,8 @@ function ns:Upgrade_Update()
 	if not AltoholicFrameSearch:IsVisible() then
 		AltoholicFrameSearch:Show()
 	end
+
+	ns:WaitForItemNames(isNameMissing)
 end
 
 -- ** Sort functions **
