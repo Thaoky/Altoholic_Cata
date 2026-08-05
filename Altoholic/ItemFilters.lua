@@ -231,7 +231,21 @@ function ns:SetSearchedItem(itemID, itemLink, isBattlePet)
 
 	s.itemName, s.itemLink, s.itemRarity, s.itemLevel,	s.itemMinLevel, s.itemType, s.itemSubType, _, s.itemEquipLoc = C_Item.GetItemInfo(itemLink or itemID)
 
-	if s.itemName then return end		-- fully cached, nothing to fill in
+	if s.itemName then
+		-- Write it down while it is in hand. The client's own cache is emptied every session
+		-- and an item level filter drops everything it cannot read a level for, so a search
+		-- run on a cold cache sees only the handful of items this session already touched -
+		-- thirteen candidates where the loot table holds hundreds. Remembering here, rather
+		-- than only for the rows that survived the filters, means each search leaves the
+		-- memory fuller than it found it and the pool grows back to its real size.
+		--
+		-- Only when we resolved a bare id : a link carries upgrades that are not the item.
+		if not itemLink then
+			Altoholic:RememberItem(itemID, s.itemName, s.itemRarity, s.itemLevel)
+		end
+
+		return		-- fully cached, nothing to fill in
+	end
 
 	-- not cached: keep what the static data gave, it is better than nothing
 	s.itemType = instantType
