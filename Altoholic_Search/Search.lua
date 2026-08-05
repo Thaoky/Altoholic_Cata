@@ -426,6 +426,9 @@ function ns:Loots_Update()
 			rowFrame.Source.Text:SetText(colors.teal .. result.dropLocation)
 			rowFrame.Source:SetID(0)
 			
+			-- browsing, this is the bosses of the instance named on the left; on an upgrade
+			-- list it is the other places that item can be had, and an item reachable one
+			-- way only leaves it empty
 			rowFrame.Stat1:SetText(colors.green .. (result.bossName or ""))
 
 			itemButton:SetInfo(itemID)

@@ -271,10 +271,17 @@ local function AddLootResult(domain, subdomain, fields)
 			result.sources[source] = true
 			result.numSources = (result.numSources or 1) + 1
 
-			-- only the browse layout has the room to spell them all out; the upgrade one
-			-- has a 210px line already holding "instance, boss", so it just gets a count
+			-- Browsing grows the boss column, which already sits under the name of the one
+			-- instance the row is about. An upgrade row covers every instance at once, so its
+			-- first source goes in the location column and the rest fill the boss column, each
+			-- naming its own place - a piece of tier gear is listed under the raid and again
+			-- under the set page, and reading one row that says both beats reading two rows.
 			if mergeSources then
 				result[field] = result[field] .. SOURCE_SEP .. source
+			else
+				result.bossName = result.bossName
+					and (result.bossName .. SOURCE_SEP .. source)
+					or source
 			end
 		end
 		return
@@ -324,13 +331,24 @@ function ns:Find(onProgress, onDone)
 	end, 400, onProgress, onDone)
 end
 
--- An item level upgrade search is the browse search with the caller's filters already set :
--- RunUpgradeSearch narrows on type, sub type, slot and item level, then walks the same table,
--- and the results are drawn in the same layout, boss column included. It used to add its rows
--- itself, bypassing AddLootResult, so it was the one search that never merged anything: an item
--- reachable three ways inside one instance came back as three rows.
+-- An item level upgrade search walks the same table with the caller's filters already set, and
+-- draws in the same layout. What differs is what a row means. Browsing, the question is where
+-- an item comes from, so one row per item and instance is right. Looking for an upgrade the
+-- question is what to go and get, and the answer is one line per item however many places list
+-- it - tier gear sits under its raid and again under the set page, and 684 of the Era table's
+-- 4607 items are in more than one section, which is a lot of the list spent saying things twice.
 function ns:FindUpgrade(onProgress, onDone)
-	return ns:Find(onProgress, onDone)
+	numItemsUnnamed = 0
+	scanTotal = CountAllSources()
+	wipe(resultsByKey)
+	mergeSources = nil		-- one row per item, however many ways there are to get it
+
+	RunScan(function()
+		local count = ParseAltoholicLoots(OnMatch)
+
+		Altoholic_UI_Options.TotalLoots = count
+		Altoholic_UI_Options.UnknownLoots = numItemsUnnamed
+	end, 400, onProgress, onDone)
 end
 
 -- A tooltip of our own, for reading item stats. AltoTooltip cannot serve here any more:
