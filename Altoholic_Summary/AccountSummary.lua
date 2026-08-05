@@ -94,6 +94,13 @@ local function FormatBagSlots(size, free)
 	return format(L["NUM_SLOTS_AND_FREE"], colors.cyan, size, colors.white, colors.green, free, colors.white)
 end
 
+-- The main bank is 24 slots on Classic Era and 28 from TBC onwards, and it is not a container
+-- the bag scan fills : it has a table of its own, and an accessor that answers for the
+-- character being looked at rather than for the client that happens to be running.
+local function GetMainBankSize(character)
+	return (DataStore:GetPlayerBankInfo(character)) or 0
+end
+
 local function FormatAiL(level)
 	return format("%s%s %s%s", colors.yellow, L["COLUMN_ILEVEL_TITLE_SHORT"], colors.green, level)
 end
@@ -880,7 +887,7 @@ columns["BankSlots"] = {
 			end
 			
 			return format("%s/%s|r/%s|r/%s|r/%s|r/%s|r/%s|r/%s",
-				DataStore:GetContainerSize(character, 100),
+				GetMainBankSize(character),
 				DataStore:GetColoredContainerSize(character, 5),
 				DataStore:GetColoredContainerSize(character, 6),
 				DataStore:GetColoredContainerSize(character, 7),
@@ -908,7 +915,8 @@ columns["BankSlots"] = {
 				return
 			end
 			
-			local link, size, free, bagType = DataStore:GetContainerInfo(character, 100)
+			local size, free = DataStore:GetPlayerBankInfo(character)
+			local link, bagType
 			tt:AddDoubleLine(format("%s[%s]", colors.white, L["Bank"]), FormatBagSlots(size, free))
 				
 			for i = 5, 11 do
