@@ -284,24 +284,13 @@ function ns:Find(onProgress, onDone)
 	end, 400, onProgress, onDone)
 end
 
+-- An item level upgrade search is the browse search with the caller's filters already set :
+-- RunUpgradeSearch narrows on type, sub type, slot and item level, then walks the same table,
+-- and the results are drawn in the same layout, boss column included. It used to add its rows
+-- itself, bypassing AddLootResult, so it was the one search that never merged anything: an item
+-- reachable three ways inside one instance came back as three rows.
 function ns:FindUpgrade(onProgress, onDone)
-	local function OnMatch(domain, subdomain)
-		addon.Search:AddResult( {
-			id = filters:GetSearchedItemInfo("itemID"),
-			iLvl = filters:GetSearchedItemInfo("itemLevel"),
-			dropLocation = domain,
-			bossName = subdomain,
-		} )
-	end
-
-	numItemsUnnamed = 0
-	scanTotal = CountAllSources()
-	wipe(resultsByKey)
-	mergeSources = nil		-- one row per item, however many ways there are to get it
-
-	RunScan(function()
-		ParseAltoholicLoots(OnMatch)
-	end, 400, onProgress, onDone)
+	return ns:Find(onProgress, onDone)
 end
 
 -- A tooltip of our own, for reading item stats. AltoTooltip cannot serve here any more:
