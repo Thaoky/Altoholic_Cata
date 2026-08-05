@@ -3,6 +3,7 @@ local addon = _G[addonName]
 local colors = addon.Colors
 
 local L = AddonFactory:GetLocale(addonName)
+local LCI = LibStub("LibCraftInfo-1.0")
 
 local recipeIsSpell = (LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_BURNING_CRUSADE)
 local ITEM_CLASS_ARMOR = LE_ITEM_CLASS_ARMOR or Enum.ItemClass.Armor
@@ -125,11 +126,17 @@ local function RecipePassesSearchFilter(recipeID)
 	end
 
 	-- .. or on the spell name for the recipes that craft no item, like enchants.
-	-- Enchanting stores the enchant's spell id, except for the few entries that do create
-	-- an item (rods, oils, ..), stored as the item id, and nothing tells the two apart
-	-- here, so try both rather than lose the ones that are items.
+	--
+	-- The few enchanting entries that do create something (rods, oils) are reached through the
+	-- craft library, which answers with the item that this very spell produces. This used to
+	-- read recipeID itself as an item id, on the grounds that those entries might be stored
+	-- that way: every spell id is also a valid item id for some unrelated item, so searching
+	-- "clo" returned Enchant Bracer rows because the item carrying the bracer enchant's number
+	-- happened to be a cloak.
 	local spellName = GetSpellInfo(recipeID)
-	local itemName = C_Item.GetItemInfo(recipeID)
+
+	local craftedID = LCI:GetCraftResultItem(recipeID)
+	local itemName = craftedID and craftedID > 0 and C_Item.GetItemInfo(craftedID) or nil
 
 	if not spellName and not itemName then
 		isNameMissing = true
