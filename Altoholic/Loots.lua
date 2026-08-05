@@ -347,37 +347,36 @@ end
 -- faces (the Karazhan opera event) lists its loot under each of them, a boss drops the same
 -- piece on normal and on heroic, and a reward is often both a drop and a reputation purchase.
 --
--- Browsing the loot tables, where an item comes from is the question, so the sources are
--- collected onto a single row per item and instance. Looking for an upgrade it is not the
--- question: one row per item is the answer, however many ways there are to get it.
+-- Every search keeps one row per item and puts all of it on that row. Rows used to be kept per
+-- item and instance while browsing, on the reading that where an item comes from is the
+-- question there and each place deserves its own line. In practice the extra lines were not
+-- places: a tier piece was listed once under the raid that drops it and again under the set
+-- page, which says the same thing with a different label. 16% of the table is listed in more
+-- than one section, and a search for cloth leg armour came back with 239 rows for 179 items.
+--
+-- The columns keep the meaning their headers give them: the left one is the place, the right
+-- one is what drops it there. A source from somewhere other than the place named on the left
+-- says where it is.
 local SOURCE_SEP = " / "
 
 local resultsByKey = {}		-- key -> index of the row already added for it
-local mergeSources
-
-local function ResultKey(itemID, domain)
-	return mergeSources and format("%s|%s", itemID, domain or "") or tostring(itemID)
-end
 
 local function AddLootResult(domain, subdomain, fields)
 	local itemID = filters:GetSearchedItemInfo("itemID")
 
-	-- Browsing keeps one row per item and instance, an upgrade search one row per item whatever
-	-- instance it came from. Either way the two columns keep the meaning their headers give
-	-- them: the left one is the place, the right one is what drops it there.
-	local key = ResultKey(itemID, domain)
+	local key = itemID
 	local index = resultsByKey[key]
 
 	if index then
 		local result = Altoholic.Search:GetResult(index)
 
-		-- An upgrade row covers every instance at once, so a source from somewhere other than
-		-- the one named on the left has to say where it is, or the right hand column would
-		-- list bosses of places the row does not mention. It also keeps two bosses of the same
-		-- name, in two different instances, from being taken for one.
+		-- A row covers every place at once, so a source from somewhere other than the one named
+		-- on the left has to say where it is, or the right hand column would list bosses of
+		-- places the row does not mention. It also keeps two bosses of the same name, in two
+		-- different instances, from being taken for one.
 		local source = subdomain or domain
 
-		if result and not mergeSources and domain ~= result.dropLocation then
+		if result and domain ~= result.dropLocation then
 			source = subdomain and format("%s, %s%s", domain, colors.green, subdomain) or domain
 		end
 
@@ -429,7 +428,6 @@ function ns:Find(onProgress, onDone)
 	numItemsUnnamed = 0
 	scanTotal = CountAllSources()
 	wipe(resultsByKey)
-	mergeSources = true		-- browsing: collect every source onto one row per instance
 
 	RunScan(function()
 		local count = ParseAltoholicLoots(OnMatch)
@@ -449,7 +447,6 @@ function ns:FindUpgrade(onProgress, onDone)
 	numItemsUnnamed = 0
 	scanTotal = CountAllSources()
 	wipe(resultsByKey)
-	mergeSources = nil		-- one row per item, however many ways there are to get it
 
 	RunScan(function()
 		local count = ParseAltoholicLoots(OnMatch)
@@ -603,7 +600,6 @@ function ns:FindUpgradeByStats(currentID, class, onProgress, onDone)
 	numItemsUnnamed = 0
 	scanTotal = CountAllSources()
 	wipe(resultsByKey)
-	mergeSources = nil		-- one row per item, however many ways there are to get it
 
 	classExcludedStats = addon.Equipment.ExcludeStats[class]
 	classBaseStats = addon.Equipment.BaseStats[class]
