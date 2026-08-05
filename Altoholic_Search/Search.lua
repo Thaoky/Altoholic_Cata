@@ -352,6 +352,33 @@ function ns:Realm_Update()
 	ScrollFrameUpdate(RealmScrollFrame_Desc)
 end
 
+-- The source column holds three or four places before it runs out of room, and a piece of tier
+-- gear is listed under its raid, under each of the class pages that catalogue it and under the
+-- set page - eleven of them for some. The column keeps saying as much as it can fit, and the
+-- row says all of it here.
+local function LootRow_OnEnter(self)
+	local result = ns:GetResult(self:GetID())
+	if not result or not result.sourceList then return end
+
+	local tt = AltoTooltip
+	tt:ClearLines()
+	tt:SetOwner(self, "ANCHOR_RIGHT")
+
+	local itemName = addon:GetItemInfo(result.id) or format("%s%d", UNKNOWN .. " #", result.id)
+	tt:AddLine(itemName, 1, 1, 1)
+	tt:AddLine(" ")
+
+	for _, source in ipairs(result.sourceList) do
+		tt:AddLine(format("%s%s", colors.teal, source), 1, 1, 1)
+	end
+
+	tt:Show()
+end
+
+local function LootRow_OnLeave()
+	AltoTooltip:Hide()
+end
+
 function ns:Loots_Update()
 
 	local frame = AltoholicFrameSearch
@@ -389,10 +416,14 @@ function ns:Loots_Update()
 		end
 		rowFrame.ILvl:Hide()
 		
-		rowFrame:SetScript("OnEnter", nil)
-		rowFrame:SetScript("OnLeave", nil)
-		
+		-- an item reachable four or five ways runs past the end of the source column, so the
+		-- whole list is on the row, one place to a line
+		rowFrame:SetScript("OnEnter", LootRow_OnEnter)
+		rowFrame:SetScript("OnLeave", LootRow_OnLeave)
+
 		local line = rowIndex + offset
+		rowFrame:SetID(line)
+
 		local result = ns:GetResult(line)
 		if result then
 			local itemID = result.id

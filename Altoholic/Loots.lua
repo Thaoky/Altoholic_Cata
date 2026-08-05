@@ -385,6 +385,12 @@ local function AddLootResult(domain, subdomain, fields)
 			result.sources[source] = true
 			result.numSources = (result.numSources or 1) + 1
 			result.bossName = result.bossName and (result.bossName .. SOURCE_SEP .. source) or source
+
+			-- the column runs out of room after three or four of them, so the list is kept
+			-- whole and spelled out one to a line by the row's tooltip. Every entry names its
+			-- own place, which the column only does for the ones that are not the row's own.
+			local list = result.sourceList
+			list[#list + 1] = format("%s, %s%s", domain, colors.green, subdomain or "")
 		end
 		return
 	end
@@ -402,6 +408,7 @@ local function AddLootResult(domain, subdomain, fields)
 
 	result.sources = subdomain and { [subdomain] = true } or nil
 	result.numSources = 1
+	result.sourceList = { format("%s, %s%s", domain, colors.green, subdomain or "") }
 
 	local name = filters:GetSearchedItemInfo("itemName")
 
