@@ -2,6 +2,11 @@ Altoholic Mists of Pandaria Classic Changelog (dates in dd/mm/yyyy)
 =============================================
 
 
+5.5.007 (02/10/2026)
+
+- DataStore_Containers : Fixed a lua error when opening the bank.
+- DataStore_Quests : Fixed 2 lua errors when turning a quest in.
+
 5.5.006 (02/10/2026)
 
 - Several bugfixes.
