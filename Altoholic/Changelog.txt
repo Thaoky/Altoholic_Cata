@@ -2,6 +2,11 @@ Altoholic Mists of Pandaria Classic Changelog (dates in dd/mm/yyyy)
 =============================================
 
 
+5.5.008 (07/10/2026)
+
+- DataStore_Characters : Fixed the calculation of rested xp for the currently logged in character.
+- Fixed ToC versions for Classic Era.
+
 5.5.007 (02/10/2026)
 
 - DataStore_Containers : Fixed a lua error when opening the bank.
