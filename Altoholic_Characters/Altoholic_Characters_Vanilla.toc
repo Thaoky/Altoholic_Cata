@@ -1,10 +1,10 @@
-## Interface: 11508
+## Interface: 11509
 ## Title: Altoholic_Characters
 ## IconTexture: Interface\Icons\inv_drink_13
 
 ## Notes: Altoholic's Characters UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 5.5.006
+## Version: 5.5.008
 ## Dependencies: Altoholic, DataStore, DataStore_Characters
 ## SavedVariables: Altoholic_CharactersTab_Options
 ## LoadOnDemand: 1
