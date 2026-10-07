@@ -1,8 +1,8 @@
-﻿## Interface: 50504, 20505, 11508
+﻿## Interface: 50504, 20505, 11509
 ## Title: Altoholic_Options
 ## Notes: Altoholic's Options UI
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 5.5.006
+## Version: 5.5.008
 ## Dependencies: Altoholic, DataStore, DataStore_Characters
 ## LoadOnDemand: 1
 ## X-Category: Interface Enhancements
