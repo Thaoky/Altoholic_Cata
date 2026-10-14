@@ -2,6 +2,10 @@ Altoholic Mists of Pandaria Classic Changelog (dates in dd/mm/yyyy)
 =============================================
 
 
+5.5.009 (14/10/2026)
+
+- Updated DataStore & AddonFactory modules.
+
 5.5.008 (07/10/2026)
 
 - DataStore_Characters : Fixed the calculation of rested xp for the currently logged in character.
